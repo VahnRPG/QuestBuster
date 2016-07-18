@@ -1,0 +1,114 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	<Script file="QuestBuster_Minimap.lua" />
+
+	<Frame name="QuestBuster_MinimapFrame" parent="Minimap" enableMouse="true" hidden="false" frameStrata="LOW">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="Minimap" relativePoint="RIGHT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Frame name="QuestBuster_MinimapHighlightFrame" hidden="true">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Button name="QuestBuster_MinimapButton">
+				<Size>
+					<AbsDimension x="32" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\AddOns\QuestBuster\Images\QuestBuster_Minimap_ButtonUp"/>
+				<PushedTexture file="Interface\AddOns\QuestBuster\Images\QuestBuster_Minimap_ButtonDown"/>
+				<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
+				<Frames>
+					<Frame name="$parentDropDown" inherits="UIDropDownMenuTemplate" clampedToScreen="true" id="1" hidden="true">
+						<Scripts>
+							<OnLoad function="QuestBuster_MinimapDropDown_OnLoad"/>
+						</Scripts>
+					</Frame>
+					<Button name="$parentButton">
+						<Size x="32" y="32"/>
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+						<Layers>
+							<Layer level="BORDER">
+								<Texture name="$parentBorder" urgency="5" file="Interface\Minimap\Minimap-TrackingBorder">
+									<Size x="54" y="54"/>
+									<Anchors>
+										<Anchor point="TOPLEFT"/>
+									</Anchors>
+								</Texture>
+							</Layer>
+							<Layer level="OVERLAY">
+								<Texture name="$parentShine" urgency="5" file="Interface\ComboFrame\ComboPoint" alphaMode="ADD" hidden="true">
+									<Size x="27" y="27"/>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset x="2" y="-2"/>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0.5625" right="1" top="0" bottom="1"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								self.dragging = false;
+								self:RegisterForDrag("LeftButton");
+								self:RegisterForClicks("AnyUp");
+								QuestBuster_Minimap_Update();
+							</OnLoad>
+							<OnEvent function="QuestBuster_Minimap_Update"/>
+							<OnClick>
+								QuestBuster_Minimap_OnClick(self, button, down);
+							</OnClick>
+							<OnEnter>
+								QuestBuster_Minimap_OnEnter();
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+							<OnDragStart>
+								self.dragging = true;
+							</OnDragStart>
+							<OnDragStop>
+								self.dragging = false;
+							</OnDragStop>
+							<OnUpdate>
+								if (self.dragging) then
+									QuestBuster_Minimap_OnDrag();
+								end
+							</OnUpdate>
+						</Scripts>
+						<HighlightTexture alphaMode="ADD" file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight"/>
+					</Button>
+				</Frames>
+			</Button>
+		</Frames>
+	</Frame>
+</Ui>

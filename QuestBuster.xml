@@ -1,0 +1,17 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	<Script file="OmgLib.lua" />
+	<Script file="QuestBuster_Tokens.lua" />
+	<Script file="QuestBuster_Globals.lua" />
+	<Script file="QuestBuster.lua" />
+
+	<Frame name="QuestBusterFrame" parent="UIParent" frameStrata="LOW" toplevel="true" inherits="SecureFrameTemplate" hidden="true">
+		<Scripts>
+			<OnLoad>
+				QuestBuster_OnLoad(self);
+			</OnLoad>
+			<OnEvent>
+				QuestBuster_OnEvent(self, event, ...);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+</Ui>

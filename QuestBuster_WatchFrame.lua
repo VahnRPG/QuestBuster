@@ -18,11 +18,12 @@ function QuestBuster_WatchFrame_ShowQuestLevel()
 	end
 
 	for i=1, #tracker.MODULES do
-		for _, block in pairs(tracker.MODULES[i].Header.module.usedBlocks) do
-			if (block.questLogIndex and block.HeaderText:GetText() and (not string.find(block.HeaderText:GetText(), "^%[.*%].*"))) then
-				--echo("Here: " .. i .. " - " .. block.questLogIndex .. " -> " .. block.HeaderText:GetText());
-				local title, level, _,_,_,_, is_daily = GetQuestLogTitle(block.questLogIndex);
-				local quest_type = GetQuestLogQuestType(block.questLogIndex);
+		for _, block in pairs(tracker.MODULES[i].usedBlocks) do
+			local questLogIndex = GetQuestLogIndexByID(block.id);
+			if (questLogIndex > 0 and block.HeaderText ~= nil and block.HeaderText:GetText() and (not string.find(block.HeaderText:GetText(), "^%[.*%].*"))) then
+				--echo("Here: " .. i .. " - " .. questLogIndex .. " -> " .. block.HeaderText:GetText());
+				local title, level, _,_,_,_, is_daily = GetQuestLogTitle(questLogIndex);
+				local quest_type = GetQuestLogQuestType(questLogIndex);
 				quest_type = QBG_QUEST_TYPES[quest_type] or "";
 
 				if (is_daily == LE_QUEST_FREQUENCY_DAILY) then
@@ -43,9 +44,10 @@ function QuestBuster_WatchFrame_ShowQuestLevel()
 end
 
 function QuestBuster_WatchFrame_AddToWatchFrame(self)
-	local index = self.activeFrame.questLogIndex;
+	local block = self.activeFrame;
+	local questLogIndex = GetQuestLogIndexByID(block.id);
 	if (QuestBusterOptions[QuestBusterEntry].watch_frame["show_abandon"]) then
-		local _,_,_,_, _,_,_,quest_id = GetQuestLogTitle(index);
+		local _,_,_,_, _,_,_,quest_id = GetQuestLogTitle(questLogIndex);
 		if (CanAbandonQuest(quest_id)) then
 			local info = UIDropDownMenu_CreateInfo();
 			info.text = ABANDON_QUEST;

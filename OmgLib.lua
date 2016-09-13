@@ -160,21 +160,21 @@ function print_r(t)
  	local print_r_cache = {};
 	local function sub_print_r(t, indent)
 		if (print_r_cache[tostring(t)]) then
-			DEFAULT_CHAT_FRAME:AddMessage(indent .. "*" .. tostring(t));
+			echo(indent .. "*" .. tostring(t));
 		else
 			print_r_cache[tostring(t)] = true;
 			if (type(t) == "table") then
-				for pos, val in sortedpairs(t) do
+				for pos, val in pairs(t) do
 					if (type(val) == "table") then
-						DEFAULT_CHAT_FRAME:AddMessage(indent .. "[" .. pos .. "] => " .. tostring(t) .. " {");
+						echo(indent .. "[" .. pos .. "] => " .. tostring(t) .. " {");
 						sub_print_r(val,indent..string.rep(" ",string.len(pos)+8));
-						DEFAULT_CHAT_FRAME:AddMessage(indent .. string.rep(" ", string.len(pos)+6) .. "}");
+						echo(indent .. string.rep(" ", string.len(pos)+6) .. "}");
 					else
-						DEFAULT_CHAT_FRAME:AddMessage(indent .. "[" .. pos .. "] => " .. tostring(val));
+						echo(indent .. "[" .. pos .. "] => " .. tostring(val));
 					end
 				end
 			else
-				DEFAULT_CHAT_FRAME:AddMessage(indent .. tostring(t));
+				echo(indent .. tostring(t));
 			end
 		end
 	end

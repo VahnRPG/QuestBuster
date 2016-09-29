@@ -9,35 +9,6 @@ QuestBusterEntry = nil;
 
 local _, qb = ...;
 
-qb.frame = CreateFrame("Frame", "QuestBusterFrame", UIParent, "SecureFrameTemplate");
-
---==SLASH COMMANDS==--
-SLASH_QBUSTER1 = "/QuestBuster";
-SLASH_QBUSTER2 = "/qbuster";
-SLASH_QBUSTER3 = "/qb";
-
-SlashCmdList["QBUSTER"] = function(cmd)
-	cmd = string.lower(cmd);
-
-	if (cmd == "help") then
-		for i = 1, QBL["HELP_LINES"] do
-			DEFAULT_CHAT_FRAME:AddMessage(QBL["HELP" .. i]);
-		end
-	elseif (cmd == "config") then
-		QuestBuster_Config_Show();
-	elseif (cmd == "test") then
-		QuestBuster_Loot_HighlightRewards();
-	elseif (cmd == "reset") then
-		qb:InitSettings("character");
-		qb.titan.update();
-		DEFAULT_CHAT_FRAME:AddMessage(QBG_MOD_COLOR .. "Reset");
-	elseif (cmd == "fullreset") then
-		qb:InitSettings(true);
-		qb.titan.update();
-		DEFAULT_CHAT_FRAME:AddMessage(QBG_MOD_COLOR .. "Fully Reset");
-	end
-end
-
 --==BINDING==--
 BINDING_HEADER_QUESTBUSTER = QBG_MOD_NAME;
 BINDING_NAME_QB_TOGGLE_WORLD_QUESTS_FRAME = QBL["BINDING_TOGGLE_WORLD_QUESTS_FRAME"];
@@ -114,29 +85,47 @@ local function initSettings(reset)
 	if (not QuestBusterOptions[QuestBusterEntry].daily_quest_rewards) then
 		QuestBusterOptions[QuestBusterEntry].daily_quest_rewards = {};
 	end
+	if (not QuestBusterOptions[QuestBusterEntry].quest_list_frames) then
+		QuestBusterOptions[QuestBusterEntry].quest_list_frames = {};
+	end
 	if (not QuestBusterOptions[QuestBusterEntry].watch_frame) then
 		QuestBusterOptions[QuestBusterEntry].watch_frame = {
 			["show_level"] = true,
 			["show_abandon"] = true,
 		};
 	end
-	if (not QuestBusterOptions[QuestBusterEntry].world_quests_frame) then
-		QuestBusterOptions[QuestBusterEntry].world_quests_frame = {};
-		QuestBusterOptions[QuestBusterEntry].world_quests_frame.show = true;
-		QuestBusterOptions[QuestBusterEntry].world_quests_frame.position = {
-			point = "TOPLEFT",
-			relative_point = "TOPLEFT",
-			x = 490,
-			y = -330,
-		};
-		QuestBusterOptions[QuestBusterEntry].world_quests_frame.locked = false;
-		QuestBusterOptions[QuestBusterEntry].world_quests_frame.state = "expanded";
-	end
 	if (not QuestBusterOptions[QuestBusterEntry].minimap) then
 		QuestBusterOptions[QuestBusterEntry].minimap = {};
 		QuestBusterOptions[QuestBusterEntry].minimap.show = true;
 		QuestBusterOptions[QuestBusterEntry].minimap.position = 310;
 		QuestBuster_Minimap_Init();
+	end
+end
+
+qb.frame = CreateFrame("Frame", "QuestBusterFrame", UIParent, "SecureFrameTemplate");
+
+--==SLASH COMMANDS==--
+SLASH_QBUSTER1 = "/QuestBuster";
+SLASH_QBUSTER2 = "/qbuster";
+SLASH_QBUSTER3 = "/qb";
+
+SlashCmdList["QBUSTER"] = function(cmd)
+	cmd = string.lower(cmd);
+
+	if (cmd == "help") then
+		for i=1, QBL["HELP_LINES"] do
+			DEFAULT_CHAT_FRAME:AddMessage(QBL["HELP" .. i]);
+		end
+	elseif (cmd == "config") then
+		QuestBuster_Config_Show();
+	elseif (cmd == "reset") then
+		initSettings("character");
+		qb.titan.update();
+		DEFAULT_CHAT_FRAME:AddMessage(QBG_MOD_COLOR .. "Reset");
+	elseif (cmd == "fullreset") then
+		initSettings(true);
+		qb.titan.update();
+		DEFAULT_CHAT_FRAME:AddMessage(QBG_MOD_COLOR .. "Fully Reset");
 	end
 end
 

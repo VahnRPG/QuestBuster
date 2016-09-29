@@ -1,5 +1,5 @@
 <Bindings>
 	<Binding category="ADDONS" header="QUESTBUSTER" name="QB_TOGGLE_WORLD_QUESTS_FRAME">
-		QuestBuster_WorldQuestsFrame_Collapse_OnClick();
+		QuestBuster_QuestListFrames_Toggle();
 	</Binding>
 </Bindings>

@@ -16,5 +16,4 @@ Utils\Utils.xml
 Locales\Locales.xml
 QuestBuster.xml
 Minimap.xml
-WorldQuests.xml
 Modules\Modules.xml

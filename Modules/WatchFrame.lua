@@ -1,13 +1,14 @@
---[[
-if (not QuestBusterOptions[QuestBusterEntry].watch_frame) then
-	QuestBusterOptions[QuestBusterEntry].watch_frame = {
-		["show_level"] = true,
-		["show_abandon"] = true,
-	};
-end
-]]--
+local _, qb = ...;
 
-function QuestBuster_WatchFrame_ShowQuestLevel()
+qb.watch_frame = {};
+qb.watch_frame.frame = CreateFrame("Frame", "QuestBuster_WatchFrameFrame", UIParent, SecureFrameTemplate);
+qb.watch_frame.frame:SetScript("OnEvent", function(self, event, ...)
+	if (QuestBusterInit) then
+		return qb.watch_frame[event] and qb.watch_frame[event](qb, ...)
+	end
+end);
+
+function qb.watch_frame.showQuestLevel()
 	if (not QuestBusterOptions[QuestBusterEntry].watch_frame["show_level"]) then 
 		return;
 	end
@@ -43,29 +44,25 @@ function QuestBuster_WatchFrame_ShowQuestLevel()
 	end
 end
 
-function QuestBuster_WatchFrame_AddToWatchFrame(self)
+function qb.watch_frame.addToWatchFrame(self)
+	if (not QuestBusterOptions[QuestBusterEntry].watch_frame["show_abandon"]) then 
+		return;
+	end
+	
 	local block = self.activeFrame;
 	local questLogIndex = GetQuestLogIndexByID(block.id);
-	if (QuestBusterOptions[QuestBusterEntry].watch_frame["show_abandon"]) then
-		local _,_,_,_, _,_,_,quest_id = GetQuestLogTitle(questLogIndex);
-		if (CanAbandonQuest(quest_id)) then
-			local info = UIDropDownMenu_CreateInfo();
-			info.text = ABANDON_QUEST;
-			info.func = (function() 
-				QuestMapQuestOptions_AbandonQuest(quest_id);
-			end);
-			info.notCheckable = 1;
-			info.noClickSound = 1;
-			UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
-		end
+	local _,_,_,_, _,_,_,quest_id = GetQuestLogTitle(questLogIndex);
+	if (CanAbandonQuest(quest_id)) then
+		local info = UIDropDownMenu_CreateInfo();
+		info.text = ABANDON_QUEST;
+		info.func = (function() 
+			QuestMapQuestOptions_AbandonQuest(quest_id);
+		end);
+		info.notCheckable = 1;
+		info.noClickSound = 1;
+		UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
 	end
 end
 
-local frame = CreateFrame("Frame", "QuestBuster_WatchFrameFrame", UIParent, SecureFrameTemplate);
---frame:RegisterEvent("QUEST_LOG_UPDATE");
-frame:SetScript("OnEvent", function(self, event, ...)
-	echo("Here: " .. event);
-end);
-
-hooksecurefunc("ObjectiveTracker_Update", QuestBuster_WatchFrame_ShowQuestLevel);
-hooksecurefunc("QuestObjectiveTracker_OnOpenDropDown", QuestBuster_WatchFrame_AddToWatchFrame);
+hooksecurefunc("ObjectiveTracker_Update", qb.watch_frame.showQuestLevel);
+hooksecurefunc("QuestObjectiveTracker_OnOpenDropDown", qb.watch_frame.addToWatchFrame);

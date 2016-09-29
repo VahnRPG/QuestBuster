@@ -10,6 +10,16 @@
 	QBL["TITAN_INFO_ALL"] = "All";
 	QBL["TITAN_INFO_YES"] = "Yes";
 	QBL["TITAN_INFO_NO"] = "No";
+
+	QBL["BINDING_TOGGLE_WORLD_QUESTS_FRAME"] = "Toggle World Quests Frame";
+	QBL["BINDING_OPEN_SKILL_1"] = "Toggle Skill 1 Window";
+	QBL["BINDING_OPEN_SKILL_1_BUSTER"] = "Toggle Skill 1 Buster Window";
+	QBL["BINDING_OPEN_SKILL_2"] = "Toggle Skill 2 Window";
+	QBL["BINDING_OPEN_SKILL_2_BUSTER"] = "Toggle Skill 2 Buster Window";
+	QBL["BINDING_OPEN_COOKING"] = "Toggle Cooking Window";
+	QBL["BINDING_OPEN_FIRST_AID"] = "Toggle First Aid Window";
+	QBL["BINDING_OPEN_ARCHAEOLOGY"] = "Toggle Archaeology Window";
+	QBL["BINDING_OPEN_LOCKPICKING_BUSTER"] = "Toggle Lockpicking Buster Window";
 	
 	QBL["TITAN_SETTINGS_PERSON"] = QBG_CLR_LIGHTGREY .. "   (personal settings)";
 	QBL["TITAN_SETTINGS_GLOBAL"] = QBG_CLR_LIGHTGREY .. "   (global settings)";

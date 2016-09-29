@@ -1,3 +1,5 @@
+local _, qb = ...;
+
 local config_frame_name = "QuestBuster_ConfigFrame";
 
 local SCROLL_FRAME_HEIGHT = 19;
@@ -141,7 +143,7 @@ config_frame:SetScript("OnShow", function(config_frame)
 				if (not QuestBusterOptions[QuestBusterEntry]) then
 					QuestBuster_InitSettings("character");
 				end
-				QuestBuster_TitanPanel_Update();
+				qb.titan:QUEST_LOG_UPDATE();
 				updateFields();
 			end
 			UIDropDownMenu_AddButton(info);
@@ -202,7 +204,7 @@ child_auto_quest_frame:SetScript("OnShow", function(child_auto_quest_frame)
 		else
 			auto_quest_details_frame:Hide();
 		end
-		QuestBuster_TitanPanel_Update();
+		qb.titan:QUEST_LOG_UPDATE();
 	end);
 
 	auto_quest_details_frame = CreateFrame("Frame", config_frame_name .. "AutoQuestDetails", child_auto_quest_frame);
@@ -232,7 +234,7 @@ child_auto_quest_frame:SetScript("OnShow", function(child_auto_quest_frame)
 			info.func = function(self)
 				UIDropDownMenu_SetSelectedValue(auto_quest_modifier_menu, self.value);
 				QuestBusterOptions[QuestBusterEntry].auto_quest["modifier"] = self.value;
-				QuestBuster_TitanPanel_Update();
+				qb.titan:QUEST_LOG_UPDATE();
 			end
 			UIDropDownMenu_AddButton(info);
 		end
@@ -246,7 +248,7 @@ child_auto_quest_frame:SetScript("OnShow", function(child_auto_quest_frame)
 	auto_quest_only_dailies:SetChecked(QuestBusterOptions[QuestBusterEntry].auto_quest["only_dailies"]);
 	auto_quest_only_dailies:SetScript("OnClick", function(self, button)
 		QuestBusterOptions[QuestBusterEntry].auto_quest["only_dailies"] = self:GetChecked();
-		QuestBuster_TitanPanel_Update();
+		qb.titan:QUEST_LOG_UPDATE();
 	end);
 
 	auto_quest_low_level = CreateFrame("CheckButton", config_frame_name .. "AutoQuestLowLevel", auto_quest_details_frame, "InterfaceOptionsCheckButtonTemplate");
@@ -255,7 +257,7 @@ child_auto_quest_frame:SetScript("OnShow", function(child_auto_quest_frame)
 	auto_quest_low_level:SetChecked(QuestBusterOptions[QuestBusterEntry].auto_quest["low_level"]);
 	auto_quest_low_level:SetScript("OnClick", function(self, button)
 		QuestBusterOptions[QuestBusterEntry].auto_quest["low_level"] = self:GetChecked();
-		QuestBuster_TitanPanel_Update();
+		qb.titan:QUEST_LOG_UPDATE();
 	end);
 
 	auto_quest_repeatable = CreateFrame("CheckButton", config_frame_name .. "AutoQuestRepeatable", auto_quest_details_frame, "InterfaceOptionsCheckButtonTemplate");
@@ -264,7 +266,7 @@ child_auto_quest_frame:SetScript("OnShow", function(child_auto_quest_frame)
 	auto_quest_repeatable:SetChecked(QuestBusterOptions[QuestBusterEntry].auto_quest["repeatable"]);
 	auto_quest_repeatable:SetScript("OnClick", function(self, button)
 		QuestBusterOptions[QuestBusterEntry].auto_quest["repeatable"] = self:GetChecked();
-		QuestBuster_TitanPanel_Update();
+		qb.titan:QUEST_LOG_UPDATE();
 	end);
 
 	local auto_quest_reward_label = auto_quest_details_frame:CreateFontString(nil, "ARTWORK", "GameFontNormal");

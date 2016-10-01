@@ -1,5 +1,7 @@
 local _, qb = ...;
 
+qb.config = {};
+
 local config_frame_name = "QuestBuster_ConfigFrame";
 
 local SCROLL_FRAME_HEIGHT = 19;
@@ -21,7 +23,7 @@ local backdrop = {
 	insets = { left = 3, right = 3, top = 5, bottom = 3 }
 };
 
-local function QuestBuster_Config_DailyQuestRewards_ScrollFrame_Init(self)
+local function dailiesRewardsInit(self)
 	for i=1, SCROLL_FRAME_COUNT do
 		local button_frame = CreateFrame("Button", self:GetParent():GetName() .. "Item" .. i, self:GetParent());
 		button_frame:SetNormalFontObject("GameFontNormalLeft");
@@ -31,7 +33,7 @@ local function QuestBuster_Config_DailyQuestRewards_ScrollFrame_Init(self)
 	end
 end
 
-local function QuestBuster_Config_DailyQuestRewards_ScrollFrame_Update(self)
+local function dailiesRewardsUpdate(self)
 	local offset = FauxScrollFrame_GetOffset(self);
 	local rewards = {};
 	local count = 0;
@@ -107,8 +109,8 @@ local function updateFields()
 	auto_quest_only_dailies:SetChecked(QuestBusterOptions[QuestBusterEntry].auto_quest["only_dailies"]);
 	auto_quest_low_level:SetChecked(QuestBusterOptions[QuestBusterEntry].auto_quest["low_level"]);
 	auto_quest_repeatable:SetChecked(QuestBusterOptions[QuestBusterEntry].auto_quest["repeatable"]);
-	QuestBuster_Config_DailyQuestRewards_ScrollFrame_Init(daily_quest_rewards_scrollframe);
-	QuestBuster_Config_DailyQuestRewards_ScrollFrame_Update(daily_quest_rewards_scrollframe);
+	dailiesRewardsInit(daily_quest_rewards_scrollframe);
+	dailiesRewardsUpdate(daily_quest_rewards_scrollframe);
 end
 
 local config_frame = CreateFrame("Frame", config_frame_name, InterfaceOptionsFramePanelContainer);
@@ -141,7 +143,7 @@ config_frame:SetScript("OnShow", function(config_frame)
 				end
 				QuestBusterEntry = QuestBusterOptions.globals[QuestBusterEntry_Personal];
 				if (not QuestBusterOptions[QuestBusterEntry]) then
-					QuestBuster_InitSettings("character");
+					qb:InitSettings("character");
 				end
 				qb.titan:QUEST_LOG_UPDATE();
 				updateFields();
@@ -305,9 +307,9 @@ child_auto_quest_frame:SetScript("OnShow", function(child_auto_quest_frame)
 	daily_quest_rewards_scrollframe:SetSize(530, SCROLL_FRAME_HEIGHT * SCROLL_FRAME_COUNT);
 	daily_quest_rewards_scrollframe:SetPoint("TOPLEFT", daily_quest_rewards_frame, "TOPLEFT", 0, -10);
 	daily_quest_rewards_scrollframe:SetScript("OnVerticalScroll", function(self, offset)
-		FauxScrollFrame_OnVerticalScroll(self, offset, SCROLL_FRAME_HEIGHT, QuestBuster_Config_DailyQuestRewards_ScrollFrame_Update);
+		FauxScrollFrame_OnVerticalScroll(self, offset, SCROLL_FRAME_HEIGHT, dailiesRewardsUpdate);
 	end);
-	QuestBuster_Config_DailyQuestRewards_ScrollFrame_Init(daily_quest_rewards_scrollframe);
+	dailiesRewardsInit(daily_quest_rewards_scrollframe);
 
 	daily_quest_rewards_none_label = daily_quest_rewards_frame:CreateFontString(nil, "ARTWORK", "GameFontNormal");
 	daily_quest_rewards_none_label:SetPoint("CENTER", daily_quest_rewards_frame);
@@ -331,7 +333,8 @@ child_watch_frame_frame:SetScript("OnShow", function(child_watch_frame_frame)
 	show_level:SetChecked(QuestBusterOptions[QuestBusterEntry].watch_frame["show_level"]);
 	show_level:SetScript("OnClick", function(self, button)
 		QuestBusterOptions[QuestBusterEntry].watch_frame["show_level"] = self:GetChecked();
-		QuestBuster_WatchFrame_ShowQuestLevel();
+		qb.watch_frame.reload = true;
+		qb.watch_frame:showQuestLevel();
 	end);
 
 	show_abandon = CreateFrame("CheckButton", config_frame_name .. "ShowAbandon", child_watch_frame_frame, "InterfaceOptionsCheckButtonTemplate");

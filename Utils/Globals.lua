@@ -10,7 +10,7 @@ QBG_GOSSIP_PARAMS = 6;
 
 QBG_REWARDS = {};
 
-QBG_LEVEL_fORMAT = "[%d%s%s] %s";
+QBG_LEVEL_FORMAT = "[%d%s%s] %s";
 --Built from http://www.wowinterface.com/forums/showthread.php?t=44549
 QBG_QUEST_TYPES = {
 	[0] = "",		--Default

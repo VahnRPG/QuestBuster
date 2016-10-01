@@ -1,6 +1,7 @@
 local _, qb = ...;
 
-local MAX_EMISSARY_QUESTS = 3;
+local MAX_EMISSARY_QUESTS = WorldMapFrame.UIElementsFrame.BountyBoard.minimumTabsToDisplay;
+--local MAX_EMISSARY_QUESTS = 3;
 
 qb.quest_lists = {};
 qb.quest_lists.frame = CreateFrame("Frame", "QuestBuster_QuestListsFrame", UIParent, SecureFrameTemplate);
@@ -120,20 +121,26 @@ function qb.quest_lists:ADDON_LOADED()
 		local frame_name = frame:GetName();
 		
 		--build base frame - emissary buttons
-		--[[
 		for i=1, MAX_EMISSARY_QUESTS do
 			local emissary_frame = CreateFrame("Frame", "QuestBuster_QuestList" .. frame_data["name"] .. "Emissary" .. i .. "Frame", frame, SecureFrameTemplate);
 			emissary_frame:SetFrameStrata(frame_data["strata"]);
 			emissary_frame:SetPoint("TOPRIGHT", frame_name, "TOPLEFT", 0, ((i - 1) * -16) - 5);
 			emissary_frame:SetSize(16, 16);
+			emissary_frame.emissary_data = {};
+			emissary_frame:SetScript("OnEnter", function(self)
+				frame_data["tooltip"]:SetOwner(self, "ANCHOR_CURSOR");
+				qb.quest_lists:setEmissaryTooltip(frame_data["tooltip"], self.emissary_data);
+				frame_data["tooltip"]:Show();
+			end);
+			emissary_frame:SetScript("OnLeave", function(self)
+				frame_data["tooltip"]:Hide();
+			end);
 			
 			emissary_frame.icon = emissary_frame:CreateTexture("ARTWORK");
 			emissary_frame.icon:SetAllPoints();
-			emissary_frame.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover_Collapse");
 			
 			frame.emissary_frames[i] = emissary_frame;
 		end
-		]]--
 		
 		--save frame
 		qb.quest_lists.frames[frame_data["name"]] = {
@@ -407,6 +414,17 @@ function qb.quest_lists:update()
 					
 					type_count = type_count + 1;
 				end
+
+				for i=1, MAX_EMISSARY_QUESTS do
+					local emissary_frame = frame.emissary_frames[i];
+					if (qb.world_quests.emissary.quests[i]) then
+						emissary_frame.emissary_data = qb.world_quests.emissary.quests[i];
+						emissary_frame.icon:SetTexture(qb.world_quests.emissary.quests[i]["icon"]);
+						emissary_frame:Show();
+					else
+						emissary_frame:Hide();
+					end
+				end
 				
 				mover_frame:Show();
 				mover_frame.collapse.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover_Collapse");
@@ -435,6 +453,30 @@ function qb.quest_lists:update()
 	end
 end
 
+function qb.quest_lists:setEmissaryTooltip(tooltip, emissary_data)
+	local faction_name, faction_description, faction_standing = GetFactionInfoByID(emissary_data["faction_id"]);
+	tooltip:SetText(faction_name .. " - " .. getglobal("FACTION_STANDING_LABEL" .. faction_standing));
+	
+	tooltip:AddLine("Completed: " .. emissary_data["completed"] .. "/" .. emissary_data["total"]);
+	
+	local timeLeftMinutes = C_TaskQuest.GetQuestTimeLeftMinutes(emissary_data["quest_id"]);
+	if (timeLeftMinutes and timeLeftMinutes > 0) then
+		local color = NORMAL_FONT_COLOR;
+		local timeString;
+		if ( timeLeftMinutes <= WORLD_QUESTS_TIME_CRITICAL_MINUTES ) then
+			color = RED_FONT_COLOR;
+			timeString = SecondsToTime(timeLeftMinutes * 60);
+		elseif (timeLeftMinutes <= 60 + WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
+			timeString = SecondsToTime((timeLeftMinutes - WORLD_QUESTS_TIME_CRITICAL_MINUTES) * 60);
+		elseif (timeLeftMinutes < 24 * 60 + WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
+			timeString = D_HOURS:format(math.floor(timeLeftMinutes - WORLD_QUESTS_TIME_CRITICAL_MINUTES) / 60);
+		else
+			timeString = D_DAYS:format(math.floor(timeLeftMinutes - WORLD_QUESTS_TIME_CRITICAL_MINUTES) / 1440);
+		end
+		tooltip:AddLine(BONUS_OBJECTIVE_TIME_LEFT:format(timeString), color:GetRGB());
+	end
+end
+
 function qb.quest_lists:setQuestTooltip(tooltip, questID)
 	local title, factionID, capped = C_TaskQuest.GetQuestInfoByQuestID(questID);
 	local tagID, tagName, worldQuestType, rarity, isElite, tradeskillLineIndex = GetQuestTagInfo(questID);
@@ -451,7 +493,7 @@ function qb.quest_lists:setQuestTooltip(tooltip, questID)
 			end
 		end
 	end
-
+	
 	if (qb.world_quests.quest_data[questID] and qb.world_quests.quest_data[questID]["zone"] ~= "") then
 		tooltip:AddLine(QBG_CLR_LIGHTGREEN .. qb.world_quests.quest_data[questID]["zone"]);
 	end

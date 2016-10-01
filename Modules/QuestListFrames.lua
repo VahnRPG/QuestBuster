@@ -357,6 +357,9 @@ function qb.quest_lists:update()
 									};
 								end
 								
+								local filter_quest_frame = _G["QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "_" .. filter_count .. "_" .. quest_count .."Frame"];
+								filter_quest_frame:SetPoint("TOPLEFT", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "_" .. filter_count .."Frame", "TOPLEFT", 20, (quests_displayed * -15) - height_padding - 15);
+								
 								local timeLeftMinutes = C_TaskQuest.GetQuestTimeLeftMinutes(quest_id);
 								if (timeLeftMinutes and timeLeftMinutes > 0) then
 									local color = HIGHLIGHT_FONT_COLOR;

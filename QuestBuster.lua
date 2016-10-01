@@ -9,6 +9,8 @@ QuestBusterEntry = nil;
 
 local _, qb = ...;
 
+qb.frame = CreateFrame("Frame", "QuestBusterFrame", UIParent, "SecureFrameTemplate");
+
 --==BINDING==--
 BINDING_HEADER_QUESTBUSTER = QBG_MOD_NAME;
 BINDING_NAME_QB_TOGGLE_WORLD_QUESTS_FRAME = QBL["BINDING_TOGGLE_WORLD_QUESTS_FRAME"];
@@ -23,7 +25,49 @@ BINDING_NAME_QB_OPEN_ARCHAEOLOGY = CBL["BINDING_OPEN_ARCHAEOLOGY"];
 BINDING_NAME_QB_OPEN_LOCKPICKING_BUSTER = CBL["BINDING_OPEN_LOCKPICKING_BUSTER"];
 ]]--
 
-local function initPlayer()
+--==SLASH COMMANDS==--
+SLASH_QBUSTER1 = "/QuestBuster";
+SLASH_QBUSTER2 = "/qbuster";
+SLASH_QBUSTER3 = "/qb";
+
+SlashCmdList["QBUSTER"] = function(cmd)
+	cmd = string.lower(cmd);
+
+	if (cmd == "help") then
+		for i=1, QBL["HELP_LINES"] do
+			DEFAULT_CHAT_FRAME:AddMessage(QBL["HELP" .. i]);
+		end
+	elseif (cmd == "config") then
+		QuestBuster_Config_Show();
+	elseif (cmd == "reset") then
+		qb:initSettings("character");
+		qb.titan:update();
+		DEFAULT_CHAT_FRAME:AddMessage(QBG_MOD_COLOR .. "Reset");
+	elseif (cmd == "fullreset") then
+		qb:initSettings(true);
+		qb.titan:update();
+		DEFAULT_CHAT_FRAME:AddMessage(QBG_MOD_COLOR .. "Fully Reset");
+	end
+end
+
+qb.frame:RegisterEvent("ADDON_LOADED");
+qb.frame:SetScript("OnEvent", function(self, event, ...)
+	return qb[event] and qb[event](qb, ...)
+end);
+
+function qb:ADDON_LOADED(self, ...)
+	if (qb:initPlayer()) then
+		qb:initSettings();
+		qb.titan:QUEST_LOG_UPDATE();
+
+		qb.frame:UnregisterEvent("ADDON_LOADED");
+		QuestBusterInit = true;
+
+		DEFAULT_CHAT_FRAME:AddMessage(QBG_MOD_COLOR .. QBG_MOD_NAME .. " (v" .. QBG_VERSION .. " - Last Updated: " .. QBG_LAST_UPDATED .. ")");
+	end
+end
+
+function qb:initPlayer()
 	QuestBusterPlayer = UnitName("player");
 	QuestBusterPlayerLevel = UnitLevel("player");
 	QuestBusterServer = GetRealmName();
@@ -47,7 +91,7 @@ local function initPlayer()
 	return true;
 end
 
-local function initSettings(reset)
+function qb:initSettings(reset)
 	if (QuestBusterInit and not reset) then
 		return;
 	end
@@ -100,48 +144,19 @@ local function initSettings(reset)
 		QuestBusterOptions[QuestBusterEntry].minimap.position = 310;
 		QuestBuster_Minimap_Init();
 	end
-end
-
-qb.frame = CreateFrame("Frame", "QuestBusterFrame", UIParent, "SecureFrameTemplate");
-
---==SLASH COMMANDS==--
-SLASH_QBUSTER1 = "/QuestBuster";
-SLASH_QBUSTER2 = "/qbuster";
-SLASH_QBUSTER3 = "/qb";
-
-SlashCmdList["QBUSTER"] = function(cmd)
-	cmd = string.lower(cmd);
-
-	if (cmd == "help") then
-		for i=1, QBL["HELP_LINES"] do
-			DEFAULT_CHAT_FRAME:AddMessage(QBL["HELP" .. i]);
+	
+	for _, frame_data in pairs(QBG_QUEST_LIST_FRAMES) do
+		if (not QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]]) then
+			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]] = {};
+			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].show = true;
+			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position = {
+				point = "TOPLEFT",
+				relative_point = "TOPLEFT",
+				x = 490,
+				y = -330,
+			};
+			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].locked = false;
+			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].state = "expanded";
 		end
-	elseif (cmd == "config") then
-		QuestBuster_Config_Show();
-	elseif (cmd == "reset") then
-		initSettings("character");
-		qb.titan.update();
-		DEFAULT_CHAT_FRAME:AddMessage(QBG_MOD_COLOR .. "Reset");
-	elseif (cmd == "fullreset") then
-		initSettings(true);
-		qb.titan.update();
-		DEFAULT_CHAT_FRAME:AddMessage(QBG_MOD_COLOR .. "Fully Reset");
-	end
-end
-
-qb.frame:RegisterEvent("ADDON_LOADED");
-qb.frame:SetScript("OnEvent", function(self, event, ...)
-	return qb[event] and qb[event](qb, ...)
-end);
-
-function qb:ADDON_LOADED(self, ...)
-	if (initPlayer()) then
-		initSettings();
-		qb.titan:QUEST_LOG_UPDATE();
-
-		qb.frame:UnregisterEvent("ADDON_LOADED");
-		QuestBusterInit = true;
-
-		DEFAULT_CHAT_FRAME:AddMessage(QBG_MOD_COLOR .. QBG_MOD_NAME .. " (v" .. QBG_VERSION .. " - Last Updated: " .. QBG_LAST_UPDATED .. ")");
 	end
 end

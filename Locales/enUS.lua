@@ -53,4 +53,14 @@
 	QBL["CONFIG_TITLE_AUTO_QUEST_MODIFIER"] = "Button to Prevent Auto Complete:";
 	QBL["CONFIG_SHOW_LEVEL"] = "Show Quest Levels";
 	QBL["CONFIG_SHOW_ABANDON"] = "Show Abandon Quest";
+	QBL["CONFIG_WORLD_QUESTS_SHOW"] = "Show World Quests";
+	QBL["CONFIG_WORLD_QUESTS_LOCKED"] = "Lock World Quests Frame";
+	QBL["CONFIG_WORLD_QUESTS_EXPAND"] = "Expand World Quests Frame";
+	QBL["CONFIG_WORLD_QUESTS_POSITION"] = "Position";
+	QBL["CONFIG_POSITION_X"] = "X:";
+	QBL["CONFIG_POSITION_Y"] = "Y:";
+	QBL["CONFIG_POSITION_POINT"] = "Point:";
+	QBL["CONFIG_POSITION_RELATIVE_POINT"] = "Relative To:";
+	QBL["CONFIG_POSITION_SET"] = "SET";
+	QBL["CONFIG_POSITIONS_RESET"] = "Reset Position";
 --end

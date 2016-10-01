@@ -10,7 +10,7 @@ QBG_GOSSIP_PARAMS = 6;
 
 QBG_REWARDS = {};
 
-QBG_LEVEL_fORMAT = "[%d%s%s] %s";
+QBG_LEVEL_FORMAT = "[%d%s%s] %s";
 --Built from http://www.wowinterface.com/forums/showthread.php?t=44549
 QBG_QUEST_TYPES = {
 	[0] = "",		--Default
@@ -29,6 +29,23 @@ QBG_WORLD_QUEST_TYPES = {
 	[LE_QUEST_TAG_TYPE_PET_BATTLE]	= "Pet Battle",
 	[LE_QUEST_TAG_TYPE_PROFESSION]	= "Profession",
 	[LE_QUEST_TAG_TYPE_DUNGEON]		= "Dungeon",
+};
+
+QBG_QUEST_LIST_FRAMES = {
+	[1] = {
+		["name"] = "Default",
+		["label"] = "Default",
+		["parent"] = UIParent,
+		["strata"] = "LOW",
+		["tooltip"] = GameTooltip,
+	},
+	[2] = {
+		["name"] = "WorldMap",
+		["label"] = "World Map",
+		["parent"] = WorldMapFrame,
+		["strata"] = "FULLSCREEN_DIALOG",
+		["tooltip"] = WorldMapTooltip,
+	},
 };
 
 -------------------------------------------------------------------------------

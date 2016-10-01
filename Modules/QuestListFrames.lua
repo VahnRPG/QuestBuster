@@ -14,21 +14,6 @@ qb.quest_lists.frames = {};
 qb.quest_lists.type_expanded = "";
 qb.quest_lists.filter_expanded = "";
 
-local quest_list_frames = {
-	[1] = {
-		["name"] = "Default",
-		["parent"] = UIParent,
-		["strata"] = "LOW",
-		["tooltip"] = GameTooltip,
-	},
-	[2] = {
-		["name"] = "WorldMap",
-		["parent"] = WorldMapFrame,
-		["strata"] = "FULLSCREEN_DIALOG",
-		["tooltip"] = WorldMapTooltip,
-	},
-};
-
 function qb.quest_lists:ADDON_LOADED()
 	local frame_backdrop = {
 		bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
@@ -36,23 +21,10 @@ function qb.quest_lists:ADDON_LOADED()
 		tile = true,
 		tileSize = 16,
 		edgeSize = 16,
-		insets = { left = 5, right = 5, top = 5, bottom = 5 }
+		insets = { left = 5, right = 5, top = 5, bottom = 5 },
 	};
-
-	for _, frame_data in pairs(quest_list_frames) do
-		if (not QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]]) then
-			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]] = {};
-			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].show = true;
-			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position = {
-				point = "TOPLEFT",
-				relative_point = "TOPLEFT",
-				x = 490,
-				y = -330,
-			};
-			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].locked = false;
-			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].state = "expanded";
-		end
-
+	
+	for _, frame_data in pairs(QBG_QUEST_LIST_FRAMES) do
 		--build mover frame
 		local mover_frame = CreateFrame("Frame", "QuestBuster_QuestList" .. frame_data["name"] .. "MoverFrame", frame_data["parent"]);
 		mover_frame:SetFrameStrata(frame_data["strata"]);
@@ -136,7 +108,7 @@ function qb.quest_lists:ADDON_LOADED()
 		mover_frame.close.icon = mover_frame.close:CreateTexture("ARTWORK");
 		mover_frame.close.icon:SetAllPoints();
 		mover_frame.close.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover_Close");
-
+		
 		--build base frame
 		local frame = CreateFrame("Frame", "QuestBuster_QuestList" .. frame_data["name"] .. "Frame", frame_data["parent"], SecureFrameTemplate);
 		frame:SetFrameStrata(frame_data["strata"]);
@@ -146,7 +118,7 @@ function qb.quest_lists:ADDON_LOADED()
 		frame.emissary_frames = {};
 		frame.type_frames = {};
 		local frame_name = frame:GetName();
-
+		
 		--build base frame - emissary buttons
 		--[[
 		for i=1, MAX_EMISSARY_QUESTS do
@@ -162,7 +134,7 @@ function qb.quest_lists:ADDON_LOADED()
 			frame.emissary_frames[i] = emissary_frame;
 		end
 		]]--
-
+		
 		--save frame
 		qb.quest_lists.frames[frame_data["name"]] = {
 			["name"] = frame_data["name"],
@@ -170,7 +142,7 @@ function qb.quest_lists:ADDON_LOADED()
 			["mover_frame"] = mover_frame,
 			["tooltip"] = frame_data["tooltip"],
 		};
-
+		
 		qb.quest_lists:updatePosition(frame_data["name"]);
 	end
 	
@@ -182,7 +154,7 @@ function qb.quest_lists:update()
 		local config = QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]];
 		local frame = frame_data["frame"];
 		local mover_frame = frame_data["mover_frame"];
-
+		
 		if (config.show and qb.world_quests.quests.count > 0) then
 			if (config.state == "expanded") then
 				local type_count = 0;
@@ -225,14 +197,14 @@ function qb.quest_lists:update()
 						type_frame.expand.label = type_frame.expand:CreateFontString(nil, "ARTWORK", "GameFontNormal");
 						type_frame.expand.label:SetPoint("CENTER");
 						type_frame.expand.label:SetText(QBL["WORLD_QUEST_" .. string.upper(quest_type)]);
-
+						
 						frame.type_frames[quest_type] = {
 							["name"] = quest_type,
 							["frame"] = type_frame,
 							["filters"] = {},
 						};
 					end
-
+					
 					local type_frame = frame.type_frames[quest_type]["frame"];
 					if (type_count == 0) then
 						type_frame:SetPoint("TOPLEFT", frame, "TOPLEFT", 8, -6);
@@ -284,7 +256,7 @@ function qb.quest_lists:update()
 							filter_frame.expand.label = filter_frame.expand:CreateFontString(nil, "ARTWORK", "GameFontNormal");
 							filter_frame.expand.label:SetPoint("CENTER");
 							filter_frame.expand.label:SetText(qb.omg:ucwords(filter_name));
-
+							
 							frame.type_frames[quest_type]["filters"][filter_name] = {
 								["name"] = filter_name,
 								["frame"] = filter_frame,
@@ -304,7 +276,7 @@ function qb.quest_lists:update()
 									local tag_id, tag_name, world_quest_type, rarity, elite, tradeskill_line = GetQuestTagInfo(quest_id);
 									local tradeskill_line_id = tradeskill_line and select(7, GetProfessionInfo(tradeskill_line));
 									local title, faction_id, capped = C_TaskQuest.GetQuestInfoByQuestID(quest_id);
-
+									
 									local tooltip = frame_data["tooltip"];
 									local quest_frame = CreateFrame("Frame", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "_" .. filter_count .. "_" .. quest_count .."Frame", frame, SecureFrameTemplate);
 									quest_frame:SetPoint("TOPLEFT", frame.type_frames[quest_type]["filters"][filter_name]["frame"], "TOPLEFT", 20, (quest_count * -15) - 15);
@@ -379,7 +351,7 @@ function qb.quest_lists:update()
 									end
 									frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]["frame"].expand.label:SetTextColor(color.r, color.g, color.b, color.a);
 								end
-
+								
 								if (qb.quest_lists.filter_expanded == filter_name) then
 									frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]["frame"]:Show();
 									frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]["frame"].expand:Show();
@@ -416,7 +388,7 @@ function qb.quest_lists:update()
 						filter_count = filter_count + 1;
 						type_filter_quest_count = type_filter_quest_count + quests_displayed;
 					end
-
+					
 					type_filter_count = type_filter_count + filters_displayed;
 					
 					if (total_quests > 0) then
@@ -450,7 +422,7 @@ function qb.quest_lists:update()
 				mover_frame.collapse.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover_Expand");
 				frame:Hide();
 			end
-
+			
 			if (not config.locked) then
 				mover_frame.lock.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover_Unlocked");
 			else
@@ -510,7 +482,7 @@ function qb.quest_lists:setQuestTooltip(tooltip, questID)
 			end
 		end
 	end
-
+	
 	if ( GetQuestLogRewardXP(questID) > 0 or GetNumQuestLogRewardCurrencies(questID) > 0 or GetNumQuestLogRewards(questID) > 0 or GetQuestLogRewardMoney(questID) > 0 or GetQuestLogRewardArtifactXP(questID) > 0 ) then
 		tooltip:AddLine(" ");
 		tooltip:AddLine(QUEST_REWARDS, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true);
@@ -540,7 +512,7 @@ function qb.quest_lists:setQuestTooltip(tooltip, questID)
 			tooltip:AddLine(text, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
 			hasAnySingleLineRewards = true;
 		end
-
+		
 		-- items
 		local numQuestRewards = GetNumQuestLogRewards(questID);
 		if numQuestRewards > 0 then

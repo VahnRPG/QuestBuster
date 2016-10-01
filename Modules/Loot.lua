@@ -32,7 +32,6 @@ end
 local function initRewardAutoSelect()
 	if (QuestIsDaily() or QuestIsWeekly()) then
 		for i=1, GetNumQuestChoices() do
-			--qb.omg:echo("Here: " .. "QuestInfoRewardsFrameQuestInfoItem" .. i);
 			local frame = _G["QuestInfoRewardsFrameQuestInfoItem" .. i];
 			frame:HookScript("OnEnter",
 				function(self, ...)

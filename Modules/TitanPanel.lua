@@ -1,3 +1,14 @@
+local _, qb = ...;
+
+qb.titan = {};
+qb.titan.frame = CreateFrame("Frame", "QuestBuster_TitanPanelFrame", UIParent, SecureFrameTemplate);
+qb.titan.frame:RegisterEvent("QUEST_LOG_UPDATE");
+qb.titan.frame:SetScript("OnEvent", function(self, event, ...)
+	if (QuestBusterInit) then
+		return qb.titan[event] and qb.titan[event](qb, ...)
+	end
+end);
+
 local LDB = LibStub("LibDataBroker-1.1"):NewDataObject(QBG_MOD_NAME, {
 	type = "data source",
 	text = "",
@@ -6,7 +17,7 @@ local LDB = LibStub("LibDataBroker-1.1"):NewDataObject(QBG_MOD_NAME, {
 	OnClick = function(self, button)
 		if (button == "LeftButton") then
 			QuestBusterOptions[QuestBusterEntry].auto_quest["enabled"] = not QuestBusterOptions[QuestBusterEntry].auto_quest["enabled"];
-			QuestBuster_TitanPanel_Update();
+			qb.titan:QUEST_LOG_UPDATE();
 		elseif (button == "RightButton") then
 			QuestBuster_Config_Show();
 		end
@@ -37,7 +48,7 @@ local LDB = LibStub("LibDataBroker-1.1"):NewDataObject(QBG_MOD_NAME, {
 	end,
 });
 
-function QuestBuster_TitanPanel_Update()
+function qb.titan:QUEST_LOG_UPDATE()
 	if (QuestBusterOptions[QuestBusterEntry].auto_quest["enabled"]) then
 		LDB.icon = "Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_TitanPanel_ButtonOn";
 		
@@ -52,11 +63,3 @@ function QuestBuster_TitanPanel_Update()
 		LDB.text = QBL["TITAN_INFO_DISABLED"];
 	end
 end
-
-local frame = CreateFrame("Frame", "QuestBuster_TitanPanelFrame", UIParent, SecureFrameTemplate);
-frame:RegisterEvent("QUEST_LOG_UPDATE");
-frame:SetScript("OnEvent", function(self, event, ...)
-	if (QuestBusterInit and (event == "QUEST_LOG_UPDATE")) then
-		QuestBuster_TitanPanel_Update();
-	end
-end);

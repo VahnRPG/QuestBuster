@@ -1,4 +1,6 @@
-local function QuestBuster_AutoQuest_CheckTrivial(trivial)
+local _, qb = ...;
+
+local function checkTrivial(trivial)
 	if (trivial and not QuestBusterOptions[QuestBusterEntry].auto_quest["low_level"]) then
 		return false;
 	end
@@ -6,7 +8,7 @@ local function QuestBuster_AutoQuest_CheckTrivial(trivial)
 	return true;
 end
 
-local function QuestBuster_AutoQuest_CheckEnabled()
+local function checkEnabled()
 	local settings = QuestBusterOptions[QuestBusterEntry].auto_quest;
 	if (
 		(not settings["enabled"])
@@ -20,7 +22,7 @@ local function QuestBuster_AutoQuest_CheckEnabled()
 	return true;
 end
 
-local function QuestBuster_AutoQuest_CheckQuest(daily, passed)
+local function checkQuest(daily, passed)
 	local settings = QuestBusterOptions[QuestBusterEntry].auto_quest;
 	if (not passed) then
 		daily = (QuestIsDaily() or QuestIsWeekly());
@@ -32,35 +34,48 @@ local function QuestBuster_AutoQuest_CheckQuest(daily, passed)
 	return true;
 end
 
-local function QuestBuster_AutoQuest_ProcessActiveQuests(...)
+local function processActiveQuests(...)
     local params = QBG_GOSSIP_PARAMS - 1;	--GetGossipActiveQuests has 1 less param than GetGossipAvailableQuests
 	for i=1, select("#", ...), params do
 		local completed = select(i + 3, ...);
 		if (completed) then
-			if (QuestBuster_AutoQuest_CheckQuest()) then
+			if (checkQuest()) then
 				SelectGossipActiveQuest(math.floor(i / params) + 1);
 			end
 		end
 	end
 end
 
-local function QuestBuster_AutoQuest_ProcessAvailableQuests(...)
+local function processAvailableQuests(...)
     local params = QBG_GOSSIP_PARAMS;
 	for i=1, select("#", ...), params do
 		local trivial = select(i + 2, ...);
 		local daily = (select(i + 3, ...) ~= 1);
-		if (QuestBuster_AutoQuest_CheckTrivial(trivial) and QuestBuster_AutoQuest_CheckQuest(daily, true)) then
+		if (checkTrivial(trivial) and checkQuest(daily, true)) then
 			SelectGossipAvailableQuest(math.floor(i / params) + 1);
 		end
 	end
 end
 
+qb.auto_quest = {};
+qb.auto_quest.frame = CreateFrame("Frame", "QuestBuster_AutoQuestFrame", UIParent, SecureFrameTemplate);
+qb.auto_quest.frame:RegisterEvent("QUEST_GREETING");
+qb.auto_quest.frame:RegisterEvent("GOSSIP_SHOW");
+qb.auto_quest.frame:RegisterEvent("QUEST_DETAIL");
+qb.auto_quest.frame:RegisterEvent("QUEST_PROGRESS");
+qb.auto_quest.frame:RegisterEvent("QUEST_COMPLETE");
+qb.auto_quest.frame:SetScript("OnEvent", function(self, event, ...)
+	if (QuestBusterInit) then
+		return qb.auto_quest[event] and qb.auto_quest[event](qb, ...)
+	end
+end);
+
 --Apparently there are some older NPCs that fire quests differently than what is standard now. Go figure
-local function QuestBuster_AutoQuest_ListOld()
-	if (QuestBuster_AutoQuest_CheckEnabled()) then
+function qb.auto_quest.QUEST_GREETING()
+	if (checkEnabled()) then
 		for i=1, GetNumActiveQuests() do
 			local _, completed = GetActiveTitle(i);
-			if (completed and QuestBuster_AutoQuest_CheckQuest()) then
+			if (completed and checkQuest()) then
 				SelectActiveQuest(i);
 			end
 		end
@@ -68,34 +83,34 @@ local function QuestBuster_AutoQuest_ListOld()
 		local settings = QuestBusterOptions[QuestBusterEntry].auto_quest;
 		for i=1, GetNumAvailableQuests() do
 			local trivial, daily, repeatable = GetAvailableQuestInfo(i);
-			if (QuestBuster_AutoQuest_CheckTrivial(trivial) and QuestBuster_AutoQuest_CheckQuest()) then
+			if (checkTrivial(trivial) and checkQuest()) then
 				SelectAvailableQuest(i);
 			end
 		end
 	end
 end
 
-local function QuestBuster_AutoQuest_ListNew()
-	if (QuestBuster_AutoQuest_CheckEnabled()) then
-		QuestBuster_AutoQuest_ProcessActiveQuests(GetGossipActiveQuests());
-	    QuestBuster_AutoQuest_ProcessAvailableQuests(GetGossipAvailableQuests());
+function qb.auto_quest.GOSSIP_SHOW()
+	if (checkEnabled()) then
+		processActiveQuests(GetGossipActiveQuests());
+	    processAvailableQuests(GetGossipAvailableQuests());
     end
 end
 
-local function QuestBuster_AutoQuest_AcceptQuest()
-	if (QuestBuster_AutoQuest_CheckEnabled() and QuestBuster_AutoQuest_CheckQuest()) then
+function qb.auto_quest.QUEST_DETAIL()
+	if (checkEnabled() and checkQuest()) then
 		AcceptQuest();
 	end
 end
 
-local function QuestBuster_AutoQuest_CompleteQuest()
-	if (IsQuestCompletable() and QuestBuster_AutoQuest_CheckEnabled() and QuestBuster_AutoQuest_CheckQuest()) then
+function qb.auto_quest.QUEST_PROGRESS()
+	if (IsQuestCompletable() and checkEnabled() and checkQuest()) then
 		CompleteQuest();
 	end
 end
 
-local function QuestBuster_AutoQuest_SelectReward()
-	if (QuestBuster_AutoQuest_CheckEnabled()) then
+function qb.auto_quest.QUEST_COMPLETE()
+	if (checkEnabled()) then
 		if (GetNumQuestChoices() > 1) then
 			local quest_id = GetQuestID();
 			if (QuestBusterOptions[QuestBusterEntry].daily_quest_rewards[quest_id] ~= nil) then
@@ -113,23 +128,3 @@ local function QuestBuster_AutoQuest_SelectReward()
 		end
 	end
 end
-
-local frame = CreateFrame("Frame", "QuestBuster_AutoQuestFrame", UIParent, SecureFrameTemplate);
-frame:RegisterEvent("QUEST_GREETING");
-frame:RegisterEvent("GOSSIP_SHOW");
-frame:RegisterEvent("QUEST_DETAIL");
-frame:RegisterEvent("QUEST_PROGRESS");
-frame:RegisterEvent("QUEST_COMPLETE");
-frame:SetScript("OnEvent", function(self, event, ...)
-	if (QuestBusterInit and (event == "QUEST_GREETING")) then
-		QuestBuster_AutoQuest_ListOld();
-	elseif (QuestBusterInit and (event == "GOSSIP_SHOW")) then
-		QuestBuster_AutoQuest_ListNew();
-	elseif (QuestBusterInit and (event == "QUEST_DETAIL")) then
-		QuestBuster_AutoQuest_AcceptQuest();
-	elseif (QuestBusterInit and (event == "QUEST_PROGRESS")) then
-		QuestBuster_AutoQuest_CompleteQuest();
-	elseif (QuestBusterInit and (event == "QUEST_COMPLETE")) then
-		QuestBuster_AutoQuest_SelectReward();
-	end
-end);

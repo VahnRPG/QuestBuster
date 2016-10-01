@@ -1,6 +1,27 @@
 -------------------------------------------------------------------------------
 -- The Object-Manipulation Grouping Lib utilities file
 -------------------------------------------------------------------------------
+local mod_name, mod = ...;
+mod.omg = {};
+
+local OMG_MONEY = {		--Thanks WowHead Looter!
+	["1"] = string.gsub(COPPER_AMOUNT, "%%d ", ""),
+	["100"] = string.gsub(SILVER_AMOUNT, "%%d ", ""),
+	["10000"] = string.gsub(GOLD_AMOUNT, "%%d ", ""),
+ };
+
+function mod.omg:omg_parse_money(money)
+	local copper = 0;
+	for base, parser in pairs(OMG_MONEY) do
+		local found, _, found_amount = string.find(money, "(%d+) " .. parser);
+		if (found) then
+			copper = copper + found_amount * tonumber(base);
+		end
+	end
+
+	return copper;
+end
+
 local backdrop = {
 	bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
 	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -10,19 +31,19 @@ local backdrop = {
 	insets = { left = 3, right = 3, top = 5, bottom = 3 }
 };
 
-function add_debug_border(frame)
+function mod.omg:add_debug_border(frame)
 	frame:SetBackdrop(backdrop);
 	frame:SetBackdropColor(0.25, 0.05, 0.25, 0.75);
 	frame:SetBackdropBorderColor(.5, .5, 0, 1);
 end
 
-function create_timer(duration, callback)
+function mod.omg:create_timer(duration, callback)
 	C_Timer.After(duration, callback);
 end
 
-function str_pad(str, size, pad_str, pad_dir)
-	if (strlen(str) >= size or size < 1) then
-		return str;
+function mod.omg:str_pad(text, size, pad_str, pad_dir)
+	if (strlen(text) >= size or size < 1) then
+		return text;
 	end
 	if (not pad_str) then
 		pad_str = " ";
@@ -31,7 +52,7 @@ function str_pad(str, size, pad_str, pad_dir)
 		pad_dir = "right";
 	end
 	
-	local count = size - strlen(str);
+	local count = size - strlen(text);
 	local pad_left = 0;
 	local pad_right = 0;
 	if (pad_dir == "both") then
@@ -44,34 +65,16 @@ function str_pad(str, size, pad_str, pad_dir)
 	end
 
 	if (pad_left > 0) then
-		str = str .. string.rep(pad_str, pad_left);
+		text = text .. string.rep(pad_str, pad_left);
 	end
 	if (pad_right > 0) then
-		str = string.rep(pad_str, pad_right) .. str;
+		text = string.rep(pad_str, pad_right) .. text;
 	end
 
-	return str;
+	return text;
 end
 
-local OMG_MONEY = {		--Thanks WowHead Looter!
-	["1"] = string.gsub(COPPER_AMOUNT, "%%d ", ""),
-	["100"] = string.gsub(SILVER_AMOUNT, "%%d ", ""),
-	["10000"] = string.gsub(GOLD_AMOUNT, "%%d ", ""),
- };
-
-function omg_parse_money(amount)
-	local copper = 0;
-	for base, parser in pairs(OMG_MONEY) do
-		local found, _, found_amount = string.find(amount, "(%d+) " .. parser);
-		if (found) then
-			copper = copper + found_amount * tonumber(base);
-		end
-	end
-
-	return copper;
-end
-
-function build_time_string(timestamp)
+function mod.omg:build_time_string(timestamp)
 	local t = math.floor(timestamp);
 	local seconds = math.fmod(t, 60);
 	t = math.floor(t / 60);
@@ -80,27 +83,31 @@ function build_time_string(timestamp)
 
 	local hours_str = "";
 	if (hours > 0) then
-		hours_str = "asdqwe" .. str_pad(hours, 2, "0") .. ":";
+		hours_str = "asdqwe" .. mod.omg:str_pad(hours, 2, "0") .. ":";
 	end
 
-	return hours_str .. str_pad(minutes, 2, "0") .. ":" .. str_pad(seconds, 2, "0");
+	return hours_str .. mod.omg:str_pad(minutes, 2, "0") .. ":" .. mod.omg:str_pad(seconds, 2, "0");
 end
 
-function end_string(cut_string, length)
+function mod.omg:end_string(text, length)
 	local end_dots = "";
-	if (string.len(cut_string) > length + 1) then
+	if (string.len(text) > length + 1) then
 		end_dots = "...";
 	end
-	cut_string = string.sub(cut_string, 1, length);
+	text = string.sub(text, 1, length);
 
-	return cut_string .. end_dots;
+	return text .. end_dots;
 end
 
-function trim(trim_string)
-	return (string.gsub(trim_string, "^%s*(.-)%s*$", "%1"))
+function mod.omg:trim(text)
+	return string.gsub(text, "^%s*(.-)%s*$", "%1");
 end
 
-function sortedpairs(t, comparator)
+function mod.omg:ucwords(text)
+	return string.gsub(" " .. text, "%W%l", string.upper):sub(2);
+end
+
+function mod.omg:sortedpairs(t, comparator)
 	local sortedKeys = {};
 	table.foreach(t, function(k, v) table.insert(sortedKeys, k) end);
 	table.sort(sortedKeys, comparator);
@@ -116,7 +123,7 @@ function sortedpairs(t, comparator)
 	return _f, nil, nil;
 end
 
-function tcount(t)
+function mod.omg:tcount(t)
 	local n = 0;
 	for _ in pairs(t) do
 		n = n + 1;
@@ -125,13 +132,11 @@ function tcount(t)
 	return n;
 end
 
-function round(num, precision)
+function mod.omg:round(num, precision)
 	return tonumber(string.format("%." .. (precision or 0) .. "f", num));
-	--local mult = 10^(precision or 0);
-	--return math.floor(num * mult + 0.5) / mult;
 end
 
-function explode(div, str)
+function mod.omg:explode(div, str)
 	if (div == "") then
 		return nil;
 	end
@@ -148,7 +153,7 @@ function explode(div, str)
 	return arr;
 end
 
-function push_table(base_table, data)
+function mod.omg:push_table(base_table, data)
 	for key, value in sortedpairs(data) do
 		base_table[key] = value;
 	end
@@ -156,31 +161,31 @@ function push_table(base_table, data)
 	return base_table;
 end
 
-function print_r(t)
+function mod.omg:print_r(t)
  	local print_r_cache = {};
 	local function sub_print_r(t, indent)
 		if (print_r_cache[tostring(t)]) then
-			echo(indent .. "*" .. tostring(t));
+			mod.omg:echo(indent .. "*" .. tostring(t));
 		else
 			print_r_cache[tostring(t)] = true;
 			if (type(t) == "table") then
 				for pos, val in pairs(t) do
 					if (type(val) == "table") then
-						echo(indent .. "[" .. pos .. "] => " .. tostring(t) .. " {");
-						sub_print_r(val,indent..string.rep(" ",string.len(pos)+8));
-						echo(indent .. string.rep(" ", string.len(pos)+6) .. "}");
+						mod.omg:echo(indent .. "[" .. pos .. "] => " .. tostring(t) .. " {");
+						sub_print_r(val, indent..string.rep(" ", string.len(pos) + 8));
+						mod.omg:echo(indent .. string.rep(" ", string.len(pos) + 6) .. "}");
 					else
-						echo(indent .. "[" .. pos .. "] => " .. tostring(val));
+						mod.omg:echo(indent .. "[" .. pos .. "] => " .. tostring(val));
 					end
 				end
 			else
-				echo(indent .. tostring(t));
+				mod.omg:echo(indent .. tostring(t));
 			end
 		end
 	end
 	sub_print_r(t, "  ");
 end
 
-function echo(text)
+function mod.omg:echo(text)
 	DEFAULT_CHAT_FRAME:AddMessage(text);
 end

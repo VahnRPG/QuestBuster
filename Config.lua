@@ -36,7 +36,7 @@ local function QuestBuster_Config_DailyQuestRewards_ScrollFrame_Update(self)
 	local rewards = {};
 	local count = 0;
 	if (QuestBusterOptions[QuestBusterEntry].daily_quest_rewards and next(QuestBusterOptions[QuestBusterEntry].daily_quest_rewards)) then
-		for quest_id, reward_data in sortedpairs(QuestBusterOptions[QuestBusterEntry].daily_quest_rewards) do
+		for quest_id, reward_data in qb.omg:sortedpairs(QuestBusterOptions[QuestBusterEntry].daily_quest_rewards) do
 			count = count + 1;
 			table.insert(rewards, reward_data);
 		end
@@ -166,7 +166,7 @@ config_frame:SetScript("OnShow", function(config_frame)
 	reward_highlights_label:SetText(QBL["CONFIG_TITLE_HIGHLIGHT_REWARD"]);
 
 	local count = 0;
-	for key, value in sortedpairs(QBG_REWARDS) do
+	for key, value in qb.omg:sortedpairs(QBG_REWARDS) do
 		if (key ~= QBT_REWARD_NONE) then
 			local module_data = CraftBuster_Modules[module_id];
 			reward_highlights[key] = CreateFrame("CheckButton", config_frame_name .. "HighlightRewards" .. key, config_frame, "InterfaceOptionsCheckButtonTemplate");
@@ -276,7 +276,7 @@ child_auto_quest_frame:SetScript("OnShow", function(child_auto_quest_frame)
 	auto_quest_reward_menu = CreateFrame("Frame", config_frame_name .. "SetReward", auto_quest_details_frame, "UIDropDownMenuTemplate");
 	auto_quest_reward_menu:SetPoint("TOPLEFT", auto_quest_reward_label, "TOPRIGHT", 0, 4);
 	UIDropDownMenu_Initialize(auto_quest_reward_menu, function()
-		for key, value in sortedpairs(QBG_REWARDS) do
+		for key, value in qb.omg:sortedpairs(QBG_REWARDS) do
 			local info = UIDropDownMenu_CreateInfo();
 			info.text = value.label;
 			info.value = key;

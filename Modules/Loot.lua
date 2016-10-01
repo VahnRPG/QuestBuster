@@ -32,7 +32,7 @@ end
 local function initRewardAutoSelect()
 	if (QuestIsDaily() or QuestIsWeekly()) then
 		for i=1, GetNumQuestChoices() do
-			--echo("Here: " .. "QuestInfoRewardsFrameQuestInfoItem" .. i);
+			--qb.omg:echo("Here: " .. "QuestInfoRewardsFrameQuestInfoItem" .. i);
 			local frame = _G["QuestInfoRewardsFrameQuestInfoItem" .. i];
 			frame:HookScript("OnEnter",
 				function(self, ...)
@@ -105,7 +105,7 @@ local function getBestPriceReward()
 
 		local item_link = GetQuestItemLink("choice", i);
 		if (not item_link) then
-			return create_timer(1, getBestPriceReward);
+			return qb.omg:create_timer(1, getBestPriceReward);
 		end
 
 		local price = item_link and select(11, GetItemInfo(item_link));

@@ -41,6 +41,7 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 							if (not qb.world_quests.quest_data[quest_id]) then
 								qb.world_quests.quest_data[quest_id] = {
 									["name"] = "",
+									["objectives"] = info.numObjectives,
 									["zone"] = {},
 									["type"] = {},
 									["faction"] = {},

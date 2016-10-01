@@ -22,7 +22,7 @@ function qb.watch_frame.showQuestLevel()
 		for _, block in pairs(tracker.MODULES[i].usedBlocks) do
 			local questLogIndex = GetQuestLogIndexByID(block.id);
 			if (questLogIndex > 0 and block.HeaderText ~= nil and block.HeaderText:GetText() and (not string.find(block.HeaderText:GetText(), "^%[.*%].*"))) then
-				--echo("Here: " .. i .. " - " .. questLogIndex .. " -> " .. block.HeaderText:GetText());
+				--qb.omg:echo("Here: " .. i .. " - " .. questLogIndex .. " -> " .. block.HeaderText:GetText());
 				local title, level, _,_,_,_, is_daily = GetQuestLogTitle(questLogIndex);
 				local quest_type = GetQuestLogQuestType(questLogIndex);
 				quest_type = QBG_QUEST_TYPES[quest_type] or "";

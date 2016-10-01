@@ -594,5 +594,5 @@ function qb.quest_lists:resetPosition(frame_name)
 end
 
 function QuestBuster_QuestListFrames_Toggle()
-	qb.quest_lists:collapse("Default");
+	qb.quest_lists:collapseFrame("Default");
 end

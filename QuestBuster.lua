@@ -144,4 +144,19 @@ function qb:initSettings(reset)
 		QuestBusterOptions[QuestBusterEntry].minimap.position = 310;
 		QuestBuster_Minimap_Init();
 	end
+	
+	for _, frame_data in pairs(QBG_QUEST_LIST_FRAMES) do
+		if (not QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]]) then
+			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]] = {};
+			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].show = true;
+			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position = {
+				point = "TOPLEFT",
+				relative_point = "TOPLEFT",
+				x = 490,
+				y = -330,
+			};
+			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].locked = false;
+			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].state = "expanded";
+		end
+	end
 end

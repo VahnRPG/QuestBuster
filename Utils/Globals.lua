@@ -31,6 +31,23 @@ QBG_WORLD_QUEST_TYPES = {
 	[LE_QUEST_TAG_TYPE_DUNGEON]		= "Dungeon",
 };
 
+QBG_QUEST_LIST_FRAMES = {
+	[1] = {
+		["name"] = "Default",
+		["label"] = "Default",
+		["parent"] = UIParent,
+		["strata"] = "LOW",
+		["tooltip"] = GameTooltip,
+	},
+	[2] = {
+		["name"] = "WorldMap",
+		["label"] = "World Map",
+		["parent"] = WorldMapFrame,
+		["strata"] = "FULLSCREEN_DIALOG",
+		["tooltip"] = WorldMapTooltip,
+	},
+};
+
 -------------------------------------------------------------------------------
 -- Colors
 -------------------------------------------------------------------------------

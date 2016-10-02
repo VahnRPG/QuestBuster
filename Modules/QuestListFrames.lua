@@ -380,10 +380,10 @@ function qb.quest_lists:update()
 								local filter_quest_frame = frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]["frame"];
 								filter_quest_frame:SetPoint("TOPLEFT", frame.type_frames[quest_type]["filters"][filter_name]["frame"], "TOPLEFT", 20, (quests_displayed * -15) - height_padding - 15);
 								
-								local timeLeftMinutes = C_TaskQuest.GetQuestTimeLeftMinutes(quest_id);
-								if (timeLeftMinutes and timeLeftMinutes > 0) then
+								local minutes_left = C_TaskQuest.GetQuestTimeLeftMinutes(quest_id);
+								if (minutes_left and minutes_left > 0) then
 									local color = HIGHLIGHT_FONT_COLOR;
-									if ( timeLeftMinutes <= WORLD_QUESTS_TIME_CRITICAL_MINUTES ) then
+									if (minutes_left <= WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
 										color = RED_FONT_COLOR;
 									end
 									frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]["frame"].expand.label:SetTextColor(color.r, color.g, color.b, color.a);
@@ -486,111 +486,114 @@ function qb.quest_lists:update()
 end
 
 function qb.quest_lists:setEmissaryTooltip(tooltip, emissary_data)
-	local faction_name, faction_description, faction_standing = GetFactionInfoByID(emissary_data["faction_id"]);
+	local faction_name, _, faction_standing = GetFactionInfoByID(emissary_data["faction_id"]);
 	tooltip:SetText(faction_name .. " - " .. getglobal("FACTION_STANDING_LABEL" .. faction_standing));
 	
 	tooltip:AddLine("Completed: " .. emissary_data["completed"] .. "/" .. emissary_data["total"]);
 	
-	local timeLeftMinutes = C_TaskQuest.GetQuestTimeLeftMinutes(emissary_data["quest_id"]);
-	if (timeLeftMinutes and timeLeftMinutes > 0) then
+	local minutes_left = C_TaskQuest.GetQuestTimeLeftMinutes(emissary_data["quest_id"]);
+	if (minutes_left and minutes_left > 0) then
 		local color = NORMAL_FONT_COLOR;
-		local timeString;
-		if ( timeLeftMinutes <= WORLD_QUESTS_TIME_CRITICAL_MINUTES ) then
+		local time_str;
+		if (minutes_left <= WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
 			color = RED_FONT_COLOR;
-			timeString = SecondsToTime(timeLeftMinutes * 60);
-		elseif (timeLeftMinutes <= 60 + WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
-			timeString = SecondsToTime((timeLeftMinutes - WORLD_QUESTS_TIME_CRITICAL_MINUTES) * 60);
-		elseif (timeLeftMinutes < 24 * 60 + WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
-			timeString = D_HOURS:format(math.floor(timeLeftMinutes - WORLD_QUESTS_TIME_CRITICAL_MINUTES) / 60);
+			time_str = SecondsToTime(minutes_left * 60);
+		elseif (minutes_left <= 60 + WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
+			time_str = SecondsToTime((minutes_left - WORLD_QUESTS_TIME_CRITICAL_MINUTES) * 60);
+		elseif (minutes_left < 24 * 60 + WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
+			time_str = D_HOURS:format(math.floor(minutes_left - WORLD_QUESTS_TIME_CRITICAL_MINUTES) / 60);
 		else
-			timeString = D_DAYS:format(math.floor(timeLeftMinutes - WORLD_QUESTS_TIME_CRITICAL_MINUTES) / 1440);
+			time_str = D_DAYS:format(math.floor(minutes_left - WORLD_QUESTS_TIME_CRITICAL_MINUTES) / 1440);
 		end
-		tooltip:AddLine(BONUS_OBJECTIVE_TIME_LEFT:format(timeString), color:GetRGB());
+		tooltip:AddLine(BONUS_OBJECTIVE_TIME_LEFT:format(time_str), color:GetRGB());
 	end
 end
 
-function qb.quest_lists:setQuestTooltip(tooltip, questID)
-	local title, factionID, capped = C_TaskQuest.GetQuestInfoByQuestID(questID);
-	local tagID, tagName, worldQuestType, rarity, isElite, tradeskillLineIndex = GetQuestTagInfo(questID);
+function qb.quest_lists:setQuestTooltip(tooltip, quest_id)
+	local title, faction_id, capped = C_TaskQuest.GetQuestInfoByQuestID(quest_id);
+	local _, _, _, rarity = GetQuestTagInfo(quest_id);
 	local color = WORLD_QUEST_QUALITY_COLORS[rarity];
 	tooltip:SetText(title, color.r, color.g, color.b);
 	
-	if ( factionID ) then
-		local factionName = GetFactionInfoByID(factionID);
-		if ( factionName ) then
+	if (faction_id) then
+		local text = GetFactionInfoByID(faction_id);
+		if (text) then
 			if (capped) then
-				tooltip:AddLine(factionName, GRAY_FONT_COLOR:GetRGB());
+				tooltip:AddLine(text, GRAY_FONT_COLOR:GetRGB());
 			else
-				tooltip:AddLine(factionName);
+				tooltip:AddLine(text);
 			end
 		end
 	end
 	
-	if (qb.world_quests.quest_data[questID] and qb.world_quests.quest_data[questID]["location"]["zone"] ~= "") then
-		tooltip:AddLine(QBG_CLR_LIGHTGREEN .. qb.world_quests.quest_data[questID]["location"]["zone"]);
+	if (qb.world_quests.quest_data[quest_id] and qb.world_quests.quest_data[quest_id]["location"]["zone"] ~= "") then
+		tooltip:AddLine(QBG_CLR_LIGHTGREEN .. qb.world_quests.quest_data[quest_id]["location"]["zone"]);
 	end
 	
-	local timeLeftMinutes = C_TaskQuest.GetQuestTimeLeftMinutes(questID);
-	if (timeLeftMinutes and timeLeftMinutes > 0) then
+	local minutes_left = C_TaskQuest.GetQuestTimeLeftMinutes(quest_id);
+	if (minutes_left and minutes_left > 0) then
 		local color = NORMAL_FONT_COLOR;
-		local timeString;
-		if ( timeLeftMinutes <= WORLD_QUESTS_TIME_CRITICAL_MINUTES ) then
+		local time_str;
+		if (minutes_left <= WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
 			color = RED_FONT_COLOR;
-			timeString = SecondsToTime(timeLeftMinutes * 60);
-		elseif (timeLeftMinutes <= 60 + WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
-			timeString = SecondsToTime((timeLeftMinutes - WORLD_QUESTS_TIME_CRITICAL_MINUTES) * 60);
-		elseif (timeLeftMinutes < 24 * 60 + WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
-			timeString = D_HOURS:format(math.floor(timeLeftMinutes - WORLD_QUESTS_TIME_CRITICAL_MINUTES) / 60);
+			time_str = SecondsToTime(minutes_left * 60);
+		elseif (minutes_left <= 60 + WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
+			time_str = SecondsToTime((minutes_left - WORLD_QUESTS_TIME_CRITICAL_MINUTES) * 60);
+		elseif (minutes_left < 24 * 60 + WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
+			time_str = D_HOURS:format(math.floor(minutes_left - WORLD_QUESTS_TIME_CRITICAL_MINUTES) / 60);
 		else
-			timeString = D_DAYS:format(math.floor(timeLeftMinutes - WORLD_QUESTS_TIME_CRITICAL_MINUTES) / 1440);
+			time_str = D_DAYS:format(math.floor(minutes_left - WORLD_QUESTS_TIME_CRITICAL_MINUTES) / 1440);
 		end
-		tooltip:AddLine(BONUS_OBJECTIVE_TIME_LEFT:format(timeString), color:GetRGB());
+		tooltip:AddLine(BONUS_OBJECTIVE_TIME_LEFT:format(time_str), color:GetRGB());
 	end
 	
-	if (qb.world_quests.quest_data[questID] and qb.world_quests.quest_data[questID]["objectives"] > 0) then
-		for objectiveIndex = 1, qb.world_quests.quest_data[questID]["objectives"] do
-			local objectiveText, objectiveType, finished = GetQuestObjectiveInfo(questID, objectiveIndex, false);
-			if ( objectiveText and #objectiveText > 0 ) then
+	if (qb.world_quests.quest_data[quest_id] and qb.world_quests.quest_data[quest_id]["objectives"] > 0) then
+		for i=1, qb.world_quests.quest_data[quest_id]["objectives"] do
+			local text, _, finished = GetQuestObjectiveInfo(quest_id, i, false);
+			if (text and #text > 0) then
 				local color = finished and GRAY_FONT_COLOR or HIGHLIGHT_FONT_COLOR;
-				tooltip:AddLine(QUEST_DASH .. objectiveText, color.r, color.g, color.b, true);
+				tooltip:AddLine(QUEST_DASH .. text, color.r, color.g, color.b, true);
 			end
 		end
 	end
 	
-	if ( GetQuestLogRewardXP(questID) > 0 or GetNumQuestLogRewardCurrencies(questID) > 0 or GetNumQuestLogRewards(questID) > 0 or GetQuestLogRewardMoney(questID) > 0 or GetQuestLogRewardArtifactXP(questID) > 0 ) then
+	if (GetQuestLogRewardXP(quest_id) > 0 or GetNumQuestLogRewardCurrencies(quest_id) > 0 or GetNumQuestLogRewards(quest_id) > 0 or GetQuestLogRewardMoney(quest_id) > 0 or GetQuestLogRewardArtifactXP(quest_id) > 0) then
 		tooltip:AddLine(" ");
 		tooltip:AddLine(QUEST_REWARDS, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true);
-		local hasAnySingleLineRewards = false;
-		-- xp
-		local xp = GetQuestLogRewardXP(questID);
-		if ( xp > 0 ) then
-			tooltip:AddLine(BONUS_OBJECTIVE_EXPERIENCE_FORMAT:format(xp), HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
-			hasAnySingleLineRewards = true;
+		local found = false;
+
+		-- experience
+		local experience = GetQuestLogRewardXP(quest_id);
+		if (experience > 0) then
+			tooltip:AddLine(BONUS_OBJECTIVE_EXPERIENCE_FORMAT:format(experience), HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+			found = true;
 		end
+
 		-- money
-		local money = GetQuestLogRewardMoney(questID);
-		if ( money > 0 ) then
+		local money = GetQuestLogRewardMoney(quest_id);
+		if (money > 0) then
 			SetTooltipMoney(tooltip, money, nil);
-			hasAnySingleLineRewards = true;
+			found = true;
 		end	
-		local artifactXP = GetQuestLogRewardArtifactXP(questID);
-		if ( artifactXP > 0 ) then
-			tooltip:AddLine(BONUS_OBJECTIVE_ARTIFACT_XP_FORMAT:format(artifactXP), HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
-			hasAnySingleLineRewards = true;
+		local artifact_experience = GetQuestLogRewardArtifactXP(quest_id);
+		if (artifact_experience > 0) then
+			tooltip:AddLine(BONUS_OBJECTIVE_ARTIFACT_XP_FORMAT:format(artifact_experience), HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+			found = true;
 		end
+
 		-- currency		
-		local numQuestCurrencies = GetNumQuestLogRewardCurrencies(questID);
-		for i = 1, numQuestCurrencies do
-			local name, texture, numItems = GetQuestLogRewardCurrencyInfo(i, questID);
-			local text = BONUS_OBJECTIVE_REWARD_WITH_COUNT_FORMAT:format(texture, numItems, name);
+		local currencies = GetNumQuestLogRewardCurrencies(quest_id);
+		for i=1, currencies do
+			local name, texture, num_items = GetQuestLogRewardCurrencyInfo(i, quest_id);
+			local text = BONUS_OBJECTIVE_REWARD_WITH_COUNT_FORMAT:format(texture, num_items, name);
 			tooltip:AddLine(text, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
-			hasAnySingleLineRewards = true;
+			found = true;
 		end
 		
 		-- items
-		local numQuestRewards = GetNumQuestLogRewards(questID);
-		if numQuestRewards > 0 then
-			if ( hasAnySingleLineRewards ) then
+		local rewards = GetNumQuestLogRewards(quest_id);
+		if (rewards > 0) then
+			if (found) then
 				tooltip:AddLine(" ");
 			end
 			
@@ -608,7 +611,7 @@ function qb.quest_lists:setQuestTooltip(tooltip, questID)
 				end
 				item_frame = _G["qb.GameTooltip.ItemTooltip"];
 			end
-			if not EmbeddedItemTooltip_SetItemByQuestReward(item_frame, 1, questID) then
+			if not EmbeddedItemTooltip_SetItemByQuestReward(item_frame, 1, quest_id) then
 				tooltip:AddLine(RETRIEVING_DATA, RED_FONT_COLOR:GetRGB());
 			end
 			if (_G["qb.GameTooltip.ItemTooltip"]) then

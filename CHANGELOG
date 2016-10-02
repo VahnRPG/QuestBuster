@@ -1,5 +1,6 @@
-v 1.0.1
+v 1.0.0
 	- Initial work updating for Legion
-
-v 0.0.5
-	- Initial release
+	- Added World Quests list frame
+	- Titan Panel/broker toggle functionality for quests
+	- Highlight most expensive quest reward if available
+	- Add quest level to tracked quests in Objective frame

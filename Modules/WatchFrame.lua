@@ -9,7 +9,7 @@ qb.watch_frame.frame:SetScript("OnEvent", function(self, event, ...)
 end);
 qb.watch_frame.reload = nil;
 
-function qb.watch_frame:showQuestLevel(self)
+function QuestBuster_WatchFrame_ShowQuestLevel(self)
 	local show_level = QuestBusterOptions[QuestBusterEntry].watch_frame["show_level"];
 	if (not show_level and not qb.watch_frame.reload) then
 		return;
@@ -49,7 +49,7 @@ function qb.watch_frame:showQuestLevel(self)
 	qb.watch_frame.reload = nil;
 end
 
-function qb.watch_frame:addToWatchFrame(self)
+function QuestBuster_WatchFrame_AddToWatchFrame(self)
 	if (not QuestBusterOptions[QuestBusterEntry].watch_frame["show_abandon"]) then 
 		return;
 	end
@@ -69,5 +69,5 @@ function qb.watch_frame:addToWatchFrame(self)
 	end
 end
 
-hooksecurefunc("ObjectiveTracker_Update", qb.watch_frame.showQuestLevel);
-hooksecurefunc("QuestObjectiveTracker_OnOpenDropDown", qb.watch_frame.addToWatchFrame);
+hooksecurefunc("ObjectiveTracker_Update", QuestBuster_WatchFrame_ShowQuestLevel);
+hooksecurefunc("QuestObjectiveTracker_OnOpenDropDown", QuestBuster_WatchFrame_AddToWatchFrame);

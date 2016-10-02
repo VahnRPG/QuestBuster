@@ -6,6 +6,7 @@ QBG_VERSION = GetAddOnMetadata(QBG_MOD_NAME, "Version");
 QBG_LAST_UPDATED = GetAddOnMetadata(QBG_MOD_NAME, "X-Date");
 
 QBG_HAS_MOGIT = IsAddOnLoaded("MogIt");
+QBG_HAS_TOMTOM = IsAddOnLoaded("TomTom");
 QBG_GOSSIP_PARAMS = 6;
 
 QBG_REWARDS = {};

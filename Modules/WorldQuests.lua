@@ -11,6 +11,9 @@ qb.world_quests.frame:SetScript("OnEvent", function(self, event, ...)
 		return qb.world_quests[event] and qb.world_quests[event](qb, ...)
 	end
 end);
+qb.world_quests.emissary = {};
+qb.world_quests.emissary.count = 0;
+qb.world_quests.emissary.quests = {};
 qb.world_quests.quest_data = {};
 
 function qb.world_quests:QUEST_LOG_UPDATE()
@@ -28,7 +31,7 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 			["other"] = {},
 		},
 	};
-
+	
 	for i, map_id in pairs(QBG_MAP_IDS) do
 		if (C_MapCanvas.GetNumZones(map_id) ~= nil) then
 			for zone_id=1, C_MapCanvas.GetNumZones(map_id) do
@@ -42,9 +45,15 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 								qb.world_quests.quest_data[quest_id] = {
 									["name"] = "",
 									["objectives"] = info.numObjectives,
-									["zone"] = {},
-									["type"] = {},
-									["faction"] = {},
+									["location"] = {
+										["zone"] = "",
+										["x"] = "",
+										["y"] = "",
+										["floor"] = "",
+										["map_id"] = "",
+									},
+									["type"] = "",
+									["faction"] = "",
 									["rewards"] = {
 										["experience"] = 0,
 										["money"] = 0,
@@ -66,7 +75,11 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 										qb.world_quests.quests.quests["zones"][zone_name] = {};
 									end
 									qb.world_quests.quests.quests["zones"][zone_name][quest_id] = quest_id;
-									qb.world_quests.quest_data[quest_id]["zone"] = zone_name;
+									qb.world_quests.quest_data[quest_id]["location"]["zone"] = zone_name;
+									qb.world_quests.quest_data[quest_id]["location"]["x"] = info.x;
+									qb.world_quests.quest_data[quest_id]["location"]["y"] = info.y;
+									qb.world_quests.quest_data[quest_id]["location"]["floor"] = info.floor;
+									qb.world_quests.quest_data[quest_id]["location"]["map_id"] = map_id;
 									
 									--process quest type
 									local _, _, world_quest_type = GetQuestTagInfo(quest_id);
@@ -139,6 +152,26 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 					end
 				end
 			end
+		end
+	end
+	
+	WorldMapFrame.UIElementsFrame.BountyBoard.mapAreaID = GetCurrentMapAreaID();
+	WorldMapFrame.UIElementsFrame.BountyBoard:Refresh();
+	qb.world_quests.emissary.count = 0;
+	qb.world_quests.emissary.quests = {};
+	if (WorldMapFrame.UIElementsFrame.BountyBoard.bounties) then
+		for bountyIndex, bounty in ipairs(WorldMapFrame.UIElementsFrame.BountyBoard.bounties) do
+			local completed, total = WorldMapFrame.UIElementsFrame.BountyBoard:CalculateBountySubObjectives(bounty);
+
+			qb.world_quests.emissary.count = qb.world_quests.emissary.count + 1;
+			qb.world_quests.emissary.quests[qb.world_quests.emissary.count] = {
+				["index"] = bountyIndex,
+				["quest_id"] = bounty.questID,
+				["faction_id"] = bounty.factionID,
+				["icon"] = bounty.icon,
+				["completed"] = completed,
+				["total"] = total,
+			};
 		end
 	end
 

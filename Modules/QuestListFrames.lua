@@ -138,6 +138,14 @@ function qb.quest_lists:ADDON_LOADED()
 			
 			emissary_frame.icon = emissary_frame:CreateTexture("ARTWORK");
 			emissary_frame.icon:SetAllPoints();
+
+			emissary_frame.check_icon = CreateFrame("Frame", nil, emissary_frame);
+			emissary_frame.check_icon:SetPoint("TOPLEFT", emissary_frame, "TOPLEFT", -(emissary_frame:GetWidth() * .25), (emissary_frame:GetHeight() * .25));
+			emissary_frame.check_icon:SetSize(emissary_frame:GetWidth() * 1.5, emissary_frame:GetHeight() * 1.5);
+			
+			emissary_frame.check_icon.icon = emissary_frame.check_icon:CreateTexture("ARTWORK");
+			emissary_frame.check_icon.icon:SetAllPoints();
+			emissary_frame.check_icon.icon:SetAtlas("worldquest-tracker-checkmark", true);
 			
 			frame.emissary_frames[i] = emissary_frame;
 		end
@@ -287,7 +295,7 @@ function qb.quest_lists:update()
 									local tooltip = frame_data["tooltip"];
 									local quest_frame = CreateFrame("Frame", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "_" .. filter_count .. "_" .. quest_count .."Frame", frame, SecureFrameTemplate);
 									quest_frame:SetPoint("TOPLEFT", frame.type_frames[quest_type]["filters"][filter_name]["frame"], "TOPLEFT", 20, (quest_count * -15) - 15);
-									quest_frame:SetSize(268, 10);
+									quest_frame:SetSize(268, 16);
 									quest_frame.frame_name = type_count .. "_" .. filter_count .. "_" .. quest_count;
 									
 									quest_frame.expand = CreateFrame("Button", quest_frame:GetName() .. "_ExpandFrame", type_frame);
@@ -339,6 +347,28 @@ function qb.quest_lists:update()
 										quest_frame.quest_type.icon:SetAtlas("worldquest-icon-dungeon", true);
 									else
 										quest_frame.quest_type.icon:SetAtlas("worldquest-questmarker-questbang");
+									end
+									
+									if (QBG_HAS_TOMTOM) then
+										quest_frame.tomtom = CreateFrame("Button", quest_frame:GetName() .. "_TomTom", quest_frame.expand);
+										quest_frame.tomtom:SetPoint("TOPRIGHT", quest_frame.expand, "TOPLEFT", 0, 0);
+										quest_frame.tomtom:SetSize(16, 16);
+										quest_frame.tomtom:SetScript("OnEnter", function(self)
+											tooltip:SetOwner(self, "ANCHOR_CURSOR");
+											tooltip:SetText(QBL["WORLD_QUEST_TOMTOM"]);
+											tooltip:Show();
+										end);
+										quest_frame.tomtom:SetScript("OnLeave", function(self)
+											tooltip:Hide();
+										end);
+										quest_frame.tomtom:SetScript("OnClick", function(self)
+											local location_data = qb.world_quests.quest_data[quest_id]["location"];
+											TomTom:AddMFWaypoint(location_data["map_id"], location_data["floor"], location_data["x"], location_data["y"], {title=title, persistent=false })
+										end);
+										
+										quest_frame.tomtom.icon = quest_frame.tomtom:CreateTexture("ARTWORK");
+										quest_frame.tomtom.icon:SetAllPoints();
+										quest_frame.tomtom.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_TomTom");
 									end
 									
 									frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id] = {
@@ -418,8 +448,10 @@ function qb.quest_lists:update()
 				for i=1, MAX_EMISSARY_QUESTS do
 					local emissary_frame = frame.emissary_frames[i];
 					if (qb.world_quests.emissary.quests[i]) then
-						emissary_frame.emissary_data = qb.world_quests.emissary.quests[i];
-						emissary_frame.icon:SetTexture(qb.world_quests.emissary.quests[i]["icon"]);
+						local quest_data = qb.world_quests.emissary.quests[i];
+						emissary_frame.emissary_data = quest_data;
+						emissary_frame.icon:SetTexture(quest_data["icon"]);
+						emissary_frame.check_icon.icon:SetAlpha(quest_data["completed"] / quest_data["total"]);
 						emissary_frame:Show();
 					else
 						emissary_frame:Hide();
@@ -494,8 +526,8 @@ function qb.quest_lists:setQuestTooltip(tooltip, questID)
 		end
 	end
 	
-	if (qb.world_quests.quest_data[questID] and qb.world_quests.quest_data[questID]["zone"] ~= "") then
-		tooltip:AddLine(QBG_CLR_LIGHTGREEN .. qb.world_quests.quest_data[questID]["zone"]);
+	if (qb.world_quests.quest_data[questID] and qb.world_quests.quest_data[questID]["location"]["zone"] ~= "") then
+		tooltip:AddLine(QBG_CLR_LIGHTGREEN .. qb.world_quests.quest_data[questID]["location"]["zone"]);
 	end
 	
 	local timeLeftMinutes = C_TaskQuest.GetQuestTimeLeftMinutes(questID);

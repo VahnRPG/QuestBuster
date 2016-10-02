@@ -38,6 +38,7 @@
 	QBL["WORLD_QUEST_TYPES"] = "Quests by Type";
 	QBL["WORLD_QUEST_ZONES"] = "Quests by Zone";
 	QBL["WORLD_QUEST_TRACKING_TOOLTIP"] = QBG_CLR_OFFBLUE .. "Click to Toggle Tracking";
+	QBL["WORLD_QUEST_TOMTOM"] = QBG_CLR_OFFBLUE .. "Add TomTom Waypoint";
 	
 	QBL["CONFIG_SETTINGS_TYPE"] = "Settings Type:";
 	QBL["CONFIG_SHOW_MINIMAP"] = "Show Minimap Button";

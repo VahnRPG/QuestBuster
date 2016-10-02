@@ -45,9 +45,15 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 								qb.world_quests.quest_data[quest_id] = {
 									["name"] = "",
 									["objectives"] = info.numObjectives,
-									["zone"] = {},
-									["type"] = {},
-									["faction"] = {},
+									["location"] = {
+										["zone"] = "",
+										["x"] = "",
+										["y"] = "",
+										["floor"] = "",
+										["map_id"] = "",
+									},
+									["type"] = "",
+									["faction"] = "",
 									["rewards"] = {
 										["experience"] = 0,
 										["money"] = 0,
@@ -69,7 +75,11 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 										qb.world_quests.quests.quests["zones"][zone_name] = {};
 									end
 									qb.world_quests.quests.quests["zones"][zone_name][quest_id] = quest_id;
-									qb.world_quests.quest_data[quest_id]["zone"] = zone_name;
+									qb.world_quests.quest_data[quest_id]["location"]["zone"] = zone_name;
+									qb.world_quests.quest_data[quest_id]["location"]["x"] = info.x;
+									qb.world_quests.quest_data[quest_id]["location"]["y"] = info.y;
+									qb.world_quests.quest_data[quest_id]["location"]["floor"] = info.floor;
+									qb.world_quests.quest_data[quest_id]["location"]["map_id"] = map_id;
 									
 									--process quest type
 									local _, _, world_quest_type = GetQuestTagInfo(quest_id);

@@ -285,7 +285,6 @@ function qb.quest_lists:update()
 						if (frame.type_frames[quest_type]["filters"][filter_name]["quests"] and next(frame.type_frames[quest_type]["filters"][filter_name]["quests"])) then
 							for quest_id, quest_data in pairs(frame.type_frames[quest_type]["filters"][filter_name]["quests"]) do
 								if (IsQuestFlaggedCompleted(quest_id)) then
-									qb.omg:echo("Completed: " .. quest_id .. " - " .. frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]["quest_name"]);
 									quest_data["frame"]:Hide();
 									quest_data["frame"].expand:Hide();
 									quest_data["frame"].quest_type:Hide();

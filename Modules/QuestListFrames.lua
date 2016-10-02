@@ -282,13 +282,26 @@ function qb.quest_lists:update()
 						local filter_frame = frame.type_frames[quest_type]["filters"][filter_name]["frame"];
 						filter_frame:SetPoint("TOPLEFT", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "Frame", "TOPLEFT", 20, (filters_displayed * -15) - height_padding - 15);
 						
+						if (frame.type_frames[quest_type]["filters"][filter_name]["quests"] and next(frame.type_frames[quest_type]["filters"][filter_name]["quests"])) then
+							for quest_id, quest_data in pairs(frame.type_frames[quest_type]["filters"][filter_name]["quests"]) do
+								if (IsQuestFlaggedCompleted(quest_id)) then
+									qb.omg:echo("Completed: " .. quest_id .. " - " .. frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]["quest_name"]);
+									quest_data["frame"]:Hide();
+									quest_data["frame"].expand:Hide();
+									quest_data["frame"].quest_type:Hide();
+									frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id] = nil;
+								end
+							end
+						end
+
 						local total_filter_quests = 0;
 						local quest_count = 0;
 						local quests_displayed = 0;
 						if (quest_ids and next(quest_ids)) then
 							for _, quest_id in pairs(quest_ids) do
 								if (not frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]) then
-									local tag_id, tag_name, world_quest_type, rarity, elite, tradeskill_line = GetQuestTagInfo(quest_id);
+									local _, _, _, rarity, elite, tradeskill_line = GetQuestTagInfo(quest_id);
+									local color = WORLD_QUEST_QUALITY_COLORS[rarity];
 									local tradeskill_line_id = tradeskill_line and select(7, GetProfessionInfo(tradeskill_line));
 									local title, faction_id, capped = C_TaskQuest.GetQuestInfoByQuestID(quest_id);
 									
@@ -330,6 +343,7 @@ function qb.quest_lists:update()
 									quest_frame.expand.label = quest_frame.expand:CreateFontString(nil, "ARTWORK", "GameFontWhiteTiny");
 									quest_frame.expand.label:SetPoint("CENTER");
 									quest_frame.expand.label:SetText(title);
+									--quest_frame.expand.label:SetTextColor(color.r, color.g, color.b);
 									
 									quest_frame.quest_type = CreateFrame("Button", quest_frame:GetName() .. "_QuestType", quest_frame.expand);
 									quest_frame.quest_type:SetPoint("TOPRIGHT", quest_frame.expand.label, "TOPLEFT", -5, 0);
@@ -355,7 +369,7 @@ function qb.quest_lists:update()
 										quest_frame.tomtom:SetSize(16, 16);
 										quest_frame.tomtom:SetScript("OnEnter", function(self)
 											tooltip:SetOwner(self, "ANCHOR_CURSOR");
-											tooltip:SetText(QBL["WORLD_QUEST_TOMTOM"]);
+											tooltip:SetText(QBL["WORLD_QUEST_TOMTOM"] .. title);
 											tooltip:Show();
 										end);
 										quest_frame.tomtom:SetScript("OnLeave", function(self)
@@ -372,7 +386,8 @@ function qb.quest_lists:update()
 									end
 									
 									frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id] = {
-										["name"] = quest_id,
+										["quest_id"] = quest_id,
+										["quest_name"] = title,
 										["frame"] = quest_frame,
 									};
 								end
@@ -381,11 +396,8 @@ function qb.quest_lists:update()
 								filter_quest_frame:SetPoint("TOPLEFT", frame.type_frames[quest_type]["filters"][filter_name]["frame"], "TOPLEFT", 20, (quests_displayed * -15) - height_padding - 15);
 								
 								local minutes_left = C_TaskQuest.GetQuestTimeLeftMinutes(quest_id);
-								if (minutes_left and minutes_left > 0) then
-									local color = HIGHLIGHT_FONT_COLOR;
-									if (minutes_left <= WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
-										color = RED_FONT_COLOR;
-									end
+								if (minutes_left and minutes_left > 0 and minutes_left <= WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
+									color = RED_FONT_COLOR;
 									frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]["frame"].expand.label:SetTextColor(color.r, color.g, color.b, color.a);
 								end
 								

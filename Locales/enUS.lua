@@ -10,6 +10,16 @@
 	QBL["TITAN_INFO_ALL"] = "All";
 	QBL["TITAN_INFO_YES"] = "Yes";
 	QBL["TITAN_INFO_NO"] = "No";
+
+	QBL["BINDING_TOGGLE_WORLD_QUESTS_FRAME"] = "Toggle World Quests Frame";
+	QBL["BINDING_OPEN_SKILL_1"] = "Toggle Skill 1 Window";
+	QBL["BINDING_OPEN_SKILL_1_BUSTER"] = "Toggle Skill 1 Buster Window";
+	QBL["BINDING_OPEN_SKILL_2"] = "Toggle Skill 2 Window";
+	QBL["BINDING_OPEN_SKILL_2_BUSTER"] = "Toggle Skill 2 Buster Window";
+	QBL["BINDING_OPEN_COOKING"] = "Toggle Cooking Window";
+	QBL["BINDING_OPEN_FIRST_AID"] = "Toggle First Aid Window";
+	QBL["BINDING_OPEN_ARCHAEOLOGY"] = "Toggle Archaeology Window";
+	QBL["BINDING_OPEN_LOCKPICKING_BUSTER"] = "Toggle Lockpicking Buster Window";
 	
 	QBL["TITAN_SETTINGS_PERSON"] = QBG_CLR_LIGHTGREY .. "   (personal settings)";
 	QBL["TITAN_SETTINGS_GLOBAL"] = QBG_CLR_LIGHTGREY .. "   (global settings)";
@@ -22,6 +32,13 @@
 	
 	QBL["DAILY_QUEST_REWARD"] = QBG_CLR_OFFBLUE .. "CTRL + Left-click " .. QBG_CLR_WHITE .. "to auto-select this item in the future";
 	QBL["DAILY_QUEST_SELECTED_REWARD"] = QBG_CLR_LIGHTGREEN .. "Auto-selected item";
+	
+	QBL["WORLD_QUEST_FACTIONS"] = "Quests by Faction";
+	QBL["WORLD_QUEST_REWARDS"] = "Quests by Rewards";
+	QBL["WORLD_QUEST_TYPES"] = "Quests by Type";
+	QBL["WORLD_QUEST_ZONES"] = "Quests by Zone";
+	QBL["WORLD_QUEST_TRACKING_TOOLTIP"] = QBG_CLR_OFFBLUE .. "Click to Toggle Tracking";
+	QBL["WORLD_QUEST_TOMTOM"] = QBG_CLR_OFFBLUE .. "Add TomTom Waypoint";
 	
 	QBL["CONFIG_SETTINGS_TYPE"] = "Settings Type:";
 	QBL["CONFIG_SHOW_MINIMAP"] = "Show Minimap Button";
@@ -37,4 +54,14 @@
 	QBL["CONFIG_TITLE_AUTO_QUEST_MODIFIER"] = "Button to Prevent Auto Complete:";
 	QBL["CONFIG_SHOW_LEVEL"] = "Show Quest Levels";
 	QBL["CONFIG_SHOW_ABANDON"] = "Show Abandon Quest";
+	QBL["CONFIG_WORLD_QUESTS_SHOW"] = "Show World Quests";
+	QBL["CONFIG_WORLD_QUESTS_LOCKED"] = "Lock World Quests Frame";
+	QBL["CONFIG_WORLD_QUESTS_EXPAND"] = "Expand World Quests Frame";
+	QBL["CONFIG_WORLD_QUESTS_POSITION"] = "Position";
+	QBL["CONFIG_POSITION_X"] = "X:";
+	QBL["CONFIG_POSITION_Y"] = "Y:";
+	QBL["CONFIG_POSITION_POINT"] = "Point:";
+	QBL["CONFIG_POSITION_RELATIVE_POINT"] = "Relative To:";
+	QBL["CONFIG_POSITION_SET"] = "SET";
+	QBL["CONFIG_POSITIONS_RESET"] = "Reset Position";
 --end

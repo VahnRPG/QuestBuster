@@ -1,19 +1,19 @@
 ## Interface: 70000
 ## Title: QuestBuster
 ## Author: Lord Vashtal
-## Version: 1.0.1
-## X-Date: 2016-07-18
-## Notes: Changes the Quest Log back to the old one, plus more
+## Version: 1.0.0
+## X-Date: 2016-10-02
+## Notes: Provides frames for World Quests, plus more
 ## SavedVariables: QuestBusterOptions
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
-## X-Curse-Packaged-Version: v1.0.1
+## X-Curse-Packaged-Version: v1.0.0
 ## X-Curse-Project-Name: QuestBuster
 ## X-Curse-Project-ID: questbuster
 Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 
+Utils\Utils.xml
+Locales\Locales.xml
 QuestBuster.xml
-QuestBuster_Config.xml
-QuestBuster_Locales.xml
-QuestBuster_Modules.xml
-QuestBuster_Minimap.xml
+Minimap.xml
+Modules\Modules.xml

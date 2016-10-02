@@ -342,7 +342,7 @@ child_watch_frame_frame:SetScript("OnShow", function(child_watch_frame_frame)
 	show_level:SetScript("OnClick", function(self, button)
 		QuestBusterOptions[QuestBusterEntry].watch_frame["show_level"] = self:GetChecked();
 		qb.watch_frame.reload = true;
-		qb.watch_frame:showQuestLevel();
+		QuestBuster_WatchFrame_ShowQuestLevel();
 	end);
 	
 	show_abandon = CreateFrame("CheckButton", config_frame_name .. "ShowAbandon", child_watch_frame_frame, "InterfaceOptionsCheckButtonTemplate");

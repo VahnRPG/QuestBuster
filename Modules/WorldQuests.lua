@@ -155,6 +155,7 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 		end
 	end
 	
+	--World Quest emissary frame doesn't get processed until you view the map. So, do it manually.
 	WorldMapFrame.UIElementsFrame.BountyBoard.mapAreaID = GetCurrentMapAreaID();
 	WorldMapFrame.UIElementsFrame.BountyBoard:Refresh();
 	qb.world_quests.emissary.count = 0;

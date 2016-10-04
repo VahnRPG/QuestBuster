@@ -1,3 +1,8 @@
+v 1.0.3
+	- Consolidated quest list images into 1 file, updated mover bar color
+	- Separated rewards and currencies into their own buckets
+	- Hack to handle quest map / world map quest lists
+
 v 1.0.2
 	- Fixed completed quests not disappearing from quest list frames
 

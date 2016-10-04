@@ -39,7 +39,7 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 				if (zone_depth <= 1) then
 					local task_info = C_TaskQuest.GetQuestsForPlayerByMapID(zone_map_id, map_id);
 					if (task_info) then
-						for i, info in ipairs(task_info) do
+						for _, info in ipairs(task_info) do
 							local quest_id = info.questId;
 							if (not qb.world_quests.quest_data[quest_id]) then
 								qb.world_quests.quest_data[quest_id] = {
@@ -58,7 +58,7 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 										["experience"] = 0,
 										["money"] = 0,
 										["artifact experience"] = 0,
-										["currency"] = {},
+										["currency"] = "",
 										["items"] = {},
 										["other"] = {},
 									},
@@ -130,18 +130,38 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 									
 									local currency = GetNumQuestLogRewardCurrencies(quest_id);
 									if (currency > 0) then
-										qb.world_quests.quests.quests["rewards"]["currency"][quest_id] = quest_id;
-										qb.world_quests.quest_data[quest_id]["rewards"]["currency"] = currency;
+										for i=1, currency do
+											local currency_name = GetQuestLogRewardCurrencyInfo(i, quest_id);
+											if (currency_name) then
+												if (not qb.world_quests.quests.quests["rewards"][currency_name]) then
+													qb.world_quests.quests.quests["rewards"][currency_name] = {};
+												end
+												qb.world_quests.quests.quests["rewards"][currency_name][quest_id] = quest_id;
+												qb.world_quests.quest_data[quest_id]["rewards"]["currency"] = currency_name;
+											end
+										end
+
 										rewards = true;
 									end
 									
 									local items = GetNumQuestLogRewards(quest_id);
 									if (items > 0) then
-										qb.world_quests.quests.quests["rewards"]["items"][quest_id] = quest_id;
-										qb.world_quests.quest_data[quest_id]["rewards"]["items"] = items;
+										for i=1, items do
+											local item_link = GetQuestItemLink(i, quest_id);
+											local _, _, _, _, _, item_id = GetQuestLogRewardInfo(i, quest_id);
+											if (item_id) then
+												local _, _, _, _, _, item_type = GetItemInfo(item_id);
+												if (not qb.world_quests.quests.quests["rewards"][item_type]) then
+													qb.world_quests.quests.quests["rewards"][item_type] = {};
+												end
+												qb.world_quests.quests.quests["rewards"][item_type][quest_id] = quest_id;
+												qb.world_quests.quest_data[quest_id]["rewards"]["items"][item_id] = item_id;
+											end
+										end
+
 										rewards = true;
 									end
-
+									
 									if (not rewards) then
 										qb.world_quests.quests.quests["rewards"]["other"][quest_id] = quest_id;
 										qb.world_quests.quest_data[quest_id]["rewards"]["other"] = "No / Other Rewards";

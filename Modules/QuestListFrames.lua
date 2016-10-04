@@ -3,6 +3,18 @@ local _, qb = ...;
 local MAX_EMISSARY_QUESTS = WorldMapFrame.UIElementsFrame.BountyBoard.minimumTabsToDisplay;
 --local MAX_EMISSARY_QUESTS = 3;
 
+local QUEST_TYPE_COLOR = { r=0.25, g=0.36, b=0.69 };
+local QUEST_TYPE_HOVER_COLOR = { r=0.39, g=0.47, b=0.72 };
+local QUEST_TYPE_EXPANDED_COLOR = { r=0.08, g=0.20, b=0.51 };
+
+local FILTER_COLOR = { r=0.31, g=0.25, b=0.69 };
+local FILTER_HOVER_COLOR = { r=0.43, g=0.39, b=0.72 };
+local FILTER_EXPANDED_COLOR = { r=0.21, g=0.08, b=0.51 };
+
+local QUEST_COLOR = { r=0.32, g=0.69, b=0.25 };
+local QUEST_HOVER_COLOR = { r=0.50, g=0.72, b=0.39 };
+--local QUEST_EXPANDED_COLOR = { r=0.16, g=0.51, b=0.08 };		--currently unused
+
 qb.quest_lists = {};
 qb.quest_lists.frame = CreateFrame("Frame", "QuestBuster_QuestListsFrame", UIParent, SecureFrameTemplate);
 qb.quest_lists.frame:RegisterEvent("ADDON_LOADED");
@@ -185,13 +197,13 @@ function qb.quest_lists:update()
 						type_frame.expand:SetPoint("TOPLEFT", type_frame, "TOPLEFT", 0, 0);
 						type_frame.expand:SetSize(308, 16);
 						type_frame.expand:SetScript("OnEnter", function(self)
-							frame.type_frames[quest_type]["frame"].expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Type_Hover");
+							type_frame.expand.icon:SetVertexColor(QUEST_TYPE_HOVER_COLOR.r, QUEST_TYPE_HOVER_COLOR.g, QUEST_TYPE_HOVER_COLOR.b);
 						end);
 						type_frame.expand:SetScript("OnLeave", function(self)
 							if (qb.quest_lists.type_expanded == quest_type) then
-								frame.type_frames[quest_type]["frame"].expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Type_Expanded");
+								type_frame.expand.icon:SetVertexColor(QUEST_TYPE_EXPANDED_COLOR.r, QUEST_TYPE_EXPANDED_COLOR.g, QUEST_TYPE_EXPANDED_COLOR.b);
 							else
-								frame.type_frames[quest_type]["frame"].expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Type");
+								type_frame.expand.icon:SetVertexColor(QUEST_TYPE_COLOR.r, QUEST_TYPE_COLOR.g, QUEST_TYPE_COLOR.b);
 							end
 						end);
 						type_frame.expand:SetScript("OnClick", function(self)
@@ -207,7 +219,8 @@ function qb.quest_lists:update()
 						type_frame.expand.icon = type_frame.expand:CreateTexture("ARTWORK");
 						type_frame.expand.icon:SetPoint("TOPLEFT", type_frame.expand, "TOPLEFT", -2, 0);
 						type_frame.expand.icon:SetSize(308, 16);
-						type_frame.expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Type");
+						type_frame.expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Bar");
+						type_frame.expand.icon:SetVertexColor(QUEST_TYPE_COLOR.r, QUEST_TYPE_COLOR.g, QUEST_TYPE_COLOR.b);
 						
 						type_frame.expand.label = type_frame.expand:CreateFontString(nil, "ARTWORK", "GameFontNormal");
 						type_frame.expand.label:SetPoint("CENTER");
@@ -246,13 +259,13 @@ function qb.quest_lists:update()
 							filter_frame.expand:SetPoint("TOPLEFT", filter_frame, "TOPLEFT", -2, 0);
 							filter_frame.expand:SetSize(288, 16);
 							filter_frame.expand:SetScript("OnEnter", function(self)
-								frame.type_frames[quest_type]["filters"][filter_name]["frame"].expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Filter_Hover");
+								filter_frame.expand.icon:SetVertexColor(FILTER_HOVER_COLOR.r, FILTER_HOVER_COLOR.g, FILTER_HOVER_COLOR.b);
 							end);
 							filter_frame.expand:SetScript("OnLeave", function(self)
 								if (qb.quest_lists.filter_expanded == filter_name) then
-									frame.type_frames[quest_type]["filters"][filter_name]["frame"].expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Filter_Expanded");
+									filter_frame.expand.icon:SetVertexColor(FILTER_EXPANDED_COLOR.r, FILTER_EXPANDED_COLOR.g, FILTER_EXPANDED_COLOR.b);
 								else
-									frame.type_frames[quest_type]["filters"][filter_name]["frame"].expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Filter");
+									filter_frame.expand.icon:SetVertexColor(FILTER_COLOR.r, FILTER_COLOR.g, FILTER_COLOR.b);
 								end
 							end);
 							filter_frame.expand:SetScript("OnClick", function(self)
@@ -266,7 +279,8 @@ function qb.quest_lists:update()
 							
 							filter_frame.expand.icon = filter_frame.expand:CreateTexture("ARTWORK");
 							filter_frame.expand.icon:SetAllPoints();
-							filter_frame.expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Filter");
+							filter_frame.expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Bar");
+							filter_frame.expand.icon:SetVertexColor(FILTER_COLOR.r, FILTER_COLOR.g, FILTER_COLOR.b);
 							
 							filter_frame.expand.label = filter_frame.expand:CreateFontString(nil, "ARTWORK", "GameFontNormal");
 							filter_frame.expand.label:SetPoint("CENTER");
@@ -314,13 +328,13 @@ function qb.quest_lists:update()
 									quest_frame.expand:SetPoint("TOPLEFT", quest_frame, "TOPLEFT", -2, 0);
 									quest_frame.expand:SetSize(268, 16);
 									quest_frame.expand:SetScript("OnEnter", function(self)
-										frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]["frame"].expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Quest_Hover");
-										tooltip:SetOwner(self, "ANCHOR_CURSOR");
+										quest_frame.expand.icon:SetVertexColor(QUEST_HOVER_COLOR.r, QUEST_HOVER_COLOR.g, QUEST_HOVER_COLOR.b);
+										tooltip:SetOwner(self, "ANCHOR_CURSOR_RIGHT");
 										qb.quest_lists:setQuestTooltip(tooltip, quest_id);
 										tooltip:Show();
 									end);
 									quest_frame.expand:SetScript("OnLeave", function(self)
-										frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]["frame"].expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Quest");
+										quest_frame.expand.icon:SetVertexColor(QUEST_COLOR.r, QUEST_COLOR.g, QUEST_COLOR.b);
 										tooltip:Hide();
 										if (_G["qb.GameTooltip.ItemTooltip"]) then
 											_G["qb.GameTooltip.ItemTooltip"]:Hide();
@@ -337,7 +351,8 @@ function qb.quest_lists:update()
 									
 									quest_frame.expand.icon = quest_frame.expand:CreateTexture("ARTWORK");
 									quest_frame.expand.icon:SetAllPoints();
-									quest_frame.expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Quest");
+									quest_frame.expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Bar");
+									quest_frame.expand.icon:SetVertexColor(QUEST_COLOR.r, QUEST_COLOR.g, QUEST_COLOR.b);
 									
 									quest_frame.expand.label = quest_frame.expand:CreateFontString(nil, "ARTWORK", "GameFontWhiteTiny");
 									quest_frame.expand.label:SetPoint("CENTER");
@@ -421,9 +436,9 @@ function qb.quest_lists:update()
 							frame.type_frames[quest_type]["filters"][filter_name]["frame"]:SetHeight(10 + (quests_displayed * 15));
 							frame.type_frames[quest_type]["filters"][filter_name]["frame"]:Show();
 							if (qb.quest_lists.filter_expanded == filter_name) then
-								frame.type_frames[quest_type]["filters"][filter_name]["frame"].expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Filter_Expanded");
+								frame.type_frames[quest_type]["filters"][filter_name]["frame"].expand.icon:SetVertexColor(FILTER_EXPANDED_COLOR.r, FILTER_EXPANDED_COLOR.g, FILTER_EXPANDED_COLOR.b);
 							else
-								frame.type_frames[quest_type]["filters"][filter_name]["frame"].expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Filter");
+								frame.type_frames[quest_type]["filters"][filter_name]["frame"].expand.icon:SetVertexColor(FILTER_COLOR.r, FILTER_COLOR.g, FILTER_COLOR.b);
 							end
 							frame.type_frames[quest_type]["filters"][filter_name]["frame"].expand:Show();
 							filters_displayed = filters_displayed + 1;
@@ -443,9 +458,9 @@ function qb.quest_lists:update()
 						frame.type_frames[quest_type]["frame"]:SetHeight(20 + (filters_displayed * 15) + height_padding);
 						frame.type_frames[quest_type]["frame"]:Show();
 						if (qb.quest_lists.type_expanded == quest_type) then
-							frame.type_frames[quest_type]["frame"].expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Type_Expanded");
+							frame.type_frames[quest_type]["frame"].expand.icon:SetVertexColor(QUEST_TYPE_EXPANDED_COLOR.r, QUEST_TYPE_EXPANDED_COLOR.g, QUEST_TYPE_EXPANDED_COLOR.b);
 						else
-							frame.type_frames[quest_type]["frame"].expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Type");
+							frame.type_frames[quest_type]["frame"].expand.icon:SetVertexColor(QUEST_TYPE_COLOR.r, QUEST_TYPE_COLOR.g, QUEST_TYPE_COLOR.b);
 						end
 						frame.type_frames[quest_type]["frame"].expand:Show();
 					else

@@ -44,7 +44,7 @@ QBG_QUEST_LIST_FRAMES = {
 		["name"] = "WorldMap",
 		["label"] = "World Map",
 		["parent"] = WorldMapFrame,
-		["strata"] = "FULLSCREEN_DIALOG",
+		["strata"] = "FULLSCREEN",
 		["tooltip"] = WorldMapTooltip,
 	},
 };

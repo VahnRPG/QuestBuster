@@ -16,7 +16,7 @@ local QUEST_HOVER_COLOR = { r=0.50, g=0.72, b=0.39 };
 --local QUEST_EXPANDED_COLOR = { r=0.16, g=0.51, b=0.08 };		--currently unused
 
 qb.quest_lists = {};
-qb.quest_lists.frame = CreateFrame("Frame", "QuestBuster_QuestListsFrame", UIParent, SecureFrameTemplate);
+qb.quest_lists.frame = CreateFrame("Frame", "QuestBuster_QuestListsFrame", UIParent);
 qb.quest_lists.frame:RegisterEvent("ADDON_LOADED");
 qb.quest_lists.frame:SetScript("OnEvent", function(self, event, ...)
 	if (QuestBusterInit) then
@@ -37,7 +37,7 @@ function qb.quest_lists:ADDON_LOADED()
 		insets = { left = 5, right = 5, top = 5, bottom = 5 },
 	};
 	
-	for _, frame_data in pairs(QBG_QUEST_LIST_FRAMES) do
+	for frame_id, frame_data in pairs(QBG_QUEST_LIST_FRAMES) do
 		--build mover frame
 		local mover_frame = CreateFrame("Frame", "QuestBuster_QuestList" .. frame_data["name"] .. "MoverFrame", frame_data["parent"]);
 		mover_frame:SetFrameStrata(frame_data["strata"]);
@@ -72,7 +72,7 @@ function qb.quest_lists:ADDON_LOADED()
 		
 		mover_frame.label = mover_frame:CreateFontString(nil, "ARTWORK", "GameFontHighlight");
 		mover_frame.label:SetPoint("CENTER");
-		mover_frame.label:SetText("World Quests");
+		mover_frame.label:SetText(QBL["WORLD_QUEST_HEADER"]);
 		
 		--build mover frame - config button
 		mover_frame.config = CreateFrame("Button", mover_frame_name .. "_ConfigMenu", mover_frame);
@@ -123,7 +123,7 @@ function qb.quest_lists:ADDON_LOADED()
 		mover_frame.close.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover_Close");
 		
 		--build base frame
-		local frame = CreateFrame("Frame", "QuestBuster_QuestList" .. frame_data["name"] .. "Frame", frame_data["parent"], SecureFrameTemplate);
+		local frame = CreateFrame("Frame", "QuestBuster_QuestList" .. frame_data["name"] .. "Frame", frame_data["parent"]);
 		frame:SetFrameStrata(frame_data["strata"]);
 		frame:SetPoint("TOPLEFT", mover_frame_name, "BOTTOMLEFT", 0, 2);
 		frame:SetSize(320, 10);
@@ -134,7 +134,7 @@ function qb.quest_lists:ADDON_LOADED()
 		
 		--build base frame - emissary buttons
 		for i=1, MAX_EMISSARY_QUESTS do
-			local emissary_frame = CreateFrame("Frame", "QuestBuster_QuestList" .. frame_data["name"] .. "Emissary" .. i .. "Frame", frame, SecureFrameTemplate);
+			local emissary_frame = CreateFrame("Frame", "QuestBuster_QuestList" .. frame_data["name"] .. "Emissary" .. i .. "Frame", frame);
 			emissary_frame:SetFrameStrata(frame_data["strata"]);
 			emissary_frame:SetPoint("TOPRIGHT", frame_name, "TOPLEFT", 0, ((i - 1) * -16) - 5);
 			emissary_frame:SetSize(16, 16);
@@ -163,7 +163,7 @@ function qb.quest_lists:ADDON_LOADED()
 		end
 		
 		--save frame
-		qb.quest_lists.frames[frame_data["name"]] = {
+		qb.quest_lists.frames[frame_id] = {
 			["name"] = frame_data["name"],
 			["frame"] = frame,
 			["mover_frame"] = mover_frame,
@@ -177,19 +177,25 @@ function qb.quest_lists:ADDON_LOADED()
 end
 
 function qb.quest_lists:update()
-	for _, frame_data in pairs(qb.quest_lists.frames) do
+	for frame_id, frame_data in pairs(qb.quest_lists.frames) do
 		local config = QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]];
 		local frame = frame_data["frame"];
 		local mover_frame = frame_data["mover_frame"];
 		
 		if (config.show and qb.world_quests.quests.count > 0) then
+			mover_frame:SetParent(QBG_QUEST_LIST_FRAMES[frame_id]["parent"]);
+			mover_frame:SetFrameStrata(QBG_QUEST_LIST_FRAMES[frame_id]["strata"]);
+			
+			frame:SetParent(QBG_QUEST_LIST_FRAMES[frame_id]["parent"]);
+			frame:SetFrameStrata(QBG_QUEST_LIST_FRAMES[frame_id]["strata"]);
+			
 			if (config.state == "expanded") then
 				local type_count = 0;
 				local type_filter_count = 0;
 				local type_filter_quest_count = 0;
 				for quest_type, quest_data in qb.omg:sortedpairs(qb.world_quests.quests.quests) do
 					if (not frame.type_frames[quest_type]) then
-						local type_frame = CreateFrame("Frame", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "Frame", frame, SecureFrameTemplate);
+						local type_frame = CreateFrame("Frame", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "Frame", frame);
 						type_frame:SetSize(308, 16);
 						type_frame.frame_name = type_count;
 						
@@ -250,7 +256,7 @@ function qb.quest_lists:update()
 					local height_padding = 0;
 					for filter_name, quest_ids in qb.omg:sortedpairs(quest_data) do
 						if (not frame.type_frames[quest_type]["filters"][filter_name]) then
-							local filter_frame = CreateFrame("Frame", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "_" .. filter_count .."Frame", frame, SecureFrameTemplate);
+							local filter_frame = CreateFrame("Frame", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "_" .. filter_count .."Frame", frame);
 							filter_frame:SetPoint("TOPLEFT", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "Frame", "TOPLEFT", 20, 0);
 							filter_frame:SetSize(288, 16);
 							filter_frame.frame_name = type_count .. "_" .. filter_count;
@@ -319,7 +325,7 @@ function qb.quest_lists:update()
 									local title, faction_id, capped = C_TaskQuest.GetQuestInfoByQuestID(quest_id);
 									
 									local tooltip = frame_data["tooltip"];
-									local quest_frame = CreateFrame("Frame", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "_" .. filter_count .. "_" .. quest_count .."Frame", frame, SecureFrameTemplate);
+									local quest_frame = CreateFrame("Frame", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "_" .. filter_count .. "_" .. quest_count .."Frame", frame);
 									quest_frame:SetPoint("TOPLEFT", frame.type_frames[quest_type]["filters"][filter_name]["frame"], "TOPLEFT", 20, (quest_count * -15) - 15);
 									quest_frame:SetSize(268, 16);
 									quest_frame.frame_name = type_count .. "_" .. filter_count .. "_" .. quest_count;
@@ -329,7 +335,7 @@ function qb.quest_lists:update()
 									quest_frame.expand:SetSize(268, 16);
 									quest_frame.expand:SetScript("OnEnter", function(self)
 										quest_frame.expand.icon:SetVertexColor(QUEST_HOVER_COLOR.r, QUEST_HOVER_COLOR.g, QUEST_HOVER_COLOR.b);
-										tooltip:SetOwner(self, "ANCHOR_CURSOR_RIGHT");
+										tooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT");
 										qb.quest_lists:setQuestTooltip(tooltip, quest_id);
 										tooltip:Show();
 									end);
@@ -706,3 +712,22 @@ end
 function QuestBuster_QuestListFrames_Toggle()
 	qb.quest_lists:collapseFrame("Default");
 end
+
+function QuestBuster_QuestListFrames_ToggleSize()
+	for frame_id, frame_data in pairs(qb.quest_lists.frames) do
+		local config = QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]];
+		local frame = frame_data["frame"];
+		local mover_frame = frame_data["mover_frame"];
+		
+		if (config.show and qb.world_quests.quests.count > 0) then
+			mover_frame:SetParent(QBG_QUEST_LIST_FRAMES[frame_id]["parent"]);
+			mover_frame:SetFrameStrata(QBG_QUEST_LIST_FRAMES[frame_id]["strata"]);
+
+			frame:SetParent(QBG_QUEST_LIST_FRAMES[frame_id]["parent"]);
+			frame:SetFrameStrata(QBG_QUEST_LIST_FRAMES[frame_id]["strata"]);
+		end
+	end
+end
+
+hooksecurefunc("WorldMap_ToggleSizeUp", QuestBuster_QuestListFrames_ToggleSize);
+hooksecurefunc("WorldMap_ToggleSizeDown", QuestBuster_QuestListFrames_ToggleSize);

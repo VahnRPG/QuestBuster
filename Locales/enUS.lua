@@ -33,6 +33,7 @@
 	QBL["DAILY_QUEST_REWARD"] = QBG_CLR_OFFBLUE .. "CTRL + Left-click " .. QBG_CLR_WHITE .. "to auto-select this item in the future";
 	QBL["DAILY_QUEST_SELECTED_REWARD"] = QBG_CLR_LIGHTGREEN .. "Auto-selected item";
 	
+	QBL["WORLD_QUEST_HEADER"] = "World Quests";
 	QBL["WORLD_QUEST_FACTIONS"] = "Quests by Faction";
 	QBL["WORLD_QUEST_REWARDS"] = "Quests by Rewards";
 	QBL["WORLD_QUEST_TYPES"] = "Quests by Type";

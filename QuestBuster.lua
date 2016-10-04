@@ -9,7 +9,7 @@ QuestBusterEntry = nil;
 
 local _, qb = ...;
 
-qb.frame = CreateFrame("Frame", "QuestBusterFrame", UIParent, "SecureFrameTemplate");
+qb.frame = CreateFrame("Frame", "QuestBusterFrame", UIParent);
 
 --==BINDING==--
 BINDING_HEADER_QUESTBUSTER = QBG_MOD_NAME;

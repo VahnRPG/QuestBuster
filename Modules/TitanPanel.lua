@@ -1,7 +1,7 @@
 local _, qb = ...;
 
 qb.titan = {};
-qb.titan.frame = CreateFrame("Frame", "QuestBuster_TitanPanelFrame", UIParent, SecureFrameTemplate);
+qb.titan.frame = CreateFrame("Frame", "QuestBuster_TitanPanelFrame", UIParent);
 qb.titan.frame:RegisterEvent("QUEST_LOG_UPDATE");
 qb.titan.frame:SetScript("OnEvent", function(self, event, ...)
 	if (QuestBusterInit) then

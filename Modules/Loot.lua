@@ -1,7 +1,7 @@
 local _, qb = ...;
 
 qb.loot = {};
-qb.loot.frame = CreateFrame("Frame", "QuestBuster_LootFrame", UIParent, SecureFrameTemplate);
+qb.loot.frame = CreateFrame("Frame", "QuestBuster_LootFrame", UIParent);
 qb.loot.frame:RegisterEvent("QUEST_COMPLETE");
 qb.loot.frame:RegisterEvent("QUEST_ITEM_UPDATE");
 qb.loot.frame:RegisterEvent("GET_ITEM_INFO_RECEIVED");

@@ -4,7 +4,7 @@ qb.world_quests = {};
 qb.world_quests.quests = {};
 qb.world_quests.quests.count = 0;
 qb.world_quests.quests.quests = {};
-qb.world_quests.frame = CreateFrame("Frame", "QuestBuster_WorldQuestsBuilderFrame", UIParent, SecureFrameTemplate);
+qb.world_quests.frame = CreateFrame("Frame", "QuestBuster_WorldQuestsBuilderFrame", UIParent);
 qb.world_quests.frame:RegisterEvent("QUEST_LOG_UPDATE");
 qb.world_quests.frame:SetScript("OnEvent", function(self, event, ...)
 	if (QuestBusterInit) then

@@ -58,7 +58,7 @@ local function processAvailableQuests(...)
 end
 
 qb.auto_quest = {};
-qb.auto_quest.frame = CreateFrame("Frame", "QuestBuster_AutoQuestFrame", UIParent, SecureFrameTemplate);
+qb.auto_quest.frame = CreateFrame("Frame", "QuestBuster_AutoQuestFrame", UIParent);
 qb.auto_quest.frame:RegisterEvent("QUEST_GREETING");
 qb.auto_quest.frame:RegisterEvent("GOSSIP_SHOW");
 qb.auto_quest.frame:RegisterEvent("QUEST_DETAIL");

@@ -260,7 +260,7 @@ function qb.quest_lists:update()
 							filter_frame:SetPoint("TOPLEFT", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "Frame", "TOPLEFT", 20, 0);
 							filter_frame:SetSize(288, 16);
 							filter_frame.frame_name = type_count .. "_" .. filter_count;
-						
+							
 							filter_frame.expand = CreateFrame("Button", filter_frame:GetName() .. "_ExpandFrame", type_frame);
 							filter_frame.expand:SetPoint("TOPLEFT", filter_frame, "TOPLEFT", -2, 0);
 							filter_frame.expand:SetSize(288, 16);
@@ -290,7 +290,7 @@ function qb.quest_lists:update()
 							
 							filter_frame.expand.label = filter_frame.expand:CreateFontString(nil, "ARTWORK", "GameFontNormal");
 							filter_frame.expand.label:SetPoint("CENTER");
-							filter_frame.expand.label:SetText(qb.omg:ucwords(filter_name));
+							filter_frame.expand.label:SetText(qb.omg:trim(qb.omg:ucwords(filter_name)));
 							
 							frame.type_frames[quest_type]["filters"][filter_name] = {
 								["name"] = filter_name,
@@ -317,7 +317,7 @@ function qb.quest_lists:update()
 						local quest_count = 0;
 						local quests_displayed = 0;
 						if (quest_ids and next(quest_ids)) then
-							for _, quest_id in pairs(quest_ids) do
+							for _, quest_id in sortedpairs(quest_ids) do
 								if (not frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]) then
 									local _, _, _, rarity, elite, tradeskill_line = GetQuestTagInfo(quest_id);
 									local color = WORLD_QUEST_QUALITY_COLORS[rarity];
@@ -389,7 +389,7 @@ function qb.quest_lists:update()
 										quest_frame.tomtom:SetSize(16, 16);
 										quest_frame.tomtom:SetScript("OnEnter", function(self)
 											tooltip:SetOwner(self, "ANCHOR_CURSOR");
-											tooltip:SetText(QBL["WORLD_QUEST_TOMTOM"] .. title);
+											tooltip:SetText(QBL["WORLD_QUEST_TOMTOM"] .. title .. "\n" .. qb.world_quests.quest_data[quest_id]["location"]["zone"]);
 											tooltip:Show();
 										end);
 										quest_frame.tomtom:SetScript("OnLeave", function(self)

@@ -16,6 +16,12 @@ qb.world_quests.emissary.count = 0;
 qb.world_quests.emissary.quests = {};
 qb.world_quests.quest_data = {};
 
+local function isWorldQuest(quest_id)
+	local _, _, world_quest_type = GetQuestTagInfo(quest_id);
+	
+	return world_quest_type ~= nil;
+end
+
 function qb.world_quests:QUEST_LOG_UPDATE()
 	qb.world_quests.quests.count = 0;
 	qb.world_quests.quests.quests = {
@@ -29,6 +35,13 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 			["currency"] = {},
 			["items"] = {},
 			["other"] = {},
+		},
+		["time"] = {
+			["less than " .. WORLD_QUESTS_TIME_CRITICAL_MINUTES .. " minutes"] = {},
+			["less than one hour"] = {},
+			["less than twelve hours"] = {},
+			["less than twenty four hours"] = {},
+			["one day or longer"] = {},
 		},
 	};
 	
@@ -62,11 +75,12 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 										["items"] = {},
 										["other"] = {},
 									},
+									["time"] = "",
 								};
 							end
 
 							if (HaveQuestData(quest_id)) then
-								if (QuestMapFrame_IsQuestWorldQuest(quest_id) and WorldMap_DoesWorldQuestInfoPassFilters(info)) then
+								if (isWorldQuest(quest_id) and WorldMap_DoesWorldQuestInfoPassFilters(info)) then
 									--process zone
 									C_TaskQuest.RequestPreloadRewardData(quest_id);
 									qb.world_quests.quests.count = qb.world_quests.quests.count + 1;
@@ -165,6 +179,25 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 									if (not rewards) then
 										qb.world_quests.quests.quests["rewards"]["other"][quest_id] = quest_id;
 										qb.world_quests.quest_data[quest_id]["rewards"]["other"] = "No / Other Rewards";
+									end
+									
+									local minutes_left = C_TaskQuest.GetQuestTimeLeftMinutes(quest_id);
+									if (minutes_left and minutes_left > 0) then
+										qb.world_quests.quest_data[quest_id]["time"] = minutes_left;
+
+										local color = NORMAL_FONT_COLOR;
+										local time_str = qb.omg:str_pad(minutes_left, 6, "0", "right");
+										if (minutes_left <= WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
+											qb.world_quests.quests.quests["time"]["less than " .. WORLD_QUESTS_TIME_CRITICAL_MINUTES .. " minutes"][time_str .. "-" .. quest_id] = quest_id;
+										elseif (minutes_left <= 60 + WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
+											qb.world_quests.quests.quests["time"]["less than one hour"][time_str .. "-" .. quest_id] = quest_id;
+										elseif (minutes_left < 12 * 60 + WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
+											qb.world_quests.quests.quests["time"]["less than twelve hours"][time_str .. "-" .. quest_id] = quest_id;
+										elseif (minutes_left < 24 * 60 + WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
+											qb.world_quests.quests.quests["time"]["less than twenty four hours"][time_str .. "-" .. quest_id] = quest_id;
+										else
+											qb.world_quests.quests.quests["time"]["one day or longer"][time_str .. "-" .. quest_id] = quest_id;
+										end
 									end
 								end
 							end

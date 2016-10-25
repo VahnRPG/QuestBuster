@@ -1,3 +1,8 @@
+v 1.0.4
+	- Updated for 7.1
+	- Fixed 'frame doesnt exist' for quest rewards
+	- Initial work for 'Quests by Time Left'
+
 v 1.0.3
 	- Consolidated quest list images into 1 file, updated mover bar color
 	- Separated rewards and currencies into their own buckets

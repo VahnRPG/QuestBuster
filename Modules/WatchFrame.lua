@@ -1,7 +1,7 @@
 local _, qb = ...;
 
 qb.watch_frame = {};
-qb.watch_frame.frame = CreateFrame("Frame", "QuestBuster_WatchFrameFrame", UIParent, SecureFrameTemplate);
+qb.watch_frame.frame = CreateFrame("Frame", "QuestBuster_WatchFrameFrame", UIParent);
 qb.watch_frame.frame:SetScript("OnEvent", function(self, event, ...)
 	if (QuestBusterInit) then
 		return qb.watch_frame[event] and qb.watch_frame[event](qb, ...)

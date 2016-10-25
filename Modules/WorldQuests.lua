@@ -4,7 +4,7 @@ qb.world_quests = {};
 qb.world_quests.quests = {};
 qb.world_quests.quests.count = 0;
 qb.world_quests.quests.quests = {};
-qb.world_quests.frame = CreateFrame("Frame", "QuestBuster_WorldQuestsBuilderFrame", UIParent, SecureFrameTemplate);
+qb.world_quests.frame = CreateFrame("Frame", "QuestBuster_WorldQuestsBuilderFrame", UIParent);
 qb.world_quests.frame:RegisterEvent("QUEST_LOG_UPDATE");
 qb.world_quests.frame:SetScript("OnEvent", function(self, event, ...)
 	if (QuestBusterInit) then
@@ -15,6 +15,12 @@ qb.world_quests.emissary = {};
 qb.world_quests.emissary.count = 0;
 qb.world_quests.emissary.quests = {};
 qb.world_quests.quest_data = {};
+
+local function isWorldQuest(quest_id)
+	local _, _, world_quest_type = GetQuestTagInfo(quest_id);
+	
+	return world_quest_type ~= nil;
+end
 
 function qb.world_quests:QUEST_LOG_UPDATE()
 	qb.world_quests.quests.count = 0;
@@ -30,6 +36,13 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 			["items"] = {},
 			["other"] = {},
 		},
+		["time"] = {
+			["less than " .. WORLD_QUESTS_TIME_CRITICAL_MINUTES .. " minutes"] = {},
+			["less than one hour"] = {},
+			["less than twelve hours"] = {},
+			["less than twenty four hours"] = {},
+			["one day or longer"] = {},
+		},
 	};
 	
 	for i, map_id in pairs(QBG_MAP_IDS) do
@@ -39,7 +52,7 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 				if (zone_depth <= 1) then
 					local task_info = C_TaskQuest.GetQuestsForPlayerByMapID(zone_map_id, map_id);
 					if (task_info) then
-						for i, info in ipairs(task_info) do
+						for _, info in ipairs(task_info) do
 							local quest_id = info.questId;
 							if (not qb.world_quests.quest_data[quest_id]) then
 								qb.world_quests.quest_data[quest_id] = {
@@ -58,15 +71,16 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 										["experience"] = 0,
 										["money"] = 0,
 										["artifact experience"] = 0,
-										["currency"] = {},
+										["currency"] = "",
 										["items"] = {},
 										["other"] = {},
 									},
+									["time"] = "",
 								};
 							end
 
 							if (HaveQuestData(quest_id)) then
-								if (QuestMapFrame_IsQuestWorldQuest(quest_id) and WorldMap_DoesWorldQuestInfoPassFilters(info)) then
+								if (isWorldQuest(quest_id) and WorldMap_DoesWorldQuestInfoPassFilters(info)) then
 									--process zone
 									C_TaskQuest.RequestPreloadRewardData(quest_id);
 									qb.world_quests.quests.count = qb.world_quests.quests.count + 1;
@@ -130,21 +144,60 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 									
 									local currency = GetNumQuestLogRewardCurrencies(quest_id);
 									if (currency > 0) then
-										qb.world_quests.quests.quests["rewards"]["currency"][quest_id] = quest_id;
-										qb.world_quests.quest_data[quest_id]["rewards"]["currency"] = currency;
+										for i=1, currency do
+											local currency_name = GetQuestLogRewardCurrencyInfo(i, quest_id);
+											if (currency_name) then
+												if (not qb.world_quests.quests.quests["rewards"][currency_name]) then
+													qb.world_quests.quests.quests["rewards"][currency_name] = {};
+												end
+												qb.world_quests.quests.quests["rewards"][currency_name][quest_id] = quest_id;
+												qb.world_quests.quest_data[quest_id]["rewards"]["currency"] = currency_name;
+											end
+										end
+
 										rewards = true;
 									end
 									
 									local items = GetNumQuestLogRewards(quest_id);
 									if (items > 0) then
-										qb.world_quests.quests.quests["rewards"]["items"][quest_id] = quest_id;
-										qb.world_quests.quest_data[quest_id]["rewards"]["items"] = items;
+										for i=1, items do
+											local item_link = GetQuestItemLink(i, quest_id);
+											local _, _, _, _, _, item_id = GetQuestLogRewardInfo(i, quest_id);
+											if (item_id) then
+												local _, _, _, _, _, item_type = GetItemInfo(item_id);
+												if (not qb.world_quests.quests.quests["rewards"][item_type]) then
+													qb.world_quests.quests.quests["rewards"][item_type] = {};
+												end
+												qb.world_quests.quests.quests["rewards"][item_type][quest_id] = quest_id;
+												qb.world_quests.quest_data[quest_id]["rewards"]["items"][item_id] = item_id;
+											end
+										end
+
 										rewards = true;
 									end
-
+									
 									if (not rewards) then
 										qb.world_quests.quests.quests["rewards"]["other"][quest_id] = quest_id;
 										qb.world_quests.quest_data[quest_id]["rewards"]["other"] = "No / Other Rewards";
+									end
+									
+									local minutes_left = C_TaskQuest.GetQuestTimeLeftMinutes(quest_id);
+									if (minutes_left and minutes_left > 0) then
+										qb.world_quests.quest_data[quest_id]["time"] = minutes_left;
+
+										local color = NORMAL_FONT_COLOR;
+										local time_str = qb.omg:str_pad(minutes_left, 6, "0", "right");
+										if (minutes_left <= WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
+											qb.world_quests.quests.quests["time"]["less than " .. WORLD_QUESTS_TIME_CRITICAL_MINUTES .. " minutes"][time_str .. "-" .. quest_id] = quest_id;
+										elseif (minutes_left <= 60 + WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
+											qb.world_quests.quests.quests["time"]["less than one hour"][time_str .. "-" .. quest_id] = quest_id;
+										elseif (minutes_left < 12 * 60 + WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
+											qb.world_quests.quests.quests["time"]["less than twelve hours"][time_str .. "-" .. quest_id] = quest_id;
+										elseif (minutes_left < 24 * 60 + WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
+											qb.world_quests.quests.quests["time"]["less than twenty four hours"][time_str .. "-" .. quest_id] = quest_id;
+										else
+											qb.world_quests.quests.quests["time"]["one day or longer"][time_str .. "-" .. quest_id] = quest_id;
+										end
 									end
 								end
 							end

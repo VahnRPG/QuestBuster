@@ -1,7 +1,7 @@
 local _, qb = ...;
 
 qb.loot = {};
-qb.loot.frame = CreateFrame("Frame", "QuestBuster_LootFrame", UIParent, SecureFrameTemplate);
+qb.loot.frame = CreateFrame("Frame", "QuestBuster_LootFrame", UIParent);
 qb.loot.frame:RegisterEvent("QUEST_COMPLETE");
 qb.loot.frame:RegisterEvent("QUEST_ITEM_UPDATE");
 qb.loot.frame:RegisterEvent("GET_ITEM_INFO_RECEIVED");
@@ -17,7 +17,7 @@ local function highlightRewards()
 	for key, reward_data in pairs(QBG_REWARDS) do
 		local sparkle_frame = sparkle_frames[key];
 		local selected = reward_data.sel_func();
-		if (QuestBusterOptions[QuestBusterEntry].reward_highlights[key] and selected) then
+		if (QuestBusterOptions[QuestBusterEntry].reward_highlights[key] and selected and _G["QuestInfoRewardsFrameQuestInfoItem" .. selected .. "IconTexture"] ~= nil) then
 			sparkle_frame:ClearAllPoints();
 			sparkle_frame:SetAllPoints("QuestInfoRewardsFrameQuestInfoItem" .. selected .. "IconTexture");
 			sparkle_frame:Show();

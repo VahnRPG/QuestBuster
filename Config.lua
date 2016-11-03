@@ -422,7 +422,7 @@ child_world_quests_frame:SetScript("OnShow", function(child_world_quests_frame)
 		quest_lists[frame_data["name"]].position_x.set:SetText(QBL["CONFIG_POSITION_SET"]);
 		quest_lists[frame_data["name"]].position_x.set:SetSize(48, 20);
 		quest_lists[frame_data["name"]].position_x.set:SetScript("OnClick", function()
-			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.x = round(quest_lists[frame_data["name"]].position_x:GetText(), 2);
+			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.x = qb.omg:round(quest_lists[frame_data["name"]].position_x:GetText(), 2);
 			qb.quest_lists:updatePosition(frame_data["name"]);
 		end);
 		
@@ -443,7 +443,7 @@ child_world_quests_frame:SetScript("OnShow", function(child_world_quests_frame)
 		quest_lists[frame_data["name"]].position_y.set:SetText(QBL["CONFIG_POSITION_SET"]);
 		quest_lists[frame_data["name"]].position_y.set:SetSize(48, 20);
 		quest_lists[frame_data["name"]].position_y.set:SetScript("OnClick", function()
-			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.y = round(quest_lists[frame_data["name"]].position_y:GetText(), 2);
+			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.y = qb.omg:round(quest_lists[frame_data["name"]].position_y:GetText(), 2);
 			qb.quest_lists:updatePosition(frame_data["name"]);
 		end);
 		

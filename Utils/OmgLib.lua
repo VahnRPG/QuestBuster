@@ -56,7 +56,7 @@ function mod.omg:str_pad(text, size, pad_str, pad_dir)
 	local pad_left = 0;
 	local pad_right = 0;
 	if (pad_dir == "both") then
-		pad_left = round(count / 2, 0);
+		pad_left = mod.omg:round(count / 2, 0);
 		pad_right = count - pad_left;
 	elseif (pad_dir == "left") then
 		pad_left = count;
@@ -83,7 +83,7 @@ function mod.omg:build_time_string(timestamp)
 
 	local hours_str = "";
 	if (hours > 0) then
-		hours_str = "asdqwe" .. mod.omg:str_pad(hours, 2, "0") .. ":";
+		hours_str = mod.omg:str_pad(hours, 2, "0") .. ":";
 	end
 
 	return hours_str .. mod.omg:str_pad(minutes, 2, "0") .. ":" .. mod.omg:str_pad(seconds, 2, "0");
@@ -154,7 +154,7 @@ function mod.omg:explode(div, str)
 end
 
 function mod.omg:push_table(base_table, data)
-	for key, value in sortedpairs(data) do
+	for key, value in mod.omg:sortedpairs(data) do
 		base_table[key] = value;
 	end
 

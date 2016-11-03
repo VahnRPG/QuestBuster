@@ -317,7 +317,7 @@ function qb.quest_lists:update()
 						local quest_count = 0;
 						local quests_displayed = 0;
 						if (quest_ids and next(quest_ids)) then
-							for _, quest_id in sortedpairs(quest_ids) do
+							for _, quest_id in qb.omg:sortedpairs(quest_ids) do
 								if (not frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]) then
 									local _, _, _, rarity, elite, tradeskill_line = GetQuestTagInfo(quest_id);
 									local color = WORLD_QUEST_QUALITY_COLORS[rarity];

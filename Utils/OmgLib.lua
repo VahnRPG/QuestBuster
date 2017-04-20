@@ -10,7 +10,7 @@ local OMG_MONEY = {		--Thanks WowHead Looter!
 	["10000"] = string.gsub(GOLD_AMOUNT, "%%d ", ""),
  };
 
-function mod.omg:omg_parse_money(money)
+function mod.omg:parse_money(money)
 	local copper = 0;
 	for base, parser in pairs(OMG_MONEY) do
 		local found, _, found_amount = string.find(money, "(%d+) " .. parser);
@@ -104,7 +104,11 @@ function mod.omg:trim(text)
 end
 
 function mod.omg:ucwords(text)
-	return string.gsub(" " .. text, "%W%l", string.upper):sub(2);
+	local function ucwords_helper(first, rest)
+	  return first:upper() .. rest:lower();
+	end
+
+	return text:gsub("(%a)([%w_']*)", ucwords_helper);
 end
 
 function mod.omg:sortedpairs(t, comparator)
@@ -161,8 +165,17 @@ function mod.omg:push_table(base_table, data)
 	return base_table;
 end
 
+function mod.omg:in_array(needle, haystack)
+	for key, value in pairs(haystack) do
+		if (value == needle) then
+			return true;
+		end
+	end
+	return false;
+end
+
 function mod.omg:print_r(t)
- 	local print_r_cache = {};
+	local print_r_cache = {};
 	local function sub_print_r(t, indent)
 		if (print_r_cache[tostring(t)]) then
 			mod.omg:echo(indent .. "*" .. tostring(t));

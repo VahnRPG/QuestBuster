@@ -42,6 +42,7 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 			["less than twelve hours"] = {},
 			["less than twenty four hours"] = {},
 			["one day or longer"] = {},
+			["invalid time left"] = {},
 		},
 	};
 	
@@ -198,6 +199,8 @@ function qb.world_quests:QUEST_LOG_UPDATE()
 										else
 											qb.world_quests.quests.quests["time"]["one day or longer"][time_str .. "-" .. quest_id] = quest_id;
 										end
+									else
+										qb.world_quests.quests.quests["time"]["invalid time left"][quest_id .. "-" .. quest_id] = quest_id;
 									end
 								end
 							end

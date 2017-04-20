@@ -79,6 +79,9 @@ function qb.quest_lists:ADDON_LOADED()
 		mover_frame.config:SetPoint("TOPLEFT", mover_frame_name, "TOPLEFT", 8, 0);
 		mover_frame.config:SetSize(16, 16);
 		mover_frame.config:SetScript("OnClick", function(self)
+			if (WorldMapFrame:IsShown()) then
+				ToggleFrame(WorldMapFrame);
+			end
 			securecall("QuestBuster_Config_Show");
 		end);
 		

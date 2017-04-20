@@ -52,7 +52,7 @@ end
 
 qb.frame:RegisterEvent("ADDON_LOADED");
 qb.frame:SetScript("OnEvent", function(self, event, ...)
-	return qb[event] and qb[event](qb, ...)
+	return qb[event] and qb[event](qb, ...);
 end);
 
 function qb:ADDON_LOADED(self, ...)

@@ -1,17 +1,17 @@
 local _, qb = ...;
 
-qb.watch_frame = {};
-qb.watch_frame.frame = CreateFrame("Frame", "QuestBuster_WatchFrameFrame", UIParent);
-qb.watch_frame.frame:SetScript("OnEvent", function(self, event, ...)
-	if (QuestBusterInit) then
-		return qb.watch_frame[event] and qb.watch_frame[event](qb, ...)
+qb.modules.watch_frame = {};
+qb.modules.watch_frame.frame = CreateFrame("Frame", "QuestBuster_ModulesWatchFrameFrame", UIParent);
+qb.modules.watch_frame.frame:SetScript("OnEvent", function(self, event, ...)
+	if (qb.settings.init) then
+		return qb.modules.watch_frame[event] and qb.modules.watch_frame[event](qb, ...)
 	end
 end);
-qb.watch_frame.reload = nil;
+qb.modules.watch_frame.reload = nil;
 
 function QuestBuster_WatchFrame_ShowQuestLevel(self)
-	local show_level = QuestBusterOptions[QuestBusterEntry].watch_frame["show_level"];
-	if (not show_level and not qb.watch_frame.reload) then
+	local show_level = qb.settings:get().watch_frame["show_level"];
+	if (not show_level and not qb.modules.watch_frame.reload) then
 		return;
 	end
 	
@@ -46,11 +46,11 @@ function QuestBuster_WatchFrame_ShowQuestLevel(self)
 			end
 		end
 	end
-	qb.watch_frame.reload = nil;
+	qb.modules.watch_frame.reload = nil;
 end
 
 function QuestBuster_WatchFrame_AddToWatchFrame(self)
-	if (not QuestBusterOptions[QuestBusterEntry].watch_frame["show_abandon"]) then 
+	if (not qb.settings:get().watch_frame["show_abandon"]) then 
 		return;
 	end
 	

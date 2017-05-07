@@ -131,6 +131,7 @@ config_frame:SetScript("OnShow", function(config_frame)
 	title_label:SetPoint("TOPLEFT", 16, -16);
 	title_label:SetText(QBG_MOD_NAME .. " v" .. QBG_VERSION);
 	
+	--[[
 	local settings_label = config_frame:CreateFontString(nil, "ARTWORK", "GameFontNormal");
 	settings_label:SetPoint("TOPLEFT", title_label, "BOTTOMLEFT", 0, -20);
 	settings_label:SetText(QBL["CONFIG_SETTINGS_TYPE"]);
@@ -154,7 +155,7 @@ config_frame:SetScript("OnShow", function(config_frame)
 				if (not QuestBusterOptions[QuestBusterEntry]) then
 					qb:InitSettings("character");
 				end
-				qb.titan:QUEST_LOG_UPDATE();
+				qb.brokers:update();
 				updateFields();
 			end
 			UIDropDownMenu_AddButton(info);
@@ -162,14 +163,16 @@ config_frame:SetScript("OnShow", function(config_frame)
 	end);
 	UIDropDownMenu_JustifyText(settings_menu, "LEFT");
 	UIDropDownMenu_SetSelectedValue(settings_menu, ((QuestBusterEntry_Personal == QuestBusterEntry) and "Personal" or "Global"));
+	]]--
 	
 	show_minimap_button = CreateFrame("CheckButton", config_frame_name .. "Minimap", config_frame, "InterfaceOptionsCheckButtonTemplate");
-	show_minimap_button:SetPoint("TOPLEFT", settings_label, "BOTTOMLEFT", 0, -24);
+	--show_minimap_button:SetPoint("TOPLEFT", settings_label, "BOTTOMLEFT", 0, -24);
+	show_minimap_button:SetPoint("TOPLEFT", title_label, "BOTTOMLEFT", 0, -24);
 	_G[show_minimap_button:GetName() .. "Text"]:SetText(QBL["CONFIG_SHOW_MINIMAP"]);
 	show_minimap_button:SetChecked(QuestBusterOptions[QuestBusterEntry].minimap.show);
 	show_minimap_button:SetScript("OnClick", function(self, button)
 		QuestBusterOptions[QuestBusterEntry].minimap.show = self:GetChecked();
-		QuestBuster_Minimap_Init();
+		qb.minimap:update();
 	end);
 	
 	local reward_highlights_label = config_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
@@ -214,7 +217,7 @@ child_auto_quest_frame:SetScript("OnShow", function(child_auto_quest_frame)
 		else
 			auto_quest_details_frame:Hide();
 		end
-		qb.titan:QUEST_LOG_UPDATE();
+		qb.brokers:update();
 	end);
 	
 	auto_quest_details_frame = CreateFrame("Frame", config_frame_name .. "AutoQuestDetails", child_auto_quest_frame);
@@ -244,7 +247,7 @@ child_auto_quest_frame:SetScript("OnShow", function(child_auto_quest_frame)
 			info.func = function(self)
 				UIDropDownMenu_SetSelectedValue(auto_quest_modifier_menu, self.value);
 				QuestBusterOptions[QuestBusterEntry].auto_quest["modifier"] = self.value;
-				qb.titan:QUEST_LOG_UPDATE();
+				qb.brokers:update();
 			end
 			UIDropDownMenu_AddButton(info);
 		end
@@ -258,7 +261,7 @@ child_auto_quest_frame:SetScript("OnShow", function(child_auto_quest_frame)
 	auto_quest_only_dailies:SetChecked(QuestBusterOptions[QuestBusterEntry].auto_quest["only_dailies"]);
 	auto_quest_only_dailies:SetScript("OnClick", function(self, button)
 		QuestBusterOptions[QuestBusterEntry].auto_quest["only_dailies"] = self:GetChecked();
-		qb.titan:QUEST_LOG_UPDATE();
+		qb.brokers:update();
 	end);
 	
 	auto_quest_low_level = CreateFrame("CheckButton", config_frame_name .. "AutoQuestLowLevel", auto_quest_details_frame, "InterfaceOptionsCheckButtonTemplate");
@@ -267,7 +270,7 @@ child_auto_quest_frame:SetScript("OnShow", function(child_auto_quest_frame)
 	auto_quest_low_level:SetChecked(QuestBusterOptions[QuestBusterEntry].auto_quest["low_level"]);
 	auto_quest_low_level:SetScript("OnClick", function(self, button)
 		QuestBusterOptions[QuestBusterEntry].auto_quest["low_level"] = self:GetChecked();
-		qb.titan:QUEST_LOG_UPDATE();
+		qb.brokers:update();
 	end);
 	
 	auto_quest_repeatable = CreateFrame("CheckButton", config_frame_name .. "AutoQuestRepeatable", auto_quest_details_frame, "InterfaceOptionsCheckButtonTemplate");
@@ -276,7 +279,7 @@ child_auto_quest_frame:SetScript("OnShow", function(child_auto_quest_frame)
 	auto_quest_repeatable:SetChecked(QuestBusterOptions[QuestBusterEntry].auto_quest["repeatable"]);
 	auto_quest_repeatable:SetScript("OnClick", function(self, button)
 		QuestBusterOptions[QuestBusterEntry].auto_quest["repeatable"] = self:GetChecked();
-		qb.titan:QUEST_LOG_UPDATE();
+		qb.brokers:update();
 	end);
 	
 	local auto_quest_reward_label = auto_quest_details_frame:CreateFontString(nil, "ARTWORK", "GameFontNormal");
@@ -293,6 +296,7 @@ child_auto_quest_frame:SetScript("OnShow", function(child_auto_quest_frame)
 			info.func = function(self)
 				UIDropDownMenu_SetSelectedValue(auto_quest_reward_menu, self.value);
 				QuestBusterOptions[QuestBusterEntry].auto_quest["reward"] = self.value;
+				qb.brokers:update();
 			end
 			UIDropDownMenu_AddButton(info);
 		end
@@ -376,7 +380,7 @@ child_world_quests_frame:SetScript("OnShow", function(child_world_quests_frame)
 		quest_lists[frame_data["name"]].show:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].show);
 		quest_lists[frame_data["name"]].show:SetScript("OnClick", function(self, button)
 			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].show = self:GetChecked();
-			qb.quest_lists:update();
+			qb.modules.quest_lists:update();
 		end);
 	
 		quest_lists[frame_data["name"]].locked = CreateFrame("CheckButton", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "Locked", child_world_quests_frame, "InterfaceOptionsCheckButtonTemplate");
@@ -385,7 +389,7 @@ child_world_quests_frame:SetScript("OnShow", function(child_world_quests_frame)
 		quest_lists[frame_data["name"]].locked:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].locked);
 		quest_lists[frame_data["name"]].locked:SetScript("OnClick", function(self, button)
 			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].locked = self:GetChecked();
-			qb.quest_lists:update();
+			qb.modules.quest_lists:update();
 		end);
 	
 		quest_lists[frame_data["name"]].expand = CreateFrame("CheckButton", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "Expand", child_world_quests_frame, "InterfaceOptionsCheckButtonTemplate");
@@ -398,7 +402,7 @@ child_world_quests_frame:SetScript("OnShow", function(child_world_quests_frame)
 				state = "expanded";
 			end
 			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].state = state;
-			qb.quest_lists:update();
+			qb.modules.quest_lists:update();
 		end);
 		
 		quest_lists[frame_data["name"]].position_label = child_world_quests_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
@@ -423,7 +427,7 @@ child_world_quests_frame:SetScript("OnShow", function(child_world_quests_frame)
 		quest_lists[frame_data["name"]].position_x.set:SetSize(48, 20);
 		quest_lists[frame_data["name"]].position_x.set:SetScript("OnClick", function()
 			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.x = qb.omg:round(quest_lists[frame_data["name"]].position_x:GetText(), 2);
-			qb.quest_lists:updatePosition(frame_data["name"]);
+			qb.modules.quest_lists:updatePosition(frame_data["name"]);
 		end);
 		
 		quest_lists[frame_data["name"]].position_y_label = child_world_quests_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
@@ -444,7 +448,7 @@ child_world_quests_frame:SetScript("OnShow", function(child_world_quests_frame)
 		quest_lists[frame_data["name"]].position_y.set:SetSize(48, 20);
 		quest_lists[frame_data["name"]].position_y.set:SetScript("OnClick", function()
 			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.y = qb.omg:round(quest_lists[frame_data["name"]].position_y:GetText(), 2);
-			qb.quest_lists:updatePosition(frame_data["name"]);
+			qb.modules.quest_lists:updatePosition(frame_data["name"]);
 		end);
 		
 		quest_lists[frame_data["name"]].position_point_label = child_world_quests_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
@@ -461,7 +465,7 @@ child_world_quests_frame:SetScript("OnShow", function(child_world_quests_frame)
 				info.func = function(self)
 					QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.point = self.value;
 					UIDropDownMenu_SetSelectedValue(quest_lists[frame_data["name"]].position_point, self.value);
-					qb.quest_lists:updatePosition(frame_data["name"]);
+					qb.modules.quest_lists:updatePosition(frame_data["name"]);
 				end
 				UIDropDownMenu_AddButton(info);
 			end
@@ -483,7 +487,7 @@ child_world_quests_frame:SetScript("OnShow", function(child_world_quests_frame)
 				info.func = function(self)
 					QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.point = self.value;
 					UIDropDownMenu_SetSelectedValue(quest_lists[frame_data["name"]].position_relative_point, self.value);
-					qb.quest_lists:updatePosition(frame_data["name"]);
+					qb.modules.quest_lists:updatePosition(frame_data["name"]);
 				end
 				UIDropDownMenu_AddButton(info);
 			end
@@ -497,7 +501,7 @@ child_world_quests_frame:SetScript("OnShow", function(child_world_quests_frame)
 		quest_lists[frame_data["name"]].reset_position:SetText(QBL["CONFIG_POSITIONS_RESET"]);
 		quest_lists[frame_data["name"]].reset_position:SetSize(160, 24);
 		quest_lists[frame_data["name"]].reset_position:SetScript("OnClick", function() 
-			qb.quest_lists:resetPosition(frame_data["name"]);
+			qb.modules.quest_lists:resetPosition(frame_data["name"]);
 			
 			quest_lists[frame_data["name"]].position_x:SetText(round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.x, 2));
 			quest_lists[frame_data["name"]].position_y:SetText(round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.y, 2));

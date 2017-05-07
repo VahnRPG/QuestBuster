@@ -105,7 +105,7 @@ end
 
 function mod.omg:ucwords(text)
 	local function ucwords_helper(first, rest)
-	  return first:upper() .. rest:lower();
+		return first:upper() .. rest:lower();
 	end
 
 	return text:gsub("(%a)([%w_']*)", ucwords_helper);
@@ -174,6 +174,20 @@ function mod.omg:in_array(needle, haystack)
 	return false;
 end
 
+function mod.omg:clone_table(t)
+    if (type(t) ~= "table") then
+		return t;
+	end
+
+	local copy = {};
+	for k, v in next, t, nil do
+		copy[mod.omg:clone_table(k)] = mod.omg:clone_table(v);
+	end
+	setmetatable(copy, mod.omg:clone_table(getmetatable(t)));
+
+    return copy;
+end
+
 function mod.omg:print_r(t)
 	local print_r_cache = {};
 	local function sub_print_r(t, indent)
@@ -185,8 +199,10 @@ function mod.omg:print_r(t)
 				for pos, val in pairs(t) do
 					if (type(val) == "table") then
 						mod.omg:echo(indent .. "[" .. pos .. "] => " .. tostring(t) .. " {");
-						sub_print_r(val, indent..string.rep(" ", string.len(pos) + 8));
+						sub_print_r(val, indent .. string.rep(" ", string.len(pos) + 8));
 						mod.omg:echo(indent .. string.rep(" ", string.len(pos) + 6) .. "}");
+					elseif (type(val) == "string") then
+						mod.omg:echo(indent .. "[" .. pos .. "] => \"" .. val .. "\"");
 					else
 						mod.omg:echo(indent .. "[" .. pos .. "] => " .. tostring(val));
 					end
@@ -196,7 +212,15 @@ function mod.omg:print_r(t)
 			end
 		end
 	end
-	sub_print_r(t, "  ");
+	if (type(t) == "table") then
+		mod.omg:echo(tostring(t).." {");
+		sub_print_r(t, "  ");
+		mod.omg:echo("}");
+	else
+		sub_print_r(t, "  ");
+	end
+
+	mod.omg:echo(" ");
 end
 
 function mod.omg:echo(text)

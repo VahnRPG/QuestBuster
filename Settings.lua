@@ -65,11 +65,6 @@ function qb.settings:initSettings(reset)
 		QuestBusterOptions[QuestBusterEntry] = qb.omg:clone_table(qb.settings:default());
 	end
 
-	local _, player_class = UnitClass("player");
-	if (player_class == "ROGUE") then
-		QuestBusterOptions[QuestBusterEntry].skills_frame.bars.lockpicking = true;
-	end
-
 	qb.settings:versionSettings();
 end
 

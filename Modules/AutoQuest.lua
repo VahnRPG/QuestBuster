@@ -1,7 +1,7 @@
 local _, qb = ...;
 
 local function checkTrivial(trivial)
-	if (trivial and not QuestBusterOptions[QuestBusterEntry].auto_quest["low_level"]) then
+	if (trivial and not qb.settings:get().auto_quest["low_level"]) then
 		return false;
 	end
 	
@@ -9,7 +9,7 @@ local function checkTrivial(trivial)
 end
 
 local function checkEnabled()
-	local settings = QuestBusterOptions[QuestBusterEntry].auto_quest;
+	local settings = qb.settings:get().auto_quest;
 	if (
 		(not settings["enabled"])
 		or (settings["modifier"] == ALT_KEY and IsAltKeyDown())
@@ -23,7 +23,7 @@ local function checkEnabled()
 end
 
 local function checkQuest(daily, passed)
-	local settings = QuestBusterOptions[QuestBusterEntry].auto_quest;
+	local settings = qb.settings:get().auto_quest;
 	if (not passed) then
 		daily = (QuestIsDaily() or QuestIsWeekly());
 	end
@@ -57,21 +57,21 @@ local function processAvailableQuests(...)
 	end
 end
 
-qb.auto_quest = {};
-qb.auto_quest.frame = CreateFrame("Frame", "QuestBuster_AutoQuestFrame", UIParent);
-qb.auto_quest.frame:RegisterEvent("QUEST_GREETING");
-qb.auto_quest.frame:RegisterEvent("GOSSIP_SHOW");
-qb.auto_quest.frame:RegisterEvent("QUEST_DETAIL");
-qb.auto_quest.frame:RegisterEvent("QUEST_PROGRESS");
-qb.auto_quest.frame:RegisterEvent("QUEST_COMPLETE");
-qb.auto_quest.frame:SetScript("OnEvent", function(self, event, ...)
-	if (QuestBusterInit) then
-		return qb.auto_quest[event] and qb.auto_quest[event](qb, ...)
+qb.modules.auto_quest = {};
+qb.modules.auto_quest.frame = CreateFrame("Frame", "QuestBuster_ModulesAutoQuestFrame", UIParent);
+qb.modules.auto_quest.frame:RegisterEvent("QUEST_GREETING");
+qb.modules.auto_quest.frame:RegisterEvent("GOSSIP_SHOW");
+qb.modules.auto_quest.frame:RegisterEvent("QUEST_DETAIL");
+qb.modules.auto_quest.frame:RegisterEvent("QUEST_PROGRESS");
+qb.modules.auto_quest.frame:RegisterEvent("QUEST_COMPLETE");
+qb.modules.auto_quest.frame:SetScript("OnEvent", function(self, event, ...)
+	if (qb.settings.init) then
+		return qb.modules.auto_quest[event] and qb.modules.auto_quest[event](qb, ...)
 	end
 end);
 
 --Apparently there are some older NPCs that fire quests differently than what is standard now. Go figure
-function qb.auto_quest.QUEST_GREETING()
+function qb.modules.auto_quest.QUEST_GREETING()
 	if (checkEnabled()) then
 		for i=1, GetNumActiveQuests() do
 			local _, completed = GetActiveTitle(i);
@@ -80,7 +80,7 @@ function qb.auto_quest.QUEST_GREETING()
 			end
 		end
 
-		local settings = QuestBusterOptions[QuestBusterEntry].auto_quest;
+		local settings = qb.settings:get().auto_quest;
 		for i=1, GetNumAvailableQuests() do
 			local trivial, daily, repeatable = GetAvailableQuestInfo(i);
 			if (checkTrivial(trivial) and checkQuest()) then
@@ -90,34 +90,34 @@ function qb.auto_quest.QUEST_GREETING()
 	end
 end
 
-function qb.auto_quest.GOSSIP_SHOW()
+function qb.modules.auto_quest.GOSSIP_SHOW()
 	if (checkEnabled()) then
 		processActiveQuests(GetGossipActiveQuests());
 	    processAvailableQuests(GetGossipAvailableQuests());
     end
 end
 
-function qb.auto_quest.QUEST_DETAIL()
+function qb.modules.auto_quest.QUEST_DETAIL()
 	if (checkEnabled() and checkQuest()) then
 		AcceptQuest();
 	end
 end
 
-function qb.auto_quest.QUEST_PROGRESS()
+function qb.modules.auto_quest.QUEST_PROGRESS()
 	if (IsQuestCompletable() and checkEnabled() and checkQuest()) then
 		CompleteQuest();
 	end
 end
 
-function qb.auto_quest.QUEST_COMPLETE()
+function qb.modules.auto_quest.QUEST_COMPLETE()
 	if (checkEnabled()) then
 		if (GetNumQuestChoices() > 1) then
 			local quest_id = GetQuestID();
-			if (QuestBusterOptions[QuestBusterEntry].daily_quest_rewards[quest_id] ~= nil) then
-				local reward = QuestBusterOptions[QuestBusterEntry].daily_quest_rewards[quest_id];
+			if (qb.settings:get().daily_quest_rewards[quest_id] ~= nil) then
+				local reward = qb.settings:get().daily_quest_rewards[quest_id];
 				GetQuestReward(reward.reward_id);
 			else
-				local reward_type = QuestBusterOptions[QuestBusterEntry].auto_quest["reward"];
+				local reward_type = qb.settings:get().auto_quest["reward"];
 				local selected = QBG_REWARDS[reward_type].sel_func();
 				if (selected) then
 					GetQuestReward(selected);

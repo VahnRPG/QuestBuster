@@ -2,7 +2,7 @@
 ## Title: QuestBuster
 ## Author: Lord Vashtal
 ## Version: 1.0.7
-## X-Date: 2017-04-20
+## X-Date: 2017-04-27
 ## Notes: Provides frames for World Quests, plus more
 ## SavedVariables: QuestBusterOptions
 ## DefaultState: Enabled
@@ -14,6 +14,7 @@ Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 
 Utils\Utils.xml
 Locales\Locales.xml
-QuestBuster.xml
-Minimap.xml
+Templates\Templates.xml
+Brokers\Brokers.xml
 Modules\Modules.xml
+QuestBuster.xml

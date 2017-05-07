@@ -2,14 +2,14 @@
 -- QuestBuster enUS Localization
 -------------------------------------------------------------------------------
 --if (GetLocale() == "enUS") then
-	QBL["TITAN_INFO_DISABLED"] = "Disabled";
-	QBL["TITAN_INFO_QUEST_LABEL"] = "Q: ";
-	QBL["TITAN_INFO_LOW_LEVEL_LABEL"] = " L: ";
-	QBL["TITAN_INFO_REWARD_LABEL"] = " R: ";
-	QBL["TITAN_INFO_DAILIES"] = "Dailies";
-	QBL["TITAN_INFO_ALL"] = "All";
-	QBL["TITAN_INFO_YES"] = "Yes";
-	QBL["TITAN_INFO_NO"] = "No";
+	QBL["BROKER_INFO_DISABLED"] = "Disabled";
+	QBL["BROKER_INFO_QUEST_LABEL"] = "Q: ";
+	QBL["BROKER_INFO_LOW_LEVEL_LABEL"] = " L: ";
+	QBL["BROKER_INFO_REWARD_LABEL"] = " R: ";
+	QBL["BROKER_INFO_DAILIES"] = "Dailies";
+	QBL["BROKER_INFO_ALL"] = "All";
+	QBL["BROKER_INFO_YES"] = "Yes";
+	QBL["BROKER_INFO_NO"] = "No";
 
 	QBL["BINDING_TOGGLE_WORLD_QUESTS_FRAME"] = "Toggle World Quests Frame";
 	QBL["BINDING_OPEN_SKILL_1"] = "Toggle Skill 1 Window";
@@ -21,14 +21,18 @@
 	QBL["BINDING_OPEN_ARCHAEOLOGY"] = "Toggle Archaeology Window";
 	QBL["BINDING_OPEN_LOCKPICKING_BUSTER"] = "Toggle Lockpicking Buster Window";
 	
-	QBL["TITAN_SETTINGS_PERSON"] = QBG_CLR_LIGHTGREY .. "   (personal settings)";
-	QBL["TITAN_SETTINGS_GLOBAL"] = QBG_CLR_LIGHTGREY .. "   (global settings)";
-	QBL["TITAN_QUESTS"] = QBG_CLR_LIGHTGREEN .. "Activate on Quests: " .. QBG_CLR_WHITE;
-	QBL["TITAN_LOW_LEVEL"] = QBG_CLR_LIGHTGREEN .. "Also Low Level: " .. QBG_CLR_WHITE;
-	QBL["TITAN_REWARD"] = QBG_CLR_LIGHTGREEN .. "Reward Selection: " .. QBG_CLR_WHITE;
-	QBL["TITAN_MODIFIER"] = QBG_CLR_WHITE .. "Disable Key: ";
-	QBL["TITAN_TOGGLE"] = QBG_CLR_WHITE .. "Left-click for " .. QBG_CLR_OFFBLUE .. "Toggle";
-	QBL["TITAN_CONFIG"] = QBG_CLR_WHITE .. "Right-click for " .. QBG_CLR_OFFBLUE .. "Config";
+	QBL["BROKER_SETTINGS_PERSON"] = QBG_CLR_LIGHTGREY .. "   (personal settings)";
+	QBL["BROKER_SETTINGS_GLOBAL"] = QBG_CLR_LIGHTGREY .. "   (global settings)";
+	QBL["BROKER_QUESTS"] = QBG_CLR_LIGHTGREEN .. "Activate on Quests: " .. QBG_CLR_WHITE;
+	QBL["BROKER_LOW_LEVEL"] = QBG_CLR_LIGHTGREEN .. "Also Low Level: " .. QBG_CLR_WHITE;
+	QBL["BROKER_REWARD"] = QBG_CLR_LIGHTGREEN .. "Reward Selection: " .. QBG_CLR_WHITE;
+	QBL["BROKER_MODIFIER"] = QBG_CLR_WHITE .. "Disable Key: ";
+	QBL["BROKER_TOGGLE"] = QBG_CLR_WHITE .. "Left-click for " .. QBG_CLR_OFFBLUE .. "Toggle";
+	QBL["BROKER_CONFIG"] = QBG_CLR_WHITE .. "Right-click for " .. QBG_CLR_OFFBLUE .. "Config";
+	
+	QBL["BROKER_WORLD_QUEST_COUNT"] = QBG_CLR_LIGHTGREEN .. "World Quests Available: ";
+	QBL["BROKER_WORLD_QUEST_EMISSARY"] = QBG_CLR_LIGHTGREEN .. "Emissary Quests:";
+	QBL["BROKER_WORLD_QUEST_MENU"] = QBG_CLR_WHITE .. "Left-click for " .. QBG_CLR_OFFBLUE .. "World Quests";
 	
 	QBL["DAILY_QUEST_REWARD"] = QBG_CLR_OFFBLUE .. "CTRL + Left-click " .. QBG_CLR_WHITE .. "to auto-select this item in the future";
 	QBL["DAILY_QUEST_SELECTED_REWARD"] = QBG_CLR_LIGHTGREEN .. "Auto-selected item";
@@ -50,7 +54,7 @@
 	QBL["CONFIG_AUTO_QUEST_LOW_LEVEL"] = "Auto Complete Low Level Quests";
 	QBL["CONFIG_AUTO_QUEST_REPEATABLE"] = "Auto Complete Repeatable Quests";
 	QBL["CONFIG_TITLE_AUTO_QUEST_REWARD"] = "Auto Complete Reward Select:";
-	QBL["CONFIG_TITLE_DAILY_QUEST_REWARD"] = "Daily Quest Auto-select Rewards:";
+	QBL["CONFIG_TITLE_DAILY_QUEST_REWARD"] = "Daily Quest Auto-Select Rewards:";
 	QBL["CONFIG_TITLE_DAILY_QUEST_ITEM_ERROR"] = QBG_CLR_RED .. "ERROR - " .. QBG_CLR_OFFBLUE .. "Quest"  .. QBG_CLR_WHITE .. " #";
 	QBL["CONFIG_TITLE_DAILY_QUEST_NONE"] = QBG_CLR_WHITE .. "None selected. " .. QBG_CLR_OFFBLUE .. "CTRL + Left-click " .. QBG_CLR_WHITE .. "on a reward item to add to auto-select list.";
 	QBL["CONFIG_TITLE_AUTO_QUEST_MODIFIER"] = "Button to Prevent Auto Complete:";
@@ -66,4 +70,8 @@
 	QBL["CONFIG_POSITION_RELATIVE_POINT"] = "Relative To:";
 	QBL["CONFIG_POSITION_SET"] = "SET";
 	QBL["CONFIG_POSITIONS_RESET"] = "Reset Position";
+
+	-- Minimap Localization
+	QBL["MINIMAP_HOVER_LINE1"] = QBG_CLR_WHITE .. "Left button to " .. QBG_CLR_LIGHTGREEN .. "Drag";
+	QBL["MINIMAP_HOVER_LINE2"] = QBG_CLR_WHITE .. "Right-click for " .. QBG_CLR_OFFBLUE .. "Config";
 --end

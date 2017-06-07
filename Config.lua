@@ -131,7 +131,6 @@ config_frame:SetScript("OnShow", function(config_frame)
 	title_label:SetPoint("TOPLEFT", 16, -16);
 	title_label:SetText(QBG_MOD_NAME .. " v" .. QBG_VERSION);
 	
-	--[[
 	local settings_label = config_frame:CreateFontString(nil, "ARTWORK", "GameFontNormal");
 	settings_label:SetPoint("TOPLEFT", title_label, "BOTTOMLEFT", 0, -20);
 	settings_label:SetText(QBL["CONFIG_SETTINGS_TYPE"]);
@@ -163,11 +162,9 @@ config_frame:SetScript("OnShow", function(config_frame)
 	end);
 	UIDropDownMenu_JustifyText(settings_menu, "LEFT");
 	UIDropDownMenu_SetSelectedValue(settings_menu, ((QuestBusterEntry_Personal == QuestBusterEntry) and "Personal" or "Global"));
-	]]--
 	
 	show_minimap_button = CreateFrame("CheckButton", config_frame_name .. "Minimap", config_frame, "InterfaceOptionsCheckButtonTemplate");
-	--show_minimap_button:SetPoint("TOPLEFT", settings_label, "BOTTOMLEFT", 0, -24);
-	show_minimap_button:SetPoint("TOPLEFT", title_label, "BOTTOMLEFT", 0, -24);
+	show_minimap_button:SetPoint("TOPLEFT", settings_label, "BOTTOMLEFT", 0, -24);
 	_G[show_minimap_button:GetName() .. "Text"]:SetText(QBL["CONFIG_SHOW_MINIMAP"]);
 	show_minimap_button:SetChecked(QuestBusterOptions[QuestBusterEntry].minimap.show);
 	show_minimap_button:SetScript("OnClick", function(self, button)

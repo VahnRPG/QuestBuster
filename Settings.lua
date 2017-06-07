@@ -2,6 +2,7 @@ local DB_VERSION = 0.06;
 
 QuestBusterOptions = {};
 QuestBusterEntry = nil;
+QuestBusterEntry_Personal = nil;
 
 local _, qb = ...;
 
@@ -25,10 +26,18 @@ function qb.settings:ADDON_LOADED(self, ...)
 	if (not QuestBusterOptions) then
 		QuestBusterOptions = {};
 	end
+	if (not QuestBusterOptions.globals) then
+		QuestBusterOptions.globals = {};
+	end
 	qb.settings.player.name = UnitName("player");
 	qb.settings.player.level = UnitLevel("player");
 	qb.settings.player.server = GetRealmName();
-	QuestBusterEntry = qb.settings.player.name .. "@" .. qb.settings.player.server;
+	QuestBusterEntry_Personal = qb.settings.player.name .. "@" .. qb.settings.player.server;
+	QuestBusterEntry = QuestBusterEntry_Personal;
+	if (not QuestBusterOptions.globals[QuestBusterEntry_Personal]) then
+		QuestBusterOptions.globals[QuestBusterEntry_Personal] = "global";
+	end
+	QuestBusterEntry = QuestBusterOptions.globals[QuestBusterEntry_Personal];
 	
 	qb.settings:initSettings();
 	qb.settings.init = true;
@@ -60,6 +69,9 @@ function qb.settings:initSettings(reset)
 
 	if (not QuestBusterOptions or reset == true) then
 		QuestBusterOptions = {};
+		QuestBusterOptions.globals = {};
+		QuestBusterOptions.globals[QuestBusterEntry_Personal] = "global";
+		QuestBusterEntry = QuestBusterOptions.globals[QuestBusterEntry_Personal];
 	end
 	if (not QuestBusterOptions[QuestBusterEntry] or reset == "character") then
 		QuestBusterOptions[QuestBusterEntry] = qb.omg:clone_table(qb.settings:default());

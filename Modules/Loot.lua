@@ -1,13 +1,13 @@
 local _, qb = ...;
 
-qb.loot = {};
-qb.loot.frame = CreateFrame("Frame", "QuestBuster_LootFrame", UIParent);
-qb.loot.frame:RegisterEvent("QUEST_COMPLETE");
-qb.loot.frame:RegisterEvent("QUEST_ITEM_UPDATE");
-qb.loot.frame:RegisterEvent("GET_ITEM_INFO_RECEIVED");
-qb.loot.frame:SetScript("OnEvent", function(self, event, ...)
-	if (QuestBusterInit) then
-		return qb.loot[event] and qb.loot[event](qb, ...)
+qb.modules.loot = {};
+qb.modules.loot.frame = CreateFrame("Frame", "QuestBuster_ModulesLootFrame", UIParent);
+qb.modules.loot.frame:RegisterEvent("QUEST_COMPLETE");
+qb.modules.loot.frame:RegisterEvent("QUEST_ITEM_UPDATE");
+qb.modules.loot.frame:RegisterEvent("GET_ITEM_INFO_RECEIVED");
+qb.modules.loot.frame:SetScript("OnEvent", function(self, event, ...)
+	if (qb.settings.init) then
+		return qb.modules.loot[event] and qb.modules.loot[event](qb, ...)
 	end
 end);
 
@@ -17,7 +17,7 @@ local function highlightRewards()
 	for key, reward_data in pairs(QBG_REWARDS) do
 		local sparkle_frame = sparkle_frames[key];
 		local selected = reward_data.sel_func();
-		if (QuestBusterOptions[QuestBusterEntry].reward_highlights[key] and selected and _G["QuestInfoRewardsFrameQuestInfoItem" .. selected .. "IconTexture"] ~= nil) then
+		if (qb.settings:get().reward_highlights[key] and selected and _G["QuestInfoRewardsFrameQuestInfoItem" .. selected .. "IconTexture"] ~= nil) then
 			sparkle_frame:ClearAllPoints();
 			sparkle_frame:SetAllPoints("QuestInfoRewardsFrameQuestInfoItem" .. selected .. "IconTexture");
 			sparkle_frame:Show();
@@ -41,7 +41,7 @@ local function initRewardAutoSelect()
 						local quest_id = GetQuestID();
 						
 						GameTooltip:AddLine(" ");
-						local reward = QuestBusterOptions[QuestBusterEntry].daily_quest_rewards[quest_id];
+						local reward = qb.settings:get().daily_quest_rewards[quest_id];
 						if (reward ~= nil and reward.reward_id == choice_id) then
 							GameTooltip:AddLine(QBL["DAILY_QUEST_SELECTED_REWARD"]);
 						else
@@ -72,7 +72,7 @@ local function initRewardAutoSelect()
 						reward.reward_id = choice_id;
 						reward.item_link = item_link;
 						reward.item_count = item_count;
-						QuestBusterOptions[QuestBusterEntry].daily_quest_rewards[quest_id] = reward;
+						qb.settings:get().daily_quest_rewards[quest_id] = reward;
 					end
 				end
 			);
@@ -80,16 +80,16 @@ local function initRewardAutoSelect()
 	end
 end
 
-function qb.loot:QUEST_COMPLETE()
+function qb.modules.loot:QUEST_COMPLETE()
 	highlightRewards();
 	initRewardAutoSelect();
 end
 
-function qb.loot:QUEST_ITEM_UPDATE()
+function qb.modules.loot:QUEST_ITEM_UPDATE()
 	highlightRewards();
 end
 
-function qb.loot:GET_ITEM_INFO_RECEIVED()
+function qb.modules.loot:GET_ITEM_INFO_RECEIVED()
 	highlightRewards();
 end
 

@@ -1,3 +1,6 @@
+v 1.0.8
+	- Return of global settings functionality, renamed titanpanel to broker
+
 v 1.0.7
 	- Updated for patch 7.2, fixed ucwords, fixed invalid time left world quests
 

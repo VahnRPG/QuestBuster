@@ -522,10 +522,14 @@ end
 
 function qb.modules.quest_lists:setEmissaryTooltip(tooltip, emissary_data)
 	local faction_name, _, faction_standing = GetFactionInfoByID(emissary_data["faction_id"]);
-	tooltip:SetText(faction_name .. " - " .. getglobal("FACTION_STANDING_LABEL" .. faction_standing));
-	
-	tooltip:AddLine("Completed: " .. emissary_data["completed"] .. "/" .. emissary_data["total"]);
-	
+	if (emissary_data["pending"] ~= nil) then
+		tooltip:SetText(faction_name .. " - " .. QBL["EMISSARY_PENDING"]);
+		tooltip:AddLine(emissary_data["pending"]);
+	else
+		tooltip:SetText(faction_name .. " - " .. getglobal("FACTION_STANDING_LABEL" .. faction_standing));
+		tooltip:AddLine("Completed: " .. emissary_data["completed"] .. "/" .. emissary_data["total"]);
+	end
+		
 	local minutes_left = C_TaskQuest.GetQuestTimeLeftMinutes(emissary_data["quest_id"]);
 	if (minutes_left and minutes_left > 0) then
 		local color = NORMAL_FONT_COLOR;

@@ -219,15 +219,21 @@ function qb.modules.world_quests:QUEST_LOG_UPDATE()
 	if (WorldMapFrame.UIElementsFrame.BountyBoard.bounties) then
 		for bountyIndex, bounty in ipairs(WorldMapFrame.UIElementsFrame.BountyBoard.bounties) do
 			local completed, total = WorldMapFrame.UIElementsFrame.BountyBoard:CalculateBountySubObjectives(bounty);
+			local faction_id = bounty.factionID;
+			local pending = bounty.turninRequirementText;
+			if (faction_id == 0 and bounty.turninRequirementText ~= nil and string.find(bounty.turninRequirementText, "Argus") ~= nil) then
+				faction_id = 2165;
+			end
 
 			qb.modules.world_quests.emissary.count = qb.modules.world_quests.emissary.count + 1;
 			qb.modules.world_quests.emissary.quests[qb.modules.world_quests.emissary.count] = {
 				["index"] = bountyIndex,
 				["quest_id"] = bounty.questID,
-				["faction_id"] = bounty.factionID,
+				["faction_id"] = faction_id,
 				["icon"] = bounty.icon,
 				["completed"] = completed,
 				["total"] = total,
+				["pending"] = pending,
 			};
 		end
 	end

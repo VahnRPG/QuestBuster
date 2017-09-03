@@ -46,6 +46,8 @@
 	QBL["WORLD_QUEST_TRACKING_TOOLTIP"] = QBG_CLR_OFFBLUE .. "Click to Toggle Tracking";
 	QBL["WORLD_QUEST_TOMTOM"] = QBG_CLR_OFFBLUE .. "Add TomTom Waypoint to\n";
 	
+	QBL["EMISSARY_PENDING"] = QBG_CLR_RED .. "Pending";
+	
 	QBL["CONFIG_SETTINGS_TYPE"] = "Settings Type:";
 	QBL["CONFIG_SHOW_MINIMAP"] = "Show Minimap Button";
 	QBL["CONFIG_TITLE_HIGHLIGHT_REWARD"] = "Highlight Rewards";

@@ -220,8 +220,7 @@ function qb.modules.world_quests:QUEST_LOG_UPDATE()
 		for bountyIndex, bounty in ipairs(WorldMapFrame.UIElementsFrame.BountyBoard.bounties) do
 			local completed, total = WorldMapFrame.UIElementsFrame.BountyBoard:CalculateBountySubObjectives(bounty);
 			local faction_id = bounty.factionID;
-			local pending = bounty.turninRequirementText;
-			if (faction_id == 0 and bounty.turninRequirementText ~= nil and string.find(bounty.turninRequirementText, "Argus") ~= nil) then
+			if (faction_id == 0 and bounty.questID == 48639) then
 				faction_id = 2165;
 			end
 
@@ -233,7 +232,7 @@ function qb.modules.world_quests:QUEST_LOG_UPDATE()
 				["icon"] = bounty.icon,
 				["completed"] = completed,
 				["total"] = total,
-				["pending"] = pending,
+				["pending"] = bounty.turninRequirementText,
 			};
 		end
 	end

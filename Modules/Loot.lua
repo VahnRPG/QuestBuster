@@ -127,7 +127,7 @@ end
 
 local function getTransmogItem()
 	local selected = nil;
-	if (QBG_HAS_MOGIT) then
+	if (MogIt ~= nil) then
 		local mogit_wishlist = MogIt:GetModule("Wishlist");
 		for i=1, GetNumQuestChoices() do
 			local item_link = GetQuestItemLink("choice", i);
@@ -143,7 +143,7 @@ end
 QBG_REWARDS[QBT_REWARD_NONE] = { label="None", sel_func=function() end };
 QBG_REWARDS[QBT_REWARD_PRICE] = { label="Max Sell Price", sel_func=function() return getBestPriceReward() end, r=0, g=0.55, b=0 };
 QBG_REWARDS[QBT_REWARD_UPGRADE] = { label="Upgrade", sel_func=function() return getUpgrade() end, r=0.96, g=1, b=0.55 };
-if (QBG_HAS_MOGIT) then
+if (MogIt ~= nil) then
 	QBG_REWARDS[QBT_REWARD_TRANSMOG] = { label="Transmog", sel_func=function() return getTransmogItem() end, r=0.55, g=0, b=0.55 };
 end
 QBG_REWARDS[QBT_REWARD_AUTOSELECT] = { label="Auto Selected", sel_func=function() end, r=0.55, g=0.55, b=0 };

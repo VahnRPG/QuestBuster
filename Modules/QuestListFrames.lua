@@ -350,7 +350,7 @@ function qb.modules.quest_lists:update()
 										end
 									end);
 									quest_frame.expand:SetScript("OnClick", function(self)
-										PlaySound("igMainMenuOptionCheckBoxOn");
+										PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
 										if (IsWorldQuestWatched(quest_id)) then
 											BonusObjectiveTracker_UntrackWorldQuest(quest_id);
 										else
@@ -386,7 +386,7 @@ function qb.modules.quest_lists:update()
 										quest_frame.quest_type.icon:SetAtlas("worldquest-questmarker-questbang");
 									end
 									
-									if (QBG_HAS_TOMTOM) then
+									if (TomTom ~= nil and TomTom.AddMFWaypoint ~= nil) then
 										quest_frame.tomtom = CreateFrame("Button", quest_frame:GetName() .. "_TomTom", quest_frame.expand);
 										quest_frame.tomtom:SetPoint("TOPRIGHT", quest_frame.expand, "TOPLEFT", 0, 0);
 										quest_frame.tomtom:SetSize(16, 16);
@@ -400,7 +400,13 @@ function qb.modules.quest_lists:update()
 										end);
 										quest_frame.tomtom:SetScript("OnClick", function(self)
 											local location_data = qb.modules.world_quests.quest_data[quest_id]["location"];
-											TomTom:AddMFWaypoint(location_data["map_id"], location_data["floor"], location_data["x"], location_data["y"], {title=title, persistent=false })
+											TomTom:AddMFWaypoint(location_data["map_id"], location_data["floor"], location_data["x"], location_data["y"], {
+												title = title,
+												persistent = nil,
+												minimap = true,
+												world = true,
+											});
+											TomTom:SetClosestWaypoint();
 										end);
 										
 										quest_frame.tomtom.icon = quest_frame.tomtom:CreateTexture("ARTWORK");

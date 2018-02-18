@@ -5,8 +5,6 @@ QBG_MOD_NAME = "QuestBuster";
 QBG_VERSION = GetAddOnMetadata(QBG_MOD_NAME, "Version");
 QBG_LAST_UPDATED = GetAddOnMetadata(QBG_MOD_NAME, "X-Date");
 
-QBG_HAS_MOGIT = IsAddOnLoaded("MogIt");
-QBG_HAS_TOMTOM = IsAddOnLoaded("TomTom");
 QBG_GOSSIP_PARAMS = 6;
 
 QBG_REWARDS = {};
@@ -68,8 +66,10 @@ QBG_MOD_COLOR = QBG_CLR_MAX_ALPHA .. "ee2299";
 
 -------------------------------------------------------------------------------
 -- Map IDs
+--   Generated from: https://wow.gamepedia.com/MapID
 -------------------------------------------------------------------------------
 QBG_MAP_IDS = {
+	--Kalimdor
 	13,		--Kalimdor
 	772,	--Ahn'Qiraj: The Fallen Kingdom
 	894,	--Ammen Vale
@@ -106,6 +106,7 @@ QBG_MAP_IDS = {
 	889,	--Valley of Trials
 	281,	--Winterspring
 
+	--Eastern Kingdoms
 	14,		--Eastern Kingdoms
 	614,	--Abyssal Depths
 	16,		--Arathi Highlands
@@ -155,6 +156,7 @@ QBG_MAP_IDS = {
 	39,		--Westfall
 	40,		--Wetlands
 
+	--Outland
 	466,	--Outland
 	475,	--Blade's Edge Mountains
 	465,	--Hellfire Peninsula
@@ -165,6 +167,7 @@ QBG_MAP_IDS = {
 	478,	--Terokkar Forest
 	467,	--Zangarmarsh
 
+	--Northrend
 	485,	--Northrend
 	486,	--Borean Tundra
 	510,	--Crystalsong Forest
@@ -179,12 +182,14 @@ QBG_MAP_IDS = {
 	501,	--Wintergrasp
 	496,	--Zul'Drak
 
+	--The Maelstrom
 	751,	--The Maelstrom
 	640,	--Deepholm
 	605,	--Kezan
 	544,	--The Lost Isles
 	737,	--The Maelstrom
 
+	--Pandaria
 	862,	--Pandaria
 	858,	--Dread Wastes
 	929,	--Isle of Giants
@@ -201,6 +206,7 @@ QBG_MAP_IDS = {
 	811,	--Vale of Eternal Blossoms
 	807,	--Valley of the Four Winds
 
+	--Draenor
 	962,	--Draenor
 	978,	--Ashran
 	941,	--Frostfire Ridge
@@ -216,6 +222,7 @@ QBG_MAP_IDS = {
 	970,	--Tanaan Jungle - Assault on the Dark Portal
 	1011,	--Warspear
 
+	--The Broken Isles
 	1007,	--Broken Isles
 	1015,	--Aszuna
 	1021,	--Broken Shore
@@ -225,16 +232,21 @@ QBG_MAP_IDS = {
 	1017,	--Stormheim
 	1033,	--Suramar
 	1018,	--Val'sharah
-	
-	1068,	--Hall of the Guardian - Mage Order Hall
-	1052,	--Mardum, the Shattered Abyss - Demon Hunter
-	1040,	--Netherlight Temple - Priest Order Hall
-	1035,	--Skyhold - Warrior Order Hall
-	1077,	--The Dreamgrove - Druid Order Hall
-	1057,	--The Heart of Azeroth - Shaman Order Hall
-	1044,	--The Wandering Isle - Monk Order Hall
-	1072,	--Trueshot Lodge - Hunter Order Hall
+	1170,	--Mac'Aree
+	1171,	--Antoran Wastes
+	1184,	--Argus
 
+	--Order Halls
+	1068,	--Hall of the Guardian - Mage
+	1052,	--Mardum, the Shattered Abyss - Demon Hunter
+	1040,	--Netherlight Temple - Priest
+	1035,	--Skyhold - Warrior
+	1077,	--The Dreamgrove - Druid
+	1057,	--The Heart of Azeroth - Shaman
+	1044,	--The Wandering Isle - Monk
+	1072,	--Trueshot Lodge - Hunter
+
+	--Battlegrounds
 	401,	--Alterac Valley
 	461,	--Arathi Basin
 	935,	--Deepwind Gorge
@@ -247,6 +259,7 @@ QBG_MAP_IDS = {
 	626,	--Twin Peaks
 	443,	--Warsong Gulch
 
+	--Scenarios
 	878,	--A Brewing Storm
 	912,	--A Little Patience
 	899,	--Arena of Annihilation
@@ -261,11 +274,14 @@ QBG_MAP_IDS = {
 	920,	--Domination Point (H)
 	880,	--Greenstone Village
 	911,	--Lion's Landing (A)
+	1086,	--Malorne's Nightmare
+	1099,	--The Road to Fel
 	938,	--The Secrets of Ragefire
 	906,	--Theramore's Fall (A)
 	851,	--Theramore's Fall (H)
 	882,	--Unga Ingoo
 
+	--Classic Dungeons
 	688,	--Blackfathom Deeps
 	704,	--Blackrock Depths
 	721,	--Blackrock Spire
@@ -284,11 +300,13 @@ QBG_MAP_IDS = {
 	749,	--Wailing Caverns
 	686,	--Zul'Farrak
 
+	--Classic Raids
 	755,	--Blackwing Lair
 	696,	--Molten Core
 	717,	--Ruins of Ahn'Qiraj
 	766,	--Temple of Ahn'Qiraj
 
+	--Burning Crusade Dungeons
 	722,	--Auchenai Crypts
 	797,	--Hellfire Ramparts
 	798,	--Magisters' Terrace
@@ -306,6 +324,7 @@ QBG_MAP_IDS = {
 	727,	--The Steamvault
 	726,	--The Underbog
 
+	--Burning Crusade Raids
 	796,	--Black Temple
 	776,	--Gruul's Lair
 	775,	--Hyjal Summit
@@ -315,6 +334,7 @@ QBG_MAP_IDS = {
 	789,	--Sunwell Plateau
 	782,	--The Eye
 
+	--Wrath Dungeons
 	522,	--Ahn'kahet: The Old Kingdom
 	533,	--Azjol-Nerub
 	534,	--Drak'Tharon Keep
@@ -332,6 +352,7 @@ QBG_MAP_IDS = {
 	523,	--Utgarde Keep
 	524,	--Utgarde Pinnacle
 
+	--Wrath Raids
 	604,	--Icecrown Citadel
 	535,	--Naxxramas
 	718,	--Onyxia's Lair
@@ -342,6 +363,7 @@ QBG_MAP_IDS = {
 	529,	--Ulduar
 	532,	--Vault of Archavon
 
+	--Cataclysm Dungeons
 	753,	--Blackrock Caverns
 	820,	--End Time
 	757,	--Grim Batol
@@ -355,6 +377,7 @@ QBG_MAP_IDS = {
 	781,	--Zul'Aman
 	793,	--Zul'Gurub
 
+	--Cataclysm Raids
 	752,	--Baradin Hold
 	754,	--Blackwing Descent
 	824,	--Dragon Soul
@@ -362,6 +385,7 @@ QBG_MAP_IDS = {
 	758,	--The Bastion of Twilight
 	773,	--Throne of the Four Winds
 
+	--Pandaria Dungeons
 	875,	--Gate of the Setting Sun
 	885,	--Mogu'Shan Palace
 	871,	--Scarlet Halls
@@ -372,12 +396,14 @@ QBG_MAP_IDS = {
 	876,	--Stormstout Brewery
 	867,	--Temple of the Jade Serpent
 
+	--Pandaria Raids
 	897,	--Heart of Fear
 	896,	--Mogu'shan Vaults
 	953,	--Siege of Orgrimmar
 	886,	--Terrace of Endless Spring
 	930,	--Throne of Thunder
 
+	--Draenor Dungeons
 	984,	--Auchindoun
 	964,	--Bloodmaul Slag Mines
 	993,	--Grimrail Depot
@@ -387,21 +413,33 @@ QBG_MAP_IDS = {
 	1008,	--The Everbloom
 	995,	--Upper Blackrock Spire
 
+	--Draenor Raids
 	994,	--Highmaul
 	988,	--Blackrock Foundry
 	1026,	--Hellfire Citadel
-	
+
+	--Legion Dungeons
 	1081,	--Black Rook Hold
+	1146,	--Cathedral of Eternal Night
 	1087,	--Court of Stars
 	1067,	--Darkheart Thicket
 	1046,	--Eye of Azshara
 	1041,	--Halls of Valor
 	1042,	--Maw of Souls
 	1065,	--Neltharion's Lair
+	1115,	--Return to Karazhan
 	1079,	--The Arcway
 	1045,	--Vault of the Wardens
 	1066,	--Violet Hold
 
+	--Legion Raids
 	1094,	--The Emerald Nightmare
+	1114,	--Trial of Valor
 	1088,	--The Nighthold
+	1147,	--Tomb of Sargeras
+
+	--Legion Scenarios
+	1105,	--Scarlet Monastery
+	1144,	--Shado-Pan Showdown
+	1173,	--Arcatraz
 };

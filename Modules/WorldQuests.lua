@@ -94,7 +94,7 @@ function qb.modules.world_quests:QUEST_LOG_UPDATE()
 									qb.modules.world_quests.quest_data[quest_id]["location"]["x"] = info.x;
 									qb.modules.world_quests.quest_data[quest_id]["location"]["y"] = info.y;
 									qb.modules.world_quests.quest_data[quest_id]["location"]["floor"] = info.floor;
-									qb.modules.world_quests.quest_data[quest_id]["location"]["map_id"] = map_id;
+									qb.modules.world_quests.quest_data[quest_id]["location"]["map_id"] = zone_map_id;
 									
 									--process quest type
 									local _, _, world_quest_type = GetQuestTagInfo(quest_id);
@@ -222,6 +222,15 @@ function qb.modules.world_quests:QUEST_LOG_UPDATE()
 			local faction_id = bounty.factionID;
 			if (faction_id == 0 and bounty.questID == 48639) then
 				faction_id = 2165;
+			elseif (faction_id == 0 and bounty.questID == 48641) then
+				faction_id = 2045;
+			elseif (faction_id == 0 and bounty.questID == 48642) then
+				faction_id = 2170;
+			--[[
+			elseif (faction_id == 0) then
+				qb.omg:echo("Here: " .. bountyIndex);
+				qb.omg:print_r(bounty);
+			]]--
 			end
 
 			qb.modules.world_quests.emissary.count = qb.modules.world_quests.emissary.count + 1;

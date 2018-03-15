@@ -1,3 +1,8 @@
+v 1.0.13
+	- Fixed variable in main broker for clients that don't have CraftBuster installed
+	- Fixed retrieving Argus world quests preventing changing the map
+	- Added check for auto loot if the default WoW UI reward button isn't found
+
 v 1.0.12
 	- Fixed retrieving Argus world quests
 	- Added 'find group' button

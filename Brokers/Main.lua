@@ -41,7 +41,7 @@ local LDB = LibStub("LibDataBroker-1.1"):NewDataObject(QBG_MOD_NAME, {
 		tooltip:AddLine(QBL["BROKER_REWARD"] .. QBG_REWARDS[settings.reward].label);
 		tooltip:AddLine(" ");
 		if (settings["modifier"] ~= NONE_KEY) then
-			tooltip:AddLine(QBL["BROKER_MODIFIER"] .. CBG_CLR_OFFBLUE .. qb.settings:get().auto_quest["modifier"]);
+			tooltip:AddLine(QBL["BROKER_MODIFIER"] .. QBG_CLR_OFFBLUE .. qb.settings:get().auto_quest["modifier"]);
 		end
 		tooltip:AddLine(QBL["BROKER_TOGGLE"]);
 		tooltip:AddLine(QBL["BROKER_CONFIG"]);

@@ -33,49 +33,51 @@ local function initRewardAutoSelect()
 	if (QuestIsDaily() or QuestIsWeekly()) then
 		for i=1, GetNumQuestChoices() do
 			local frame = _G["QuestInfoRewardsFrameQuestInfoItem" .. i];
-			frame:HookScript("OnEnter",
-				function(self, ...)
-					--if (self.show_frame ~= nil and self.show_frame ~= true) then
-					if (not self.show_frame or self.show_frame ~= true) then		--something weird happening to cause this to duplicate itself
-						local choice_id = self:GetID();
-						local quest_id = GetQuestID();
-						
-						GameTooltip:AddLine(" ");
-						local reward = qb.settings:get().daily_quest_rewards[quest_id];
-						if (reward ~= nil and reward.reward_id == choice_id) then
-							GameTooltip:AddLine(QBL["DAILY_QUEST_SELECTED_REWARD"]);
-						else
-							GameTooltip:AddLine(QBL["DAILY_QUEST_REWARD"]);
+			if (frame ~= nil) then
+				frame:HookScript("OnEnter",
+					function(self, ...)
+						--if (self.show_frame ~= nil and self.show_frame ~= true) then
+						if (not self.show_frame or self.show_frame ~= true) then		--something weird happening to cause this to duplicate itself
+							local choice_id = self:GetID();
+							local quest_id = GetQuestID();
+							
+							GameTooltip:AddLine(" ");
+							local reward = qb.settings:get().daily_quest_rewards[quest_id];
+							if (reward ~= nil and reward.reward_id == choice_id) then
+								GameTooltip:AddLine(QBL["DAILY_QUEST_SELECTED_REWARD"]);
+							else
+								GameTooltip:AddLine(QBL["DAILY_QUEST_REWARD"]);
+							end
+							GameTooltip:Show();
+							
+							self.show_frame = true;
 						end
-						GameTooltip:Show();
-						
-						self.show_frame = true;
 					end
-				end
-			);
-			frame:HookScript("OnLeave",
-				function(self, ...)
-					self.show_frame = false;
-				end
-			);
-			frame:HookScript("OnClick",
-				function(self, button, ...)
-					if (button == "LeftButton" and IsControlKeyDown()) then
-						local choice_id = self:GetID();
-						local quest_id = GetQuestID();
-						local item_link = GetQuestItemLink("choice", choice_id);
-						local _, _, item_count = GetQuestItemInfo("choice", choice_id);
+				);
+				frame:HookScript("OnLeave",
+					function(self, ...)
+						self.show_frame = false;
+					end
+				);
+				frame:HookScript("OnClick",
+					function(self, button, ...)
+						if (button == "LeftButton" and IsControlKeyDown()) then
+							local choice_id = self:GetID();
+							local quest_id = GetQuestID();
+							local item_link = GetQuestItemLink("choice", choice_id);
+							local _, _, item_count = GetQuestItemInfo("choice", choice_id);
 
-						local reward = {};
-						reward.quest_id = quest_id;
-						reward.quest_title = GetTitleText();
-						reward.reward_id = choice_id;
-						reward.item_link = item_link;
-						reward.item_count = item_count;
-						qb.settings:get().daily_quest_rewards[quest_id] = reward;
+							local reward = {};
+							reward.quest_id = quest_id;
+							reward.quest_title = GetTitleText();
+							reward.reward_id = choice_id;
+							reward.item_link = item_link;
+							reward.item_count = item_count;
+							qb.settings:get().daily_quest_rewards[quest_id] = reward;
+						end
 					end
-				end
-			);
+				);
+			end
 		end
 	end
 end

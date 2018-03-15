@@ -45,6 +45,7 @@
 	QBL["WORLD_QUEST_ZONES"] = "Quests by Zone";
 	QBL["WORLD_QUEST_TRACKING_TOOLTIP"] = QBG_CLR_OFFBLUE .. "Click to Toggle Tracking";
 	QBL["WORLD_QUEST_TOMTOM"] = QBG_CLR_OFFBLUE .. "Add TomTom Waypoint to\n";
+	QBL["WORLD_QUEST_FIND_GROUP"] = QBG_CLR_OFFBLUE .. "Find Group for\n";
 	
 	QBL["EMISSARY_PENDING"] = QBG_CLR_RED .. "Pending";
 	
@@ -68,8 +69,6 @@
 	QBL["CONFIG_WORLD_QUESTS_POSITION"] = "Position";
 	QBL["CONFIG_POSITION_X"] = "X:";
 	QBL["CONFIG_POSITION_Y"] = "Y:";
-	QBL["CONFIG_POSITION_POINT"] = "Point:";
-	QBL["CONFIG_POSITION_RELATIVE_POINT"] = "Relative To:";
 	QBL["CONFIG_POSITION_SET"] = "SET";
 	QBL["CONFIG_POSITIONS_RESET"] = "Reset Position";
 

@@ -234,6 +234,7 @@ QBG_MAP_IDS = {
 	1018,	--Val'sharah
 	1170,	--Mac'Aree
 	1171,	--Antoran Wastes
+	1135,	--Krokuun
 	1184,	--Argus
 
 	--Order Halls
@@ -442,4 +443,10 @@ QBG_MAP_IDS = {
 	1105,	--Scarlet Monastery
 	1144,	--Shado-Pan Showdown
 	1173,	--Arcatraz
+};
+
+QBG_ARGUS_MAP_IDS = {
+	1170,	--Mac'Aree
+	1171,	--Antoran Wastes
+	1135,	--Krokuun
 };

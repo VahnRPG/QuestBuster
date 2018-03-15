@@ -42,9 +42,7 @@ function qb.modules.quest_lists:ADDON_LOADED()
 		local mover_frame = CreateFrame("Frame", "QuestBuster_QuestList" .. frame_data["name"] .. "MoverFrame", frame_data["parent"]);
 		mover_frame:SetFrameStrata(frame_data["strata"]);
 		mover_frame:SetPoint("CENTER", frame_data["parent"]);
-		mover_frame:SetSize(320, 10);
-		mover_frame:EnableMouse(true);
-		mover_frame:SetMovable(true);
+		mover_frame:SetSize(336, 10);
 		mover_frame:RegisterForDrag("LeftButton");
 		mover_frame:SetScript("OnDragStart", function(self)
 			if (not qb.settings:get().quest_list_frames[frame_data["name"]].locked) then
@@ -67,7 +65,7 @@ function qb.modules.quest_lists:ADDON_LOADED()
 		
 		mover_frame.texture = mover_frame:CreateTexture("BACKGROUND");
 		mover_frame.texture:SetPoint("TOPLEFT");
-		mover_frame.texture:SetSize(320, 16);
+		mover_frame.texture:SetSize(336, 16);
 		mover_frame.texture:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover");
 		
 		mover_frame.label = mover_frame:CreateFontString(nil, "ARTWORK", "GameFontHighlight");
@@ -129,7 +127,7 @@ function qb.modules.quest_lists:ADDON_LOADED()
 		local frame = CreateFrame("Frame", "QuestBuster_QuestList" .. frame_data["name"] .. "Frame", frame_data["parent"]);
 		frame:SetFrameStrata(frame_data["strata"]);
 		frame:SetPoint("TOPLEFT", mover_frame_name, "BOTTOMLEFT", 0, 2);
-		frame:SetSize(320, 10);
+		frame:SetSize(336, 10);
 		frame:SetBackdrop(frame_backdrop);
 		frame.emissary_frames = {};
 		frame.type_frames = {};
@@ -199,12 +197,12 @@ function qb.modules.quest_lists:update()
 				for quest_type, quest_data in qb.omg:sortedpairs(qb.modules.world_quests.quests.quests) do
 					if (not frame.type_frames[quest_type]) then
 						local type_frame = CreateFrame("Frame", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "Frame", frame);
-						type_frame:SetSize(308, 16);
+						type_frame:SetSize(324, 16);
 						type_frame.frame_name = type_count;
 						
 						type_frame.expand = CreateFrame("Button", type_frame:GetName() .. "_ExpandFrame", type_frame);
 						type_frame.expand:SetPoint("TOPLEFT", type_frame, "TOPLEFT", 0, 0);
-						type_frame.expand:SetSize(308, 16);
+						type_frame.expand:SetSize(324, 16);
 						type_frame.expand:SetScript("OnEnter", function(self)
 							type_frame.expand.icon:SetVertexColor(QUEST_TYPE_HOVER_COLOR.r, QUEST_TYPE_HOVER_COLOR.g, QUEST_TYPE_HOVER_COLOR.b);
 						end);
@@ -227,7 +225,7 @@ function qb.modules.quest_lists:update()
 						
 						type_frame.expand.icon = type_frame.expand:CreateTexture("ARTWORK");
 						type_frame.expand.icon:SetPoint("TOPLEFT", type_frame.expand, "TOPLEFT", -2, 0);
-						type_frame.expand.icon:SetSize(308, 16);
+						type_frame.expand.icon:SetSize(324, 16);
 						type_frame.expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Bar");
 						type_frame.expand.icon:SetVertexColor(QUEST_TYPE_COLOR.r, QUEST_TYPE_COLOR.g, QUEST_TYPE_COLOR.b);
 						
@@ -261,12 +259,12 @@ function qb.modules.quest_lists:update()
 						if (not frame.type_frames[quest_type]["filters"][filter_name]) then
 							local filter_frame = CreateFrame("Frame", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "_" .. filter_count .."Frame", frame);
 							filter_frame:SetPoint("TOPLEFT", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "Frame", "TOPLEFT", 20, 0);
-							filter_frame:SetSize(288, 16);
+							filter_frame:SetSize(304, 16);
 							filter_frame.frame_name = type_count .. "_" .. filter_count;
 							
 							filter_frame.expand = CreateFrame("Button", filter_frame:GetName() .. "_ExpandFrame", type_frame);
 							filter_frame.expand:SetPoint("TOPLEFT", filter_frame, "TOPLEFT", -2, 0);
-							filter_frame.expand:SetSize(288, 16);
+							filter_frame.expand:SetSize(304, 16);
 							filter_frame.expand:SetScript("OnEnter", function(self)
 								filter_frame.expand.icon:SetVertexColor(FILTER_HOVER_COLOR.r, FILTER_HOVER_COLOR.g, FILTER_HOVER_COLOR.b);
 							end);
@@ -413,6 +411,25 @@ function qb.modules.quest_lists:update()
 										quest_frame.tomtom.icon:SetAllPoints();
 										quest_frame.tomtom.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_TomTom");
 									end
+
+									quest_frame.find_group = CreateFrame("Button", quest_frame:GetName() .. "_FindGroup", quest_frame.expand);
+									quest_frame.find_group:SetPoint("TOPLEFT", quest_frame.expand, "TOPRIGHT", 0, 0);
+									quest_frame.find_group:SetSize(16, 16);
+									quest_frame.find_group:SetScript("OnEnter", function(self)
+										tooltip:SetOwner(self, "ANCHOR_CURSOR");
+										tooltip:SetText(QBL["WORLD_QUEST_FIND_GROUP"] .. title);
+										tooltip:Show();
+									end);
+									quest_frame.find_group:SetScript("OnLeave", function(self)
+										tooltip:Hide();
+									end);
+									quest_frame.find_group:SetScript("OnClick", function(self)
+										LFGListUtil_FindQuestGroup(quest_id);
+									end);
+									
+									quest_frame.find_group.icon = quest_frame.find_group:CreateTexture("ARTWORK");
+									quest_frame.find_group.icon:SetAllPoints();
+									quest_frame.find_group.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_FindGroup");
 									
 									frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id] = {
 										["quest_id"] = quest_id,
@@ -656,7 +673,7 @@ function qb.modules.quest_lists:setQuestTooltip(tooltip, quest_id)
 				end
 				item_frame = _G["qb.GameTooltip.ItemTooltip"];
 			end
-			if not EmbeddedItemTooltip_SetItemByQuestReward(item_frame, 1, quest_id) then
+			if (not EmbeddedItemTooltip_SetItemByQuestReward(item_frame, 1, quest_id)) then
 				tooltip:AddLine(RETRIEVING_DATA, RED_FONT_COLOR:GetRGB());
 			end
 			if (_G["qb.GameTooltip.ItemTooltip"]) then

@@ -51,7 +51,13 @@ function qb.modules.world_quests:QUEST_LOG_UPDATE()
 			for zone_id=1, C_MapCanvas.GetNumZones(map_id) do
 				local zone_map_id, zone_name, zone_depth = C_MapCanvas.GetZoneInfo(map_id, zone_id);
 				if (zone_depth <= 1) then
-					local task_info = C_TaskQuest.GetQuestsForPlayerByMapID(zone_map_id, map_id);
+					local task_info = nil;
+					if (qb.omg:in_array(zone_map_id, QBG_ARGUS_MAP_IDS)) then
+						SetMapByID(zone_map_id);
+						task_info = C_TaskQuest.GetQuestsForPlayerByMapID(zone_map_id);
+					else
+						task_info = C_TaskQuest.GetQuestsForPlayerByMapID(zone_map_id, map_id);
+					end
 					if (task_info) then
 						for _, info in ipairs(task_info) do
 							local quest_id = info.questId;

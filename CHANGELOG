@@ -1,3 +1,11 @@
+v 1.0.12
+	- Fixed retrieving Argus world quests
+	- Added 'find group' button
+	- Separated positioning from world quests frame in config
+	- Removed point and relative point from positioning config
+	- Fixed more omglib migration issues
+	- Fixed moving & storing world quest list frame position
+
 v 1.0.11
 	- Fixed 'Armies of Legionfall' and 'Argussian Reach' emissary quest in world quest frame
 	- Fixed PlaySound update

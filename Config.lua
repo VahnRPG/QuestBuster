@@ -117,8 +117,8 @@ local function updateFields()
 		quest_lists[frame_data["name"]].show:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].show);
 		quest_lists[frame_data["name"]].locked:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].locked);
 		quest_lists[frame_data["name"]].expand:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].state == "expanded");
-		quest_lists[frame_data["name"]].position_x:SetText(round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.x, 2));
-		quest_lists[frame_data["name"]].position_y:SetText(round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.y, 2));
+		quest_lists[frame_data["name"]].position_x:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.x, 2));
+		quest_lists[frame_data["name"]].position_y:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.y, 2));
 	end
 end
 
@@ -362,17 +362,22 @@ local child_world_quests_frame = CreateFrame("Frame", config_frame_name .. "Worl
 child_world_quests_frame.name = "World Quests";
 child_world_quests_frame.parent = config_frame.name;
 child_world_quests_frame:SetScript("OnShow", function(child_world_quests_frame)
-	local points = { "TOPLEFT", "TOPRIGHT", "BOTTOMLEFT", "BOTTOMRIGHT", "CENTER" };
 	local title_label = child_world_quests_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
 	title_label:SetPoint("TOPLEFT", 16, -16);
 	title_label:SetText(QBG_MOD_NAME .. " - " .. child_world_quests_frame.name);
 	
 	local count = 1;
 	for _, frame_data in pairs(QBG_QUEST_LIST_FRAMES) do
-		quest_lists[frame_data["name"]] = {};
-	
+		if (not quest_lists[frame_data["name"]]) then
+			quest_lists[frame_data["name"]] = {};
+		end
+		
+		quest_lists[frame_data["name"]].label = child_world_quests_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
+		quest_lists[frame_data["name"]].label:SetPoint("TOPLEFT", title_label, "BOTTOMLEFT", 0, ((count - 1) * -120) - 20);
+		quest_lists[frame_data["name"]].label:SetText(frame_data["label"]);
+		
 		quest_lists[frame_data["name"]].show = CreateFrame("CheckButton", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "Show", child_world_quests_frame, "InterfaceOptionsCheckButtonTemplate");
-		quest_lists[frame_data["name"]].show:SetPoint("TOPLEFT", title_label, "BOTTOMLEFT", 0, ((count - 1) * -220) - 20);
+		quest_lists[frame_data["name"]].show:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].label, "BOTTOMLEFT", 0, 0);
 		_G[quest_lists[frame_data["name"]].show:GetName() .. "Text"]:SetText(QBL["CONFIG_WORLD_QUESTS_SHOW"] .. " - " .. frame_data["label"]);
 		quest_lists[frame_data["name"]].show:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].show);
 		quest_lists[frame_data["name"]].show:SetScript("OnClick", function(self, button)
@@ -401,24 +406,45 @@ child_world_quests_frame:SetScript("OnShow", function(child_world_quests_frame)
 			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].state = state;
 			qb.modules.quest_lists:update();
 		end);
+
+		count = count + 1;
+	end
+	
+	child_world_quests_frame:SetScript("OnShow", nil);
+end);
+InterfaceOptions_AddCategory(child_world_quests_frame);
+
+local child_positioning_frame = CreateFrame("Frame", config_frame_name .. "Positioning", config_frame);
+child_positioning_frame.name = "Positioning";
+child_positioning_frame.parent = config_frame.name;
+child_positioning_frame:SetScript("OnShow", function(child_positioning_frame)
+	local title_label = child_positioning_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
+	title_label:SetPoint("TOPLEFT", 16, -16);
+	title_label:SetText(QBG_MOD_NAME .. " - " .. child_positioning_frame.name);
+	
+	local count = 1;
+	for _, frame_data in pairs(QBG_QUEST_LIST_FRAMES) do
+		if (not quest_lists[frame_data["name"]]) then
+			quest_lists[frame_data["name"]] = {};
+		end
 		
-		quest_lists[frame_data["name"]].position_label = child_world_quests_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
-		quest_lists[frame_data["name"]].position_label:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].expand, "BOTTOMLEFT", 0, -5);
-		quest_lists[frame_data["name"]].position_label:SetText(QBL["CONFIG_WORLD_QUESTS_POSITION"]);
+		quest_lists[frame_data["name"]].position_label = child_positioning_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
+		quest_lists[frame_data["name"]].position_label:SetPoint("TOPLEFT", title_label, "BOTTOMLEFT", 0, ((count - 1) * -120) - 20);
+		quest_lists[frame_data["name"]].position_label:SetText(frame_data["label"]);
 		
-		quest_lists[frame_data["name"]].position_x_label = child_world_quests_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
+		quest_lists[frame_data["name"]].position_x_label = child_positioning_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
 		quest_lists[frame_data["name"]].position_x_label:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].position_label, "BOTTOMLEFT", 10, -10);
 		quest_lists[frame_data["name"]].position_x_label:SetText(QBL["CONFIG_POSITION_X"]);
 		
-		quest_lists[frame_data["name"]].position_x = CreateFrame("EditBox", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "PositionX", child_world_quests_frame, "InputBoxTemplate");
+		quest_lists[frame_data["name"]].position_x = CreateFrame("EditBox", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "PositionX", child_positioning_frame, "InputBoxTemplate");
 		quest_lists[frame_data["name"]].position_x:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].position_x_label, "TOPRIGHT", 10, 0);
 		quest_lists[frame_data["name"]].position_x:SetSize(64, 16);
-		quest_lists[frame_data["name"]].position_x:SetText(round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.x, 2));
+		quest_lists[frame_data["name"]].position_x:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.x, 2));
 		quest_lists[frame_data["name"]].position_x:SetAutoFocus(false);
 		quest_lists[frame_data["name"]].position_x:SetFontObject(ChatFontNormal);
 		quest_lists[frame_data["name"]].position_x:SetCursorPosition(0);
 
-		quest_lists[frame_data["name"]].position_x.set = CreateFrame("Button", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "SetPositionX", child_world_quests_frame, "UIPanelButtonTemplate");
+		quest_lists[frame_data["name"]].position_x.set = CreateFrame("Button", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "SetPositionX", child_positioning_frame, "UIPanelButtonTemplate");
 		quest_lists[frame_data["name"]].position_x.set:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].position_x, "TOPRIGHT", 10, 2);
 		quest_lists[frame_data["name"]].position_x.set:SetText(QBL["CONFIG_POSITION_SET"]);
 		quest_lists[frame_data["name"]].position_x.set:SetSize(48, 20);
@@ -427,19 +453,19 @@ child_world_quests_frame:SetScript("OnShow", function(child_world_quests_frame)
 			qb.modules.quest_lists:updatePosition(frame_data["name"]);
 		end);
 		
-		quest_lists[frame_data["name"]].position_y_label = child_world_quests_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
+		quest_lists[frame_data["name"]].position_y_label = child_positioning_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
 		quest_lists[frame_data["name"]].position_y_label:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].position_x, "TOPRIGHT", 120, 0);
 		quest_lists[frame_data["name"]].position_y_label:SetText(QBL["CONFIG_POSITION_Y"]);
 		
-		quest_lists[frame_data["name"]].position_y = CreateFrame("EditBox", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "PositionY", child_world_quests_frame, "InputBoxTemplate");
+		quest_lists[frame_data["name"]].position_y = CreateFrame("EditBox", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "PositionY", child_positioning_frame, "InputBoxTemplate");
 		quest_lists[frame_data["name"]].position_y:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].position_y_label, "TOPRIGHT", 10, 0);
 		quest_lists[frame_data["name"]].position_y:SetSize(64, 16);
-		quest_lists[frame_data["name"]].position_y:SetText(round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.y, 2));
+		quest_lists[frame_data["name"]].position_y:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.y, 2));
 		quest_lists[frame_data["name"]].position_y:SetAutoFocus(false);
 		quest_lists[frame_data["name"]].position_y:SetFontObject(ChatFontNormal);
 		quest_lists[frame_data["name"]].position_y:SetCursorPosition(0);
 
-		quest_lists[frame_data["name"]].position_y.set = CreateFrame("Button", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "SetPositionY", child_world_quests_frame, "UIPanelButtonTemplate");
+		quest_lists[frame_data["name"]].position_y.set = CreateFrame("Button", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "SetPositionY", child_positioning_frame, "UIPanelButtonTemplate");
 		quest_lists[frame_data["name"]].position_y.set:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].position_y, "TOPRIGHT", 10, 2);
 		quest_lists[frame_data["name"]].position_y.set:SetText(QBL["CONFIG_POSITION_SET"]);
 		quest_lists[frame_data["name"]].position_y.set:SetSize(48, 20);
@@ -448,70 +474,24 @@ child_world_quests_frame:SetScript("OnShow", function(child_world_quests_frame)
 			qb.modules.quest_lists:updatePosition(frame_data["name"]);
 		end);
 		
-		quest_lists[frame_data["name"]].position_point_label = child_world_quests_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
-		quest_lists[frame_data["name"]].position_point_label:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].position_x_label, "BOTTOMLEFT", 0, -20);
-		quest_lists[frame_data["name"]].position_point_label:SetText(QBL["CONFIG_POSITION_POINT"]);
-
-		quest_lists[frame_data["name"]].position_point = CreateFrame("Frame", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "SetPoint", child_world_quests_frame, "UIDropDownMenuTemplate");
-		quest_lists[frame_data["name"]].position_point:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].position_point_label, "TOPRIGHT", 0, 2);
-		UIDropDownMenu_Initialize(quest_lists[frame_data["name"]].position_point, function()
-			for i, point in pairs(points) do
-				local info = UIDropDownMenu_CreateInfo();
-				info.text = point;
-				info.value = point;
-				info.func = function(self)
-					QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.point = self.value;
-					UIDropDownMenu_SetSelectedValue(quest_lists[frame_data["name"]].position_point, self.value);
-					qb.modules.quest_lists:updatePosition(frame_data["name"]);
-				end
-				UIDropDownMenu_AddButton(info);
-			end
-		end);
-		UIDropDownMenu_JustifyText(quest_lists[frame_data["name"]].position_point, "LEFT");
-		UIDropDownMenu_SetSelectedValue(quest_lists[frame_data["name"]].position_point, QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.point);
-		
-		quest_lists[frame_data["name"]].position_relative_point_label = child_world_quests_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
-		quest_lists[frame_data["name"]].position_relative_point_label:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].position_y_label, "BOTTOMLEFT", 0, -20);
-		quest_lists[frame_data["name"]].position_relative_point_label:SetText(QBL["CONFIG_POSITION_RELATIVE_POINT"]);
-
-		quest_lists[frame_data["name"]].position_relative_point = CreateFrame("Frame", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "SetRelativePoint", child_world_quests_frame, "UIDropDownMenuTemplate");
-		quest_lists[frame_data["name"]].position_relative_point:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].position_relative_point_label, "TOPRIGHT", 0, 2);
-		UIDropDownMenu_Initialize(quest_lists[frame_data["name"]].position_relative_point, function()
-			for i, point in pairs(points) do
-				local info = UIDropDownMenu_CreateInfo();
-				info.text = point;
-				info.value = point;
-				info.func = function(self)
-					QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.point = self.value;
-					UIDropDownMenu_SetSelectedValue(quest_lists[frame_data["name"]].position_relative_point, self.value);
-					qb.modules.quest_lists:updatePosition(frame_data["name"]);
-				end
-				UIDropDownMenu_AddButton(info);
-			end
-		end);
-		UIDropDownMenu_JustifyText(quest_lists[frame_data["name"]].position_relative_point, "LEFT");
-		UIDropDownMenu_SetSelectedValue(quest_lists[frame_data["name"]].position_relative_point, QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.relative_point);
-		
 		--Reset Positions
-		quest_lists[frame_data["name"]].reset_position = CreateFrame("Button", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "ResetPositions", child_world_quests_frame, "UIPanelButtonTemplate");
-		quest_lists[frame_data["name"]].reset_position:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].position_label, "BOTTOMLEFT", 0, -75);
+		quest_lists[frame_data["name"]].reset_position = CreateFrame("Button", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "ResetPositions", child_positioning_frame, "UIPanelButtonTemplate");
+		quest_lists[frame_data["name"]].reset_position:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].position_label, "BOTTOMLEFT", 0, -35);
 		quest_lists[frame_data["name"]].reset_position:SetText(QBL["CONFIG_POSITIONS_RESET"]);
 		quest_lists[frame_data["name"]].reset_position:SetSize(160, 24);
 		quest_lists[frame_data["name"]].reset_position:SetScript("OnClick", function() 
 			qb.modules.quest_lists:resetPosition(frame_data["name"]);
 			
-			quest_lists[frame_data["name"]].position_x:SetText(round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.x, 2));
-			quest_lists[frame_data["name"]].position_y:SetText(round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.y, 2));
-			UIDropDownMenu_SetSelectedValue(quest_lists[frame_data["name"]].position_point, QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.point);
-			UIDropDownMenu_SetSelectedValue(quest_lists[frame_data["name"]].position_relative_point, QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.relative_point);
+			quest_lists[frame_data["name"]].position_x:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.x, 2));
+			quest_lists[frame_data["name"]].position_y:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.y, 2));
 		end);
 
 		count = count + 1;
 	end
 	
-	child_world_quests_frame:SetScript("OnShow", nil);
+	child_positioning_frame:SetScript("OnShow", nil);
 end);
-InterfaceOptions_AddCategory(child_world_quests_frame);
+InterfaceOptions_AddCategory(child_positioning_frame);
 
 function QuestBuster_Config_Show()
 	InterfaceOptionsFrame_OpenToCategory(config_frame.name);

@@ -1,3 +1,8 @@
+v 1.0.14
+	- Fixed emissary icons not showing when not in a questing zone
+	- Removed "find group" button for pet battle world quests
+	- Added "find group" toggle to config
+
 v 1.0.13
 	- Fixed variable in main broker for clients that don't have CraftBuster installed
 	- Fixed retrieving Argus world quests preventing changing the map

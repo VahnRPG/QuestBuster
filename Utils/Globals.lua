@@ -24,10 +24,12 @@ QBG_QUEST_TYPES = {
 };
 
 QBG_WORLD_QUEST_TYPES = {
+	[LE_QUEST_TAG_TYPE_DUNGEON]		= "Dungeon",
+	[LE_QUEST_TAG_TYPE_INVASION]	= "Invasion",
 	[LE_QUEST_TAG_TYPE_PVP]			= "PVP",
 	[LE_QUEST_TAG_TYPE_PET_BATTLE]	= "Pet Battle",
 	[LE_QUEST_TAG_TYPE_PROFESSION]	= "Profession",
-	[LE_QUEST_TAG_TYPE_DUNGEON]		= "Dungeon",
+	[LE_QUEST_TAG_TYPE_RAID]		= "Raid",
 };
 
 QBG_QUEST_LIST_FRAMES = {
@@ -443,6 +445,12 @@ QBG_MAP_IDS = {
 	1105,	--Scarlet Monastery
 	1144,	--Shado-Pan Showdown
 	1173,	--Arcatraz
+};
+
+QBG_EMISSARY_MAP_IDS = {
+	962,	--Draenor
+	1007,	--Broken Isles
+	1184,	--Argus
 };
 
 QBG_ARGUS_MAP_IDS = {

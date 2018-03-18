@@ -117,6 +117,7 @@ local function updateFields()
 		quest_lists[frame_data["name"]].show:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].show);
 		quest_lists[frame_data["name"]].locked:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].locked);
 		quest_lists[frame_data["name"]].expand:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].state == "expanded");
+		quest_lists[frame_data["name"]].find_group:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].show_find_group);
 		quest_lists[frame_data["name"]].position_x:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.x, 2));
 		quest_lists[frame_data["name"]].position_y:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.y, 2));
 	end
@@ -373,7 +374,7 @@ child_world_quests_frame:SetScript("OnShow", function(child_world_quests_frame)
 		end
 		
 		quest_lists[frame_data["name"]].label = child_world_quests_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
-		quest_lists[frame_data["name"]].label:SetPoint("TOPLEFT", title_label, "BOTTOMLEFT", 0, ((count - 1) * -120) - 20);
+		quest_lists[frame_data["name"]].label:SetPoint("TOPLEFT", title_label, "BOTTOMLEFT", 0, ((count - 1) * -140) - 20);
 		quest_lists[frame_data["name"]].label:SetText(frame_data["label"]);
 		
 		quest_lists[frame_data["name"]].show = CreateFrame("CheckButton", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "Show", child_world_quests_frame, "InterfaceOptionsCheckButtonTemplate");
@@ -404,6 +405,19 @@ child_world_quests_frame:SetScript("OnShow", function(child_world_quests_frame)
 				state = "expanded";
 			end
 			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].state = state;
+			qb.modules.quest_lists:update();
+		end);
+	
+		quest_lists[frame_data["name"]].find_group = CreateFrame("CheckButton", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "FindGroup", child_world_quests_frame, "InterfaceOptionsCheckButtonTemplate");
+		quest_lists[frame_data["name"]].find_group:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].expand, "BOTTOMLEFT", 0, 0);
+		_G[quest_lists[frame_data["name"]].find_group:GetName() .. "Text"]:SetText(QBL["CONFIG_WORLD_QUESTS_FIND_GROUP"] .. " - " .. frame_data["label"]);
+		quest_lists[frame_data["name"]].find_group:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].find_group);
+		quest_lists[frame_data["name"]].find_group:SetScript("OnClick", function(self, button)
+			local state = nil;
+			if (self:GetChecked()) then
+				state = true;
+			end
+			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].show_find_group = state;
 			qb.modules.quest_lists:update();
 		end);
 

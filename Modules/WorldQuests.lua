@@ -46,6 +46,7 @@ local function setQuestData(zone_name, info)
 				["other"] = {},
 			},
 			["time"] = "",
+			["find_group"] = true,
 		};
 	end
 
@@ -76,6 +77,10 @@ local function setQuestData(zone_name, info)
 			end
 			qb.modules.world_quests.quests.quests["types"][type_name][quest_id] = quest_id;
 			qb.modules.world_quests.quest_data[quest_id]["type"] = world_quest_type;
+
+			if (world_quest_type == LE_QUEST_TAG_TYPE_PET_BATTLE) then
+				qb.modules.world_quests.quest_data[quest_id]["find_group"] = nil;
+			end
 			
 			--process faction
 			local _, faction_id = C_TaskQuest.GetQuestInfoByQuestID(quest_id);
@@ -234,13 +239,25 @@ function qb.modules.world_quests:updateWorldQuests()
 	end
 end
 
-function qb.modules.world_quests:updateEmissary()
+function qb.modules.world_quests:findEmissary()
 	--World Quest emissary frame doesn't get processed until you view the map. So, do it manually.
-	WorldMapFrame.UIElementsFrame.BountyBoard.mapAreaID = GetCurrentMapAreaID();
-	WorldMapFrame.UIElementsFrame.BountyBoard:Refresh();
+	for i, map_id in pairs(QBG_EMISSARY_MAP_IDS) do
+		WorldMapFrame.UIElementsFrame.BountyBoard.mapAreaID = map_id;
+		WorldMapFrame.UIElementsFrame.BountyBoard:Refresh();
+
+		if (qb.omg:tcount(WorldMapFrame.UIElementsFrame.BountyBoard.bounties) > 0) then
+			return true;
+		end
+	end
+
+	return nil;
+end
+
+function qb.modules.world_quests:updateEmissary()
 	qb.modules.world_quests.emissary.count = 0;
 	qb.modules.world_quests.emissary.quests = {};
-	if (WorldMapFrame.UIElementsFrame.BountyBoard.bounties) then
+
+	if (qb.modules.world_quests:findEmissary()) then
 		for bountyIndex, bounty in ipairs(WorldMapFrame.UIElementsFrame.BountyBoard.bounties) do
 			local completed, total = WorldMapFrame.UIElementsFrame.BountyBoard:CalculateBountySubObjectives(bounty);
 			local faction_id = bounty.factionID;

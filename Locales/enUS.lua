@@ -66,6 +66,7 @@
 	QBL["CONFIG_WORLD_QUESTS_SHOW"] = "Show World Quests";
 	QBL["CONFIG_WORLD_QUESTS_LOCKED"] = "Lock World Quests Frame";
 	QBL["CONFIG_WORLD_QUESTS_EXPAND"] = "Expand World Quests Frame";
+	QBL["CONFIG_WORLD_QUESTS_FIND_GROUP"] = "Show Find Group";
 	QBL["CONFIG_WORLD_QUESTS_POSITION"] = "Position";
 	QBL["CONFIG_POSITION_X"] = "X:";
 	QBL["CONFIG_POSITION_Y"] = "Y:";

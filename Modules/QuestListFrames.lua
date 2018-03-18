@@ -412,24 +412,26 @@ function qb.modules.quest_lists:update()
 										quest_frame.tomtom.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_TomTom");
 									end
 
-									quest_frame.find_group = CreateFrame("Button", quest_frame:GetName() .. "_FindGroup", quest_frame.expand);
-									quest_frame.find_group:SetPoint("TOPLEFT", quest_frame.expand, "TOPRIGHT", 0, 0);
-									quest_frame.find_group:SetSize(16, 16);
-									quest_frame.find_group:SetScript("OnEnter", function(self)
-										tooltip:SetOwner(self, "ANCHOR_CURSOR");
-										tooltip:SetText(QBL["WORLD_QUEST_FIND_GROUP"] .. title);
-										tooltip:Show();
-									end);
-									quest_frame.find_group:SetScript("OnLeave", function(self)
-										tooltip:Hide();
-									end);
-									quest_frame.find_group:SetScript("OnClick", function(self)
-										LFGListUtil_FindQuestGroup(quest_id);
-									end);
+									if (qb.modules.world_quests.quest_data[quest_id]["find_group"]) then
+										quest_frame.find_group = CreateFrame("Button", quest_frame:GetName() .. "_FindGroup", quest_frame.expand);
+										quest_frame.find_group:SetPoint("TOPLEFT", quest_frame.expand, "TOPRIGHT", 0, 0);
+										quest_frame.find_group:SetSize(16, 16);
+										quest_frame.find_group:SetScript("OnEnter", function(self)
+											tooltip:SetOwner(self, "ANCHOR_CURSOR");
+											tooltip:SetText(QBL["WORLD_QUEST_FIND_GROUP"] .. title);
+											tooltip:Show();
+										end);
+										quest_frame.find_group:SetScript("OnLeave", function(self)
+											tooltip:Hide();
+										end);
+										quest_frame.find_group:SetScript("OnClick", function(self)
+											LFGListUtil_FindQuestGroup(quest_id);
+										end);
 									
-									quest_frame.find_group.icon = quest_frame.find_group:CreateTexture("ARTWORK");
-									quest_frame.find_group.icon:SetAllPoints();
-									quest_frame.find_group.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_FindGroup");
+										quest_frame.find_group.icon = quest_frame.find_group:CreateTexture("ARTWORK");
+										quest_frame.find_group.icon:SetAllPoints();
+										quest_frame.find_group.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_FindGroup");
+									end
 									
 									frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id] = {
 										["quest_id"] = quest_id,
@@ -444,18 +446,32 @@ function qb.modules.quest_lists:update()
 								local minutes_left = C_TaskQuest.GetQuestTimeLeftMinutes(quest_id);
 								if (minutes_left and minutes_left > 0 and minutes_left <= WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
 									color = RED_FONT_COLOR;
-									frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]["frame"].expand.label:SetTextColor(color.r, color.g, color.b, color.a);
+									filter_quest_frame.expand.label:SetTextColor(color.r, color.g, color.b, color.a);
 								end
 								
 								if (qb.modules.quest_lists.filter_expanded == filter_name) then
-									frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]["frame"]:Show();
-									frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]["frame"].expand:Show();
-									frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]["frame"].quest_type:Show();
+									filter_quest_frame:Show();
+									filter_quest_frame.expand:Show();
+									filter_quest_frame.quest_type:Show();
+									if (filter_quest_frame.find_group ~= nil) then
+										if (config.show_find_group) then
+											filter_quest_frame:SetWidth(268);
+											filter_quest_frame.expand:SetWidth(268);
+											filter_quest_frame.find_group:Show();
+										else
+											filter_quest_frame:SetWidth(284);
+											filter_quest_frame.expand:SetWidth(284);
+											filter_quest_frame.find_group:Hide();
+										end
+									else
+										filter_quest_frame:SetWidth(284);
+										filter_quest_frame.expand:SetWidth(284);
+									end
 									quests_displayed = quests_displayed + 1;
 								else
-									frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]["frame"]:Hide();
-									frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]["frame"].expand:Hide();
-									frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]["frame"].quest_type:Hide();
+									filter_quest_frame:Hide();
+									filter_quest_frame.expand:Hide();
+									filter_quest_frame.quest_type:Hide();
 								end
 								
 								total_quests = total_quests + 1;

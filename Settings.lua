@@ -1,4 +1,4 @@
-local DB_VERSION = 0.06;
+local DB_VERSION = 0.07;
 
 QuestBusterOptions = {};
 QuestBusterEntry = nil;
@@ -82,6 +82,12 @@ end
 
 function qb.settings:versionSettings()
 	local settings = qb.settings:get();
+	
+	if (not settings.db_version or settings.db_version < 0.07) then
+		for _, frame_data in pairs(QBG_QUEST_LIST_FRAMES) do
+			settings.quest_list_frames[frame_data["name"]].show_find_group = true;
+		end
+	end
 
 	settings.db_version = DB_VERSION;
 end
@@ -135,6 +141,7 @@ function qb.settings:default()
 			};
 			settings.quest_list_frames[frame_data["name"]].locked = false;
 			settings.quest_list_frames[frame_data["name"]].state = "expanded";
+			settings.quest_list_frames[frame_data["name"]].show_find_group = true;
 		end
 	end
 

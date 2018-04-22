@@ -38,7 +38,7 @@ function mod.omg:add_debug_border(frame)
 end
 
 function mod.omg:create_timer(duration, callback)
-	C_Timer.After(duration, callback);
+	return C_Timer.NewTimer(duration, callback);
 end
 
 function mod.omg:str_pad(text, size, pad_str, pad_dir)

@@ -16,15 +16,18 @@ local sparkle_frames = {};
 local function highlightRewards()
 	for key, reward_data in pairs(QBG_REWARDS) do
 		local sparkle_frame = sparkle_frames[key];
+		sparkle_frame:Hide();
+		AnimatedShine_Stop(sparkle_frame);
+
 		local selected = reward_data.sel_func();
-		if (qb.settings:get().reward_highlights[key] and selected and _G["QuestInfoRewardsFrameQuestInfoItem" .. selected .. "IconTexture"] ~= nil) then
-			sparkle_frame:ClearAllPoints();
-			sparkle_frame:SetAllPoints("QuestInfoRewardsFrameQuestInfoItem" .. selected .. "IconTexture");
-			sparkle_frame:Show();
-			AnimatedShine_Start(sparkle_frame, reward_data.r, reward_data.g, reward_data.b);
-		else
-			sparkle_frame:Hide();
-			AnimatedShine_Stop(sparkle_frame);
+		if (type(selected) ~= "table" and selected ~= nil) then
+			qb.omg:echo("Here: " .. selected);
+			if (qb.settings:get().reward_highlights[key] and selected and _G["QuestInfoRewardsFrameQuestInfoItem" .. selected .. "IconTexture"] ~= nil) then
+				sparkle_frame:ClearAllPoints();
+				sparkle_frame:SetAllPoints("QuestInfoRewardsFrameQuestInfoItem" .. selected .. "IconTexture");
+				sparkle_frame:Show();
+				AnimatedShine_Start(sparkle_frame, reward_data.r, reward_data.g, reward_data.b);
+			end
 		end
 	end
 end
@@ -137,6 +140,10 @@ local function getTransmogItem()
 				selected = i;
 			end
 		end
+	end
+	if (selected ~= nil) then
+		qb.omg:echo("Here: 3");
+		qb.omg:print_r(selected);
 	end
 	
 	return selected;

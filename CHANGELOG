@@ -1,3 +1,9 @@
+v 1.0.15
+	- Fixed moving world quests frame
+	- Removed professions from 'find group' button
+	- Decreased the number of times world quest updates should be called
+	- Initial attempts to prevent using spells to complete world quests breaking the UI
+
 v 1.0.14
 	- Fixed emissary icons not showing when not in a questing zone
 	- Removed "find group" button for pet battle world quests

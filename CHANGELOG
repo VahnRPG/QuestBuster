@@ -1,3 +1,6 @@
+v 1.0.16
+	- Removed debug code
+
 v 1.0.15
 	- Fixed moving world quests frame
 	- Removed professions from 'find group' button

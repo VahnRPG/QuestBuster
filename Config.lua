@@ -76,7 +76,7 @@ local function dailiesRewardsUpdate(self)
 					button_frame:SetAttribute("target-item", item_name);
 				end
 				button_frame:SetAttribute("ctrl-type2", "function");
-				button_frame:SetAttribute("_function", CraftBuster_Buster_Button_Ignore_Item);
+				button_frame:SetAttribute("_function", QuestBuster_Buster_Button_Ignore_Item);
 				]]--
 				button_frame:Show();
 			else

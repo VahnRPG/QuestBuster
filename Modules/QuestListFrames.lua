@@ -18,6 +18,7 @@ local QUEST_HOVER_COLOR = { r=0.50, g=0.72, b=0.39 };
 qb.modules.quest_lists = {};
 qb.modules.quest_lists.frame = CreateFrame("Frame", "QuestBuster_ModulesQuestListsFrame", UIParent);
 qb.modules.quest_lists.frame:RegisterEvent("ADDON_LOADED");
+qb.modules.quest_lists.frame:RegisterEvent("PLAYER_LOGIN");
 qb.modules.quest_lists.frame:SetScript("OnEvent", function(self, event, ...)
 	if (qb.settings.init) then
 		return qb.modules.quest_lists[event] and qb.modules.quest_lists[event](qb, ...)
@@ -27,6 +28,7 @@ qb.modules.quest_lists.frames = {};
 qb.modules.quest_lists.type_expanded = "";
 qb.modules.quest_lists.filter_expanded = "";
 
+local addon_loaded = false;
 function qb.modules.quest_lists:ADDON_LOADED()
 	local frame_backdrop = {
 		bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
@@ -37,11 +39,14 @@ function qb.modules.quest_lists:ADDON_LOADED()
 		insets = { left = 5, right = 5, top = 5, bottom = 5 },
 	};
 	
+	addon_loaded = false;
 	for frame_id, frame_data in pairs(QBG_QUEST_LIST_FRAMES) do
 		--build mover frame
 		local mover_frame = CreateFrame("Frame", "QuestBuster_QuestList" .. frame_data["name"] .. "MoverFrame", frame_data["parent"]);
 		mover_frame:SetFrameStrata(frame_data["strata"]);
 		mover_frame:SetPoint("CENTER", frame_data["parent"]);
+		mover_frame:EnableMouse(true);
+		mover_frame:SetMovable(true);
 		mover_frame:SetSize(336, 10);
 		mover_frame:RegisterForDrag("LeftButton");
 		mover_frame:SetScript("OnDragStart", function(self)
@@ -171,10 +176,23 @@ function qb.modules.quest_lists:ADDON_LOADED()
 			["tooltip"] = frame_data["tooltip"],
 		};
 		
-		qb.modules.quest_lists:updatePosition(frame_data["name"]);
+		--qb.modules.quest_lists:updatePosition(frame_data["name"]);
 	end
+	addon_loaded = true;
 	
 	qb.modules.quest_lists.frame:UnregisterEvent("ADDON_LOADED");
+end
+
+function qb.modules.quest_lists:PLAYER_LOGIN()
+	if (addon_loaded) then
+		for frame_id, frame_data in pairs(QBG_QUEST_LIST_FRAMES) do
+			qb.modules.quest_lists:updatePosition(frame_data["name"]);
+		end
+		
+		qb.modules.quest_lists.frame:UnregisterEvent("PLAYER_LOGIN");
+	else
+		qb.omg:create_timer(1, qb.modules.quest_lists:PLAYER_LOGIN());
+	end
 end
 
 function qb.modules.quest_lists:update()

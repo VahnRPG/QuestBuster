@@ -78,7 +78,7 @@ local function setQuestData(zone_name, info)
 			qb.modules.world_quests.quests.quests["types"][type_name][quest_id] = quest_id;
 			qb.modules.world_quests.quest_data[quest_id]["type"] = world_quest_type;
 
-			if (world_quest_type == LE_QUEST_TAG_TYPE_PET_BATTLE) then
+			if (world_quest_type == LE_QUEST_TAG_TYPE_PET_BATTLE or world_quest_type == LE_QUEST_TAG_TYPE_PROFESSION) then
 				qb.modules.world_quests.quest_data[quest_id]["find_group"] = nil;
 			end
 			
@@ -180,12 +180,19 @@ local function setQuestData(zone_name, info)
 	end
 end
 
+local previous_time = 0;
 function qb.modules.world_quests:QUEST_LOG_UPDATE()
 	if (WorldMapFrame:IsShown()) then
 		return;
 	end
+	
+	local cur_time = GetTime();
+	--if (Nx ~= nil and cur_time < previous_time + 3) then		--Carbonite Maps calls this event a ton. Prevent updates from being attempted too quickly
+	if (cur_time < previous_time + 3) then
+		return;
+	end
+	previous_time = cur_time;
 
-	--qb.omg:echo("Here: " .. GetTime());
 	qb.modules.world_quests:updateWorldQuests();
 	qb.modules.world_quests:updateEmissary();
 	qb.modules.quest_lists:update();
@@ -239,14 +246,64 @@ function qb.modules.world_quests:updateWorldQuests()
 	end
 end
 
+local function CalculateBountySubObjectives(bountyData)
+	local numCompleted = 0;
+	local numTotal = 0;
+
+	for objectiveIndex = 1, bountyData.numObjectives do
+		local objectiveText, objectiveType, finished, numFulfilled, numRequired = GetQuestObjectiveInfo(bountyData.questID, objectiveIndex, false);
+		if objectiveText and #objectiveText > 0 and numRequired > 0 then
+			for objectiveSubIndex = 1, numRequired do
+				if objectiveSubIndex <= numFulfilled then
+					numCompleted = numCompleted + 1;
+				end
+				numTotal = numTotal + 1;
+
+				if numTotal >= MAX_BOUNTY_OBJECTIVES then
+					return numCompleted, numTotal;
+				end
+			end
+		end
+	end
+
+	return numCompleted, numTotal;
+end
+
 function qb.modules.world_quests:findEmissary()
 	--World Quest emissary frame doesn't get processed until you view the map. So, do it manually.
 	for i, map_id in pairs(QBG_EMISSARY_MAP_IDS) do
-		WorldMapFrame.UIElementsFrame.BountyBoard.mapAreaID = map_id;
-		WorldMapFrame.UIElementsFrame.BountyBoard:Refresh();
+		local bounty_data, _, locked_quest_id = GetQuestBountyInfoForMapID(map_id);
+		if (bounty_data ~= nil and qb.omg:tcount(bounty_data) > 0) then
+			bounties = {};
+			for i, bounty in ipairs(bounty_data) do
+				local faction_id = bounty.factionID;
+				if (faction_id == 0 and bounty.questID == 48639) then
+					faction_id = 2165;
+				elseif (faction_id == 0 and bounty.questID == 48641) then
+					faction_id = 2045;
+				elseif (faction_id == 0 and bounty.questID == 48642) then
+					faction_id = 2170;
+				--[[
+				elseif (faction_id == 0) then
+					qb.omg:echo("Here: " .. i);
+					qb.omg:print_r(bounty);
+				]]--
+				end
+				
+				local completed, total = CalculateBountySubObjectives(bounty);
 
-		if (qb.omg:tcount(WorldMapFrame.UIElementsFrame.BountyBoard.bounties) > 0) then
-			return true;
+				bounties[i] = {
+					["index"] = i,
+					["quest_id"] = bounty.questID,
+					["faction_id"] = faction_id,
+					["icon"] = bounty.icon,
+					["completed"] = completed,
+					["total"] = total,
+					["pending"] = bounty.turninRequirementText,
+				};
+			end
+
+			return bounties;
 		end
 	end
 
@@ -257,33 +314,13 @@ function qb.modules.world_quests:updateEmissary()
 	qb.modules.world_quests.emissary.count = 0;
 	qb.modules.world_quests.emissary.quests = {};
 
-	if (qb.modules.world_quests:findEmissary()) then
-		for bountyIndex, bounty in ipairs(WorldMapFrame.UIElementsFrame.BountyBoard.bounties) do
-			local completed, total = WorldMapFrame.UIElementsFrame.BountyBoard:CalculateBountySubObjectives(bounty);
-			local faction_id = bounty.factionID;
-			if (faction_id == 0 and bounty.questID == 48639) then
-				faction_id = 2165;
-			elseif (faction_id == 0 and bounty.questID == 48641) then
-				faction_id = 2045;
-			elseif (faction_id == 0 and bounty.questID == 48642) then
-				faction_id = 2170;
-			--[[
-			elseif (faction_id == 0) then
-				qb.omg:echo("Here: " .. bountyIndex);
-				qb.omg:print_r(bounty);
-			]]--
-			end
-
+	--Something about this function borks when "using spells on world quests"
+	local start_time = GetTime();
+	local bounties = qb.modules.world_quests:findEmissary();
+	if (bounties ~= nil) then
+		for i, bounty in ipairs(bounties) do
 			qb.modules.world_quests.emissary.count = qb.modules.world_quests.emissary.count + 1;
-			qb.modules.world_quests.emissary.quests[qb.modules.world_quests.emissary.count] = {
-				["index"] = bountyIndex,
-				["quest_id"] = bounty.questID,
-				["faction_id"] = faction_id,
-				["icon"] = bounty.icon,
-				["completed"] = completed,
-				["total"] = total,
-				["pending"] = bounty.turninRequirementText,
-			};
+			qb.modules.world_quests.emissary.quests[qb.modules.world_quests.emissary.count] = bounty;
 		end
 	end
 end

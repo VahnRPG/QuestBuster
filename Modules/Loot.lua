@@ -21,7 +21,6 @@ local function highlightRewards()
 
 		local selected = reward_data.sel_func();
 		if (type(selected) ~= "table" and selected ~= nil) then
-			qb.omg:echo("Here: " .. selected);
 			if (qb.settings:get().reward_highlights[key] and selected and _G["QuestInfoRewardsFrameQuestInfoItem" .. selected .. "IconTexture"] ~= nil) then
 				sparkle_frame:ClearAllPoints();
 				sparkle_frame:SetAllPoints("QuestInfoRewardsFrameQuestInfoItem" .. selected .. "IconTexture");
@@ -140,10 +139,6 @@ local function getTransmogItem()
 				selected = i;
 			end
 		end
-	end
-	if (selected ~= nil) then
-		qb.omg:echo("Here: 3");
-		qb.omg:print_r(selected);
 	end
 	
 	return selected;

@@ -1,4 +1,4 @@
-local DB_VERSION = 0.07;
+local DB_VERSION = 0.08;
 
 QuestBusterOptions = {};
 QuestBusterEntry = nil;
@@ -82,11 +82,31 @@ end
 
 function qb.settings:versionSettings()
 	local settings = qb.settings:get();
-	
-	if (not settings.db_version or settings.db_version < 0.07) then
-		for _, frame_data in pairs(QBG_QUEST_LIST_FRAMES) do
-			settings.quest_list_frames[frame_data["name"]].show_find_group = true;
+
+	if (not settings.db_version or settings.db_version < 0.08) then
+		if (not settings.quest_list_frame) then
+			settings.quest_list_frame = {};
+			settings.quest_list_frame.show = true;
+			settings.quest_list_frame.position = {
+				point = "TOPLEFT",
+				relative_point = "TOPLEFT",
+				x = 490,
+				y = -330,
+			};
+			settings.quest_list_frame.locked = false;
+			settings.quest_list_frame.state = "expanded";
+			settings.quest_list_frame.show_find_group = true;
 		end
+
+		if (settings.quest_list_frames["Default"] ~= nil) then
+			settings.quest_list_frame.show = settings.quest_list_frames["Default"].show;
+			settings.quest_list_frame.position = settings.quest_list_frames["Default"].position;
+			settings.quest_list_frame.locked = settings.quest_list_frames["Default"].locked;
+			settings.quest_list_frame.state = settings.quest_list_frames["Default"].state;
+			settings.quest_list_frame.show_find_group = settings.quest_list_frames["Default"].show_find_group;
+		end
+
+		settings.quest_list_frames = nil;
 	end
 
 	settings.db_version = DB_VERSION;
@@ -129,20 +149,18 @@ function qb.settings:default()
 		settings.reward_highlights[key] = true;
 	end
 
-	for _, frame_data in pairs(QBG_QUEST_LIST_FRAMES) do
-		if (not settings.quest_list_frames[frame_data["name"]]) then
-			settings.quest_list_frames[frame_data["name"]] = {};
-			settings.quest_list_frames[frame_data["name"]].show = true;
-			settings.quest_list_frames[frame_data["name"]].position = {
-				point = "TOPLEFT",
-				relative_point = "TOPLEFT",
-				x = 490,
-				y = -330,
-			};
-			settings.quest_list_frames[frame_data["name"]].locked = false;
-			settings.quest_list_frames[frame_data["name"]].state = "expanded";
-			settings.quest_list_frames[frame_data["name"]].show_find_group = true;
-		end
+	if (not settings.quest_list_frame) then
+		settings.quest_list_frame = {};
+		settings.quest_list_frame.show = true;
+		settings.quest_list_frame.position = {
+			point = "TOPLEFT",
+			relative_point = "TOPLEFT",
+			x = 490,
+			y = -330,
+		};
+		settings.quest_list_frame.locked = false;
+		settings.quest_list_frame.state = "expanded";
+		settings.quest_list_frame.show_find_group = true;
 	end
 
 	return settings;

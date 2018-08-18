@@ -1,0 +1,93 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	<Frame name="QuestBuster_QuuestListBar_Template" frameStrata="LOW" toplevel="true" virtual="true">
+		<Frames>
+			<Button name="$parent_Expand">
+				<Size>
+					<AbsDimension x="304" y="16" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentLabel" inherits="GameFontNormal" text="">
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<NormalTexture file="Interface\AddOns\QuestBuster\Images\QuestBuster_QuestList_Bar" />
+				<Scripts>
+					<OnEnter />
+					<OnLeave />
+					<OnClick />
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+	
+	<Frame name="QuestBuster_QuuestListQuestBar_Template" frameStrata="LOW" toplevel="true" virtual="true">
+		<Frames>
+			<Button name="$parent_Expand">
+				<Size>
+					<AbsDimension x="284" y="16" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\AddOns\QuestBuster\Images\QuestBuster_QuestList_Bar" />
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentLabel" inherits="GameFontWhiteTiny" text="">
+							<Anchors>
+								<Anchor point="CENTER">
+									<Offset>
+										<AbsDimension x="0" y="0" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+					<Layer level="OVERLAY">
+						<Texture name="$parentQuestIcon" file="Interface\AddOns\QuestBuster\Images\QuestBuster_WorldQuest_Icons">
+							<AbsDimension x="10" y="10" />
+							<Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parentLabel" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-3" y="0" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Button>
+			<Button name="$parent_TomTom" hidden="false">
+				<Size>
+					<AbsDimension x="16" y="16" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_Expand" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\AddOns\QuestBuster\Images\QuestBuster_QuestList_TomTom" />
+			</Button>
+		</Frames>
+	</Frame>
+</Ui>

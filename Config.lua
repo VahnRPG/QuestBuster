@@ -13,7 +13,7 @@ local auto_quest_enabled, auto_quest_details_frame, auto_quest_only_dailies, aut
 local daily_quest_rewards_frame, daily_quest_rewards_scrollframe, daily_quest_rewards_none_label;
 local daily_quest_rewards_scrollframe_buttons = {};
 local show_level, show_abandon;
-local quest_lists = {};
+local quest_list = {};
 
 local backdrop = {
 	bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
@@ -113,14 +113,11 @@ local function updateFields()
 	dailiesRewardsInit(daily_quest_rewards_scrollframe);
 	dailiesRewardsUpdate(daily_quest_rewards_scrollframe);
 	
-	for _, frame_data in pairs(QBG_QUEST_LIST_FRAMES) do
-		quest_lists[frame_data["name"]].show:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].show);
-		quest_lists[frame_data["name"]].locked:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].locked);
-		quest_lists[frame_data["name"]].expand:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].state == "expanded");
-		quest_lists[frame_data["name"]].find_group:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].show_find_group);
-		quest_lists[frame_data["name"]].position_x:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.x, 2));
-		quest_lists[frame_data["name"]].position_y:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.y, 2));
-	end
+	quest_list.show:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frame.show);
+	quest_list.locked:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frame.locked);
+	quest_list.expand:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frame.state == "expanded");
+	quest_list.position_x:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frame.position.x, 2));
+	quest_list.position_y:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frame.position.y, 2));
 end
 
 local config_frame = CreateFrame("Frame", config_frame_name, InterfaceOptionsFramePanelContainer);
@@ -367,145 +364,98 @@ child_world_quests_frame:SetScript("OnShow", function(child_world_quests_frame)
 	title_label:SetPoint("TOPLEFT", 16, -16);
 	title_label:SetText(QBG_MOD_NAME .. " - " .. child_world_quests_frame.name);
 	
-	local count = 1;
-	for _, frame_data in pairs(QBG_QUEST_LIST_FRAMES) do
-		if (not quest_lists[frame_data["name"]]) then
-			quest_lists[frame_data["name"]] = {};
-		end
-		
-		quest_lists[frame_data["name"]].label = child_world_quests_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
-		quest_lists[frame_data["name"]].label:SetPoint("TOPLEFT", title_label, "BOTTOMLEFT", 0, ((count - 1) * -140) - 20);
-		quest_lists[frame_data["name"]].label:SetText(frame_data["label"]);
-		
-		quest_lists[frame_data["name"]].show = CreateFrame("CheckButton", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "Show", child_world_quests_frame, "InterfaceOptionsCheckButtonTemplate");
-		quest_lists[frame_data["name"]].show:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].label, "BOTTOMLEFT", 0, 0);
-		_G[quest_lists[frame_data["name"]].show:GetName() .. "Text"]:SetText(QBL["CONFIG_WORLD_QUESTS_SHOW"] .. " - " .. frame_data["label"]);
-		quest_lists[frame_data["name"]].show:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].show);
-		quest_lists[frame_data["name"]].show:SetScript("OnClick", function(self, button)
-			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].show = self:GetChecked();
-			qb.modules.quest_lists:update();
-		end);
-	
-		quest_lists[frame_data["name"]].locked = CreateFrame("CheckButton", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "Locked", child_world_quests_frame, "InterfaceOptionsCheckButtonTemplate");
-		quest_lists[frame_data["name"]].locked:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].show, "BOTTOMLEFT", 0, 0);
-		_G[quest_lists[frame_data["name"]].locked:GetName() .. "Text"]:SetText(QBL["CONFIG_WORLD_QUESTS_LOCKED"] .. " - " .. frame_data["label"]);
-		quest_lists[frame_data["name"]].locked:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].locked);
-		quest_lists[frame_data["name"]].locked:SetScript("OnClick", function(self, button)
-			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].locked = self:GetChecked();
-			qb.modules.quest_lists:update();
-		end);
-	
-		quest_lists[frame_data["name"]].expand = CreateFrame("CheckButton", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "Expand", child_world_quests_frame, "InterfaceOptionsCheckButtonTemplate");
-		quest_lists[frame_data["name"]].expand:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].locked, "BOTTOMLEFT", 0, 0);
-		_G[quest_lists[frame_data["name"]].expand:GetName() .. "Text"]:SetText(QBL["CONFIG_WORLD_QUESTS_EXPAND"] .. " - " .. frame_data["label"]);
-		quest_lists[frame_data["name"]].expand:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].state == "expanded");
-		quest_lists[frame_data["name"]].expand:SetScript("OnClick", function(self, button)
-			local state = "collapsed";
-			if (self:GetChecked()) then
-				state = "expanded";
-			end
-			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].state = state;
-			qb.modules.quest_lists:update();
-		end);
-	
-		quest_lists[frame_data["name"]].find_group = CreateFrame("CheckButton", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "FindGroup", child_world_quests_frame, "InterfaceOptionsCheckButtonTemplate");
-		quest_lists[frame_data["name"]].find_group:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].expand, "BOTTOMLEFT", 0, 0);
-		_G[quest_lists[frame_data["name"]].find_group:GetName() .. "Text"]:SetText(QBL["CONFIG_WORLD_QUESTS_FIND_GROUP"] .. " - " .. frame_data["label"]);
-		quest_lists[frame_data["name"]].find_group:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].find_group);
-		quest_lists[frame_data["name"]].find_group:SetScript("OnClick", function(self, button)
-			local state = nil;
-			if (self:GetChecked()) then
-				state = true;
-			end
-			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].show_find_group = state;
-			qb.modules.quest_lists:update();
-		end);
+	quest_list.show = CreateFrame("CheckButton", config_frame_name .. "_Show", child_world_quests_frame, "InterfaceOptionsCheckButtonTemplate");
+	quest_list.show:SetPoint("TOPLEFT", title_label, "BOTTOMLEFT", 0, -20);
+	_G[quest_list.show:GetName() .. "Text"]:SetText(QBL["CONFIG_WORLD_QUESTS_SHOW"]);
+	quest_list.show:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frame.show);
+	quest_list.show:SetScript("OnClick", function(self, button)
+		QuestBusterOptions[QuestBusterEntry].quest_list_frame.show = self:GetChecked();
+		qb.modules.quest_lists:update();
+	end);
 
-		count = count + 1;
-	end
+	quest_list.locked = CreateFrame("CheckButton", config_frame_name .. "_Locked", child_world_quests_frame, "InterfaceOptionsCheckButtonTemplate");
+	quest_list.locked:SetPoint("TOPLEFT", quest_list.show, "BOTTOMLEFT", 0, 0);
+	_G[quest_list.locked:GetName() .. "Text"]:SetText(QBL["CONFIG_WORLD_QUESTS_LOCKED"]);
+	quest_list.locked:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frame.locked);
+	quest_list.locked:SetScript("OnClick", function(self, button)
+		QuestBusterOptions[QuestBusterEntry].quest_list_frame.locked = self:GetChecked();
+		qb.modules.quest_lists:update();
+	end);
+
+	quest_list.expand = CreateFrame("CheckButton", config_frame_name .. "_Expand", child_world_quests_frame, "InterfaceOptionsCheckButtonTemplate");
+	quest_list.expand:SetPoint("TOPLEFT", quest_list.locked, "BOTTOMLEFT", 0, 0);
+	_G[quest_list.expand:GetName() .. "Text"]:SetText(QBL["CONFIG_WORLD_QUESTS_EXPAND"]);
+	quest_list.expand:SetChecked(QuestBusterOptions[QuestBusterEntry].quest_list_frame.state == "expanded");
+	quest_list.expand:SetScript("OnClick", function(self, button)
+		local state = "collapsed";
+		if (self:GetChecked()) then
+			state = "expanded";
+		end
+		QuestBusterOptions[QuestBusterEntry].quest_list_frame.state = state;
+		qb.modules.quest_lists:update();
+	end);
+
+	quest_list.position_label = child_world_quests_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
+	quest_list.position_label:SetPoint("TOPLEFT", quest_list.expand, "BOTTOMLEFT", 0, -24);
+	quest_list.position_label:SetText(QBL["CONFIG_WORLD_QUESTS_POSITION"]);
+	
+	quest_list.position_x_label = child_world_quests_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
+	quest_list.position_x_label:SetPoint("TOPLEFT", quest_list.position_label, "BOTTOMLEFT", 10, -10);
+	quest_list.position_x_label:SetText(QBL["CONFIG_POSITION_X"]);
+	
+	quest_list.position_x = CreateFrame("EditBox", config_frame_name .. "_PositionX", child_world_quests_frame, "InputBoxTemplate");
+	quest_list.position_x:SetPoint("TOPLEFT", quest_list.position_x_label, "TOPRIGHT", 10, 0);
+	quest_list.position_x:SetSize(64, 16);
+	quest_list.position_x:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frame.position.x, 2));
+	quest_list.position_x:SetAutoFocus(false);
+	quest_list.position_x:SetFontObject(ChatFontNormal);
+	quest_list.position_x:SetCursorPosition(0);
+
+	quest_list.position_x.set = CreateFrame("Button", config_frame_name .. "_SetPositionX", child_world_quests_frame, "UIPanelButtonTemplate");
+	quest_list.position_x.set:SetPoint("TOPLEFT", quest_list.position_x, "TOPRIGHT", 10, 2);
+	quest_list.position_x.set:SetText(QBL["CONFIG_POSITION_SET"]);
+	quest_list.position_x.set:SetSize(48, 20);
+	quest_list.position_x.set:SetScript("OnClick", function()
+		QuestBusterOptions[QuestBusterEntry].quest_list_frame.position.x = qb.omg:round(quest_list.position_x:GetText(), 2);
+		qb.modules.quest_lists:updatePosition();
+	end);
+	
+	quest_list.position_y_label = child_world_quests_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
+	quest_list.position_y_label:SetPoint("TOPLEFT", quest_list.position_x, "TOPRIGHT", 120, 0);
+	quest_list.position_y_label:SetText(QBL["CONFIG_POSITION_Y"]);
+	
+	quest_list.position_y = CreateFrame("EditBox", config_frame_name .. "_PositionY", child_world_quests_frame, "InputBoxTemplate");
+	quest_list.position_y:SetPoint("TOPLEFT", quest_list.position_y_label, "TOPRIGHT", 10, 0);
+	quest_list.position_y:SetSize(64, 16);
+	quest_list.position_y:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frame.position.y, 2));
+	quest_list.position_y:SetAutoFocus(false);
+	quest_list.position_y:SetFontObject(ChatFontNormal);
+	quest_list.position_y:SetCursorPosition(0);
+
+	quest_list.position_y.set = CreateFrame("Button", config_frame_name .. "_SetPositionY", child_world_quests_frame, "UIPanelButtonTemplate");
+	quest_list.position_y.set:SetPoint("TOPLEFT", quest_list.position_y, "TOPRIGHT", 10, 2);
+	quest_list.position_y.set:SetText(QBL["CONFIG_POSITION_SET"]);
+	quest_list.position_y.set:SetSize(48, 20);
+	quest_list.position_y.set:SetScript("OnClick", function()
+		QuestBusterOptions[QuestBusterEntry].quest_list_frame.position.y = qb.omg:round(quest_list.position_y:GetText(), 2);
+		qb.modules.quest_lists:updatePosition();
+	end);
+	
+	--Reset Positions
+	quest_list.reset_position = CreateFrame("Button", config_frame_name .. "_ResetPositions", child_world_quests_frame, "UIPanelButtonTemplate");
+	quest_list.reset_position:SetPoint("TOPLEFT", quest_list.position_label, "BOTTOMLEFT", 0, -35);
+	quest_list.reset_position:SetText(QBL["CONFIG_POSITIONS_RESET"]);
+	quest_list.reset_position:SetSize(160, 24);
+	quest_list.reset_position:SetScript("OnClick", function() 
+		qb.modules.quest_lists:resetPosition();
+		
+		quest_list.position_x:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frame.position.x, 2));
+		quest_list.position_y:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frame.position.y, 2));
+	end);
 	
 	child_world_quests_frame:SetScript("OnShow", nil);
 end);
 InterfaceOptions_AddCategory(child_world_quests_frame);
-
-local child_positioning_frame = CreateFrame("Frame", config_frame_name .. "Positioning", config_frame);
-child_positioning_frame.name = "Positioning";
-child_positioning_frame.parent = config_frame.name;
-child_positioning_frame:SetScript("OnShow", function(child_positioning_frame)
-	local title_label = child_positioning_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
-	title_label:SetPoint("TOPLEFT", 16, -16);
-	title_label:SetText(QBG_MOD_NAME .. " - " .. child_positioning_frame.name);
-	
-	local count = 1;
-	for _, frame_data in pairs(QBG_QUEST_LIST_FRAMES) do
-		if (not quest_lists[frame_data["name"]]) then
-			quest_lists[frame_data["name"]] = {};
-		end
-		
-		quest_lists[frame_data["name"]].position_label = child_positioning_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
-		quest_lists[frame_data["name"]].position_label:SetPoint("TOPLEFT", title_label, "BOTTOMLEFT", 0, ((count - 1) * -120) - 20);
-		quest_lists[frame_data["name"]].position_label:SetText(frame_data["label"]);
-		
-		quest_lists[frame_data["name"]].position_x_label = child_positioning_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
-		quest_lists[frame_data["name"]].position_x_label:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].position_label, "BOTTOMLEFT", 10, -10);
-		quest_lists[frame_data["name"]].position_x_label:SetText(QBL["CONFIG_POSITION_X"]);
-		
-		quest_lists[frame_data["name"]].position_x = CreateFrame("EditBox", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "PositionX", child_positioning_frame, "InputBoxTemplate");
-		quest_lists[frame_data["name"]].position_x:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].position_x_label, "TOPRIGHT", 10, 0);
-		quest_lists[frame_data["name"]].position_x:SetSize(64, 16);
-		quest_lists[frame_data["name"]].position_x:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.x, 2));
-		quest_lists[frame_data["name"]].position_x:SetAutoFocus(false);
-		quest_lists[frame_data["name"]].position_x:SetFontObject(ChatFontNormal);
-		quest_lists[frame_data["name"]].position_x:SetCursorPosition(0);
-
-		quest_lists[frame_data["name"]].position_x.set = CreateFrame("Button", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "SetPositionX", child_positioning_frame, "UIPanelButtonTemplate");
-		quest_lists[frame_data["name"]].position_x.set:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].position_x, "TOPRIGHT", 10, 2);
-		quest_lists[frame_data["name"]].position_x.set:SetText(QBL["CONFIG_POSITION_SET"]);
-		quest_lists[frame_data["name"]].position_x.set:SetSize(48, 20);
-		quest_lists[frame_data["name"]].position_x.set:SetScript("OnClick", function()
-			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.x = qb.omg:round(quest_lists[frame_data["name"]].position_x:GetText(), 2);
-			qb.modules.quest_lists:updatePosition(frame_data["name"]);
-		end);
-		
-		quest_lists[frame_data["name"]].position_y_label = child_positioning_frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge");
-		quest_lists[frame_data["name"]].position_y_label:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].position_x, "TOPRIGHT", 120, 0);
-		quest_lists[frame_data["name"]].position_y_label:SetText(QBL["CONFIG_POSITION_Y"]);
-		
-		quest_lists[frame_data["name"]].position_y = CreateFrame("EditBox", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "PositionY", child_positioning_frame, "InputBoxTemplate");
-		quest_lists[frame_data["name"]].position_y:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].position_y_label, "TOPRIGHT", 10, 0);
-		quest_lists[frame_data["name"]].position_y:SetSize(64, 16);
-		quest_lists[frame_data["name"]].position_y:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.y, 2));
-		quest_lists[frame_data["name"]].position_y:SetAutoFocus(false);
-		quest_lists[frame_data["name"]].position_y:SetFontObject(ChatFontNormal);
-		quest_lists[frame_data["name"]].position_y:SetCursorPosition(0);
-
-		quest_lists[frame_data["name"]].position_y.set = CreateFrame("Button", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "SetPositionY", child_positioning_frame, "UIPanelButtonTemplate");
-		quest_lists[frame_data["name"]].position_y.set:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].position_y, "TOPRIGHT", 10, 2);
-		quest_lists[frame_data["name"]].position_y.set:SetText(QBL["CONFIG_POSITION_SET"]);
-		quest_lists[frame_data["name"]].position_y.set:SetSize(48, 20);
-		quest_lists[frame_data["name"]].position_y.set:SetScript("OnClick", function()
-			QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.y = qb.omg:round(quest_lists[frame_data["name"]].position_y:GetText(), 2);
-			qb.modules.quest_lists:updatePosition(frame_data["name"]);
-		end);
-		
-		--Reset Positions
-		quest_lists[frame_data["name"]].reset_position = CreateFrame("Button", config_frame_name .. "_" .. frame_data["name"] .. "_" .. "ResetPositions", child_positioning_frame, "UIPanelButtonTemplate");
-		quest_lists[frame_data["name"]].reset_position:SetPoint("TOPLEFT", quest_lists[frame_data["name"]].position_label, "BOTTOMLEFT", 0, -35);
-		quest_lists[frame_data["name"]].reset_position:SetText(QBL["CONFIG_POSITIONS_RESET"]);
-		quest_lists[frame_data["name"]].reset_position:SetSize(160, 24);
-		quest_lists[frame_data["name"]].reset_position:SetScript("OnClick", function() 
-			qb.modules.quest_lists:resetPosition(frame_data["name"]);
-			
-			quest_lists[frame_data["name"]].position_x:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.x, 2));
-			quest_lists[frame_data["name"]].position_y:SetText(qb.omg:round(QuestBusterOptions[QuestBusterEntry].quest_list_frames[frame_data["name"]].position.y, 2));
-		end);
-
-		count = count + 1;
-	end
-	
-	child_positioning_frame:SetScript("OnShow", nil);
-end);
-InterfaceOptions_AddCategory(child_positioning_frame);
 
 function QuestBuster_Config_Show()
 	InterfaceOptionsFrame_OpenToCategory(config_frame.name);

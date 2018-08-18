@@ -1,0 +1,90 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	<Frame name="QuestBuster_MoverBar_Template" frameStrata="LOW" toplevel="true" enableMouse="true" movable="true" hidden="false" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentTexture" file="Interface\AddOns\QuestBuster\Images\QuestBuster_Mover">
+					<Size>
+						<AbsDimension x="336" y="16" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<FontString name="$parentLabel" inherits="GameFontHighlight" text="">
+					<Anchors>
+						<Anchor point="CENTER">
+							<Offset>
+								<AbsDimension x="0" y="0" />
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parent_ConfigMenu" hidden="false">
+				<Size>
+					<AbsDimension x="16" y="16" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="8" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\AddOns\QuestBuster\Images\QuestBuster_Mover_Menu" />
+				<Scripts>
+					<OnClick>
+						securecall("QuestBuster_Config_Show");
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parent_LockFrame" hidden="false">
+				<Size>
+					<AbsDimension x="16" y="16" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-32" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\AddOns\QuestBuster\Images\QuestBuster_Mover_Unlocked" />
+			</Button>
+			<Button name="$parent_CollapseFrame" hidden="false">
+				<Size>
+					<AbsDimension x="16" y="16" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_LockFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-2" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\AddOns\QuestBuster\Images\QuestBuster_Mover_Collapse" />
+			</Button>
+			<Button name="$parent_CloseFrame" hidden="false">
+				<Size>
+					<AbsDimension x="16" y="16" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent_CollapseFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-2" y="0" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<NormalTexture file="Interface\AddOns\QuestBuster\Images\QuestBuster_Mover_Close" />
+			</Button>
+		</Frames>
+	</Frame>
+</Ui>

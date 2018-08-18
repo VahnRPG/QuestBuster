@@ -128,6 +128,10 @@ function mod.omg:sortedpairs(t, comparator)
 end
 
 function mod.omg:tcount(t)
+	if (not t) then
+		return 0;
+	end
+
 	local n = 0;
 	for _ in pairs(t) do
 		n = n + 1;

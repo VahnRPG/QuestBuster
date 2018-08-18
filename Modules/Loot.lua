@@ -4,7 +4,6 @@ qb.modules.loot = {};
 qb.modules.loot.frame = CreateFrame("Frame", "QuestBuster_ModulesLootFrame", UIParent);
 qb.modules.loot.frame:RegisterEvent("QUEST_COMPLETE");
 qb.modules.loot.frame:RegisterEvent("QUEST_ITEM_UPDATE");
-qb.modules.loot.frame:RegisterEvent("GET_ITEM_INFO_RECEIVED");
 qb.modules.loot.frame:SetScript("OnEvent", function(self, event, ...)
 	if (qb.settings.init) then
 		return qb.modules.loot[event] and qb.modules.loot[event](qb, ...)
@@ -85,15 +84,11 @@ local function initRewardAutoSelect()
 end
 
 function qb.modules.loot:QUEST_COMPLETE()
-	highlightRewards();
 	initRewardAutoSelect();
+	highlightRewards();
 end
 
 function qb.modules.loot:QUEST_ITEM_UPDATE()
-	highlightRewards();
-end
-
-function qb.modules.loot:GET_ITEM_INFO_RECEIVED()
 	highlightRewards();
 end
 

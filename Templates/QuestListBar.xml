@@ -26,11 +26,6 @@
 					</Layer>
 				</Layers>
 				<NormalTexture file="Interface\AddOns\QuestBuster\Images\QuestBuster_QuestList_Bar" />
-				<Scripts>
-					<OnEnter />
-					<OnLeave />
-					<OnClick />
-				</Scripts>
 			</Button>
 		</Frames>
 	</Frame>
@@ -62,7 +57,7 @@
 						</FontString>
 					</Layer>
 					<Layer level="OVERLAY">
-						<Texture name="$parentQuestIcon" file="Interface\AddOns\QuestBuster\Images\QuestBuster_WorldQuest_Icons">
+						<Texture name="$parentQuestIcon">
 							<AbsDimension x="10" y="10" />
 							<Anchors>
 								<Anchor point="TOPRIGHT" relativeTo="$parentLabel" relativePoint="TOPLEFT">

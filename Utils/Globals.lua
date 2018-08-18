@@ -32,23 +32,6 @@ QBG_WORLD_QUEST_TYPES = {
 	[LE_QUEST_TAG_TYPE_RAID]		= "Raid",
 };
 
-QBG_QUEST_LIST_FRAMES = {
-	[1] = {
-		["name"] = "Default",
-		["label"] = "Default",
-		["parent"] = UIParent,
-		["strata"] = "LOW",
-		["tooltip"] = GameTooltip,
-	},
-	[2] = {
-		["name"] = "WorldMap",
-		["label"] = "World Map",
-		["parent"] = WorldMapFrame,
-		["strata"] = "FULLSCREEN_DIALOG",
-		["tooltip"] = WorldMapTooltip,
-	},
-};
-
 -------------------------------------------------------------------------------
 -- Colors
 -------------------------------------------------------------------------------
@@ -67,394 +50,405 @@ QBG_CLR_ORANGE = QBG_CLR_MAX_ALPHA .. "ffaa00";
 QBG_MOD_COLOR = QBG_CLR_MAX_ALPHA .. "ee2299";
 
 -------------------------------------------------------------------------------
--- Map IDs
---   Generated from: https://wow.gamepedia.com/MapID
+-- uiMapIDs
+--   Normally generated from: https://wow.gamepedia.com/MapID
 -------------------------------------------------------------------------------
 QBG_MAP_IDS = {
-	--Kalimdor
-	13,		--Kalimdor
-	772,	--Ahn'Qiraj: The Fallen Kingdom
-	894,	--Ammen Vale
-	43,		--Ashenvale
-	181,	--Azshara
-	464,	--Azuremyst Isle
-	476,	--Bloodmyst Isle
-	890,	--Camp Narache
-	42,		--Darkshore
-	381,	--Darnassus
-	101,	--Desolace
-	4,		--Durotar
-	141,	--Dustwallow Marsh
-	891,	--Echo Isles
-	182,	--Felwood
-	121,	--Feralas
-	795,	--Molten Front
-	241,	--Moonglade
-	606,	--Mount Hyjal
-	9,		--Mulgore
-	11,		--Northern Barrens
-	321,	--Orgrimmar
-	888,	--Shadowglen
-	261,	--Silithus
-	607,	--Southern Barrens
-	81,		--Stonetalon Mountains
-	161,	--Tanaris
-	41,		--Teldrassil
-	471,	--The Exodar
-	61,		--Thousand Needles
-	362,	--Thunder Bluff
-	720,	--Uldum
-	201,	--Un'Goro Crater
-	889,	--Valley of Trials
-	281,	--Winterspring
-
-	--Eastern Kingdoms
-	14,		--Eastern Kingdoms
-	614,	--Abyssal Depths
-	16,		--Arathi Highlands
-	17,		--Badlands
-	19,		--Blasted Lands
-	29,		--Burning Steppes
-	866,	--Coldridge Valley
-	32,		--Deadwind Pass
-	892,	--Deathknell
-	27,		--Dun Morogh
-	34,		--Duskwood
-	23,		--Eastern Plaguelands
-	30,		--Elwynn Forest
-	462,	--Eversong Woods
-	463,	--Ghostlands
-	545,	--Gilneas
-	611,	--Gilneas City
-	24,		--Hillsbrad Foothills
-	341,	--Ironforge
-	499,	--Isle of Quel'Danas
-	610,	--Kelp'thar Forest
-	35,		--Loch Modan
-	895,	--New Tinkertown
-	37,		--Northern Stranglethorn
-	864,	--Northshire
-	36,		--Redridge Mountains
-	684,	--Ruins of Gilneas
-	685,	--Ruins of Gilneas City
-	28,		--Searing Gorge
-	615,	--Shimmering Expanse
-	480,	--Silvermoon City
-	21,		--Silverpine Forest
-	301,	--Stormwind City
-	689,	--Stranglethorn Vale
-	893,	--Sunstrider Isle
-	38,		--Swamp of Sorrows
-	673,	--The Cape of Stranglethorn
-	26,		--The Hinterlands
-	502,	--The Scarlet Enclave
-	20,		--Tirisfal Glades
-	708,	--Tol Barad
-	709,	--Tol Barad Peninsula
-	700,	--Twilight Highlands
-	382,	--Undercity
-	613,	--Vashj'ir
-	22,		--Western Plaguelands
-	39,		--Westfall
-	40,		--Wetlands
-
-	--Outland
-	466,	--Outland
-	475,	--Blade's Edge Mountains
-	465,	--Hellfire Peninsula
-	477,	--Nagrand
-	479,	--Netherstorm
-	473,	--Shadowmoon Valley
-	481,	--Shattrath City
-	478,	--Terokkar Forest
-	467,	--Zangarmarsh
-
-	--Northrend
-	485,	--Northrend
-	486,	--Borean Tundra
-	510,	--Crystalsong Forest
-	504,	--Dalaran
-	488,	--Dragonblight
-	490,	--Grizzly Hills
-	491,	--Howling Fjord
-	541,	--Hrothgar's Landing
-	492,	--Icecrown
-	493,	--Sholazar Basin
-	495,	--The Storm Peaks
-	501,	--Wintergrasp
-	496,	--Zul'Drak
-
-	--The Maelstrom
-	751,	--The Maelstrom
-	640,	--Deepholm
-	605,	--Kezan
-	544,	--The Lost Isles
-	737,	--The Maelstrom
-
-	--Pandaria
-	862,	--Pandaria
-	858,	--Dread Wastes
-	929,	--Isle of Giants
-	928,	--Isle of Thunder
-	857,	--Krasarang Wilds
-	809,	--Kun-Lai Summit
-	905,	--Shrine of Seven Stars
-	903,	--Shrine of Two Moons
-	806,	--The Jade Forest
-	873,	--The Veiled Stair
-	808,	--The Wandering Isle
-	951,	--Timeless Isle
-	810,	--Townlong Steppes
-	811,	--Vale of Eternal Blossoms
-	807,	--Valley of the Four Winds
-
-	--Draenor
-	962,	--Draenor
-	978,	--Ashran
-	941,	--Frostfire Ridge
-	976,	--Frostwall
-	949,	--Gorgrond
-	971,	--Lunarfall
-	950,	--Nagrand
-	947,	--Shadowmoon Valley
-	948,	--Spires of Arak
-	1009,	--Stormshield
-	946,	--Talador
-	945,	--Tanaan Jungle
-	970,	--Tanaan Jungle - Assault on the Dark Portal
-	1011,	--Warspear
-
-	--The Broken Isles
-	1007,	--Broken Isles
-	1015,	--Aszuna
-	1021,	--Broken Shore
-	1014,	--Dalaran
-	1098,	--Eye of Azshara
-	1024,	--Highmountain
-	1017,	--Stormheim
-	1033,	--Suramar
-	1018,	--Val'sharah
-	1170,	--Mac'Aree
-	1171,	--Antoran Wastes
-	1135,	--Krokuun
-	1184,	--Argus
-
-	--Order Halls
-	1068,	--Hall of the Guardian - Mage
-	1052,	--Mardum, the Shattered Abyss - Demon Hunter
-	1040,	--Netherlight Temple - Priest
-	1035,	--Skyhold - Warrior
-	1077,	--The Dreamgrove - Druid
-	1057,	--The Heart of Azeroth - Shaman
-	1044,	--The Wandering Isle - Monk
-	1072,	--Trueshot Lodge - Hunter
-
-	--Battlegrounds
-	401,	--Alterac Valley
-	461,	--Arathi Basin
-	935,	--Deepwind Gorge
-	482,	--Eye of the Storm
-	540,	--Isle of Conquest
-	860,	--Silvershard Mines
-	512,	--Strand of the Ancients
-	856,	--Temple of Kotmogu
-	736,	--The Battle for Gilneas
-	626,	--Twin Peaks
-	443,	--Warsong Gulch
-
-	--Scenarios
-	878,	--A Brewing Storm
-	912,	--A Little Patience
-	899,	--Arena of Annihilation
-	883,	--Assault on Zan'vess
-	940,	--Battle on the High Seas
-	939,	--Blood in the Snow
-	884,	--Brewmoon Festival
-	955,	--Celestial Tournament
-	900,	--Crypt of Forgotten Kings
-	914,	--Dagger in the Dark
-	937,	--Dark Heart of Pandaria
-	920,	--Domination Point (H)
-	880,	--Greenstone Village
-	911,	--Lion's Landing (A)
-	1086,	--Malorne's Nightmare
-	1099,	--The Road to Fel
-	938,	--The Secrets of Ragefire
-	906,	--Theramore's Fall (A)
-	851,	--Theramore's Fall (H)
-	882,	--Unga Ingoo
-
-	--Classic Dungeons
-	688,	--Blackfathom Deeps
-	704,	--Blackrock Depths
-	721,	--Blackrock Spire
-	699,	--Dire Maul
-	691,	--Gnomeregan
-	750,	--Maraudon
-	680,	--Ragefire Chasm
-	760,	--Razorfen Downs
-	761,	--Razorfen Kraul
-	764,	--Shadowfang Keep
-	765,	--Stratholme
-	756,	--The Deadmines
-	690,	--The Stockade
-	687,	--The Temple of Atal'Hakkar
-	692,	--Uldaman
-	749,	--Wailing Caverns
-	686,	--Zul'Farrak
-
-	--Classic Raids
-	755,	--Blackwing Lair
-	696,	--Molten Core
-	717,	--Ruins of Ahn'Qiraj
-	766,	--Temple of Ahn'Qiraj
-
-	--Burning Crusade Dungeons
-	722,	--Auchenai Crypts
-	797,	--Hellfire Ramparts
-	798,	--Magisters' Terrace
-	732,	--Mana-Tombs
-	734,	--Old Hillsbrad Foothills
-	723,	--Sethekk Halls
-	724,	--Shadow Labyrinth
-	731,	--The Arcatraz
-	733,	--The Black Morass
-	725,	--The Blood Furnace
-	729,	--The Botanica
-	730,	--The Mechanar
-	710,	--The Shattered Halls
-	728,	--The Slave Pens
-	727,	--The Steamvault
-	726,	--The Underbog
-
-	--Burning Crusade Raids
-	796,	--Black Temple
-	776,	--Gruul's Lair
-	775,	--Hyjal Summit
-	799,	--Karazhan
-	779,	--Magtheridon's Lair
-	780,	--Serpentshrine Cavern
-	789,	--Sunwell Plateau
-	782,	--The Eye
-
-	--Wrath Dungeons
-	522,	--Ahn'kahet: The Old Kingdom
-	533,	--Azjol-Nerub
-	534,	--Drak'Tharon Keep
-	530,	--Gundrak
-	525,	--Halls of Lightning
-	603,	--Halls of Reflection
-	526,	--Halls of Stone
-	602,	--Pit of Saron
-	521,	--The Culling of Stratholme
-	601,	--The Forge of Souls
-	520,	--The Nexus
-	528,	--The Oculus
-	536,	--The Violet Hold
-	542,	--Trial of the Champion
-	523,	--Utgarde Keep
-	524,	--Utgarde Pinnacle
-
-	--Wrath Raids
-	604,	--Icecrown Citadel
-	535,	--Naxxramas
-	718,	--Onyxia's Lair
-	527,	--The Eye of Eternity
-	531,	--The Obsidian Sanctum
-	609,	--The Ruby Sanctum
-	543,	--Trial of the Crusader
-	529,	--Ulduar
-	532,	--Vault of Archavon
-
-	--Cataclysm Dungeons
-	753,	--Blackrock Caverns
-	820,	--End Time
-	757,	--Grim Batol
-	759,	--Halls of Origination
-	819,	--Hour of Twilight
-	747,	--Lost City of the Tol'vir
-	768,	--The Stonecore
-	769,	--The Vortex Pinnacle
-	767,	--Throne of the Tides
-	816,	--Well of Eternity
-	781,	--Zul'Aman
-	793,	--Zul'Gurub
-
-	--Cataclysm Raids
-	752,	--Baradin Hold
-	754,	--Blackwing Descent
-	824,	--Dragon Soul
-	800,	--Firelands
-	758,	--The Bastion of Twilight
-	773,	--Throne of the Four Winds
-
-	--Pandaria Dungeons
-	875,	--Gate of the Setting Sun
-	885,	--Mogu'Shan Palace
-	871,	--Scarlet Halls
-	874,	--Scarlet Monastery
-	898,	--Scholomance
-	877,	--Shado-pan Monastery
-	887,	--Siege of Niuzao Temple
-	876,	--Stormstout Brewery
-	867,	--Temple of the Jade Serpent
-
-	--Pandaria Raids
-	897,	--Heart of Fear
-	896,	--Mogu'shan Vaults
-	953,	--Siege of Orgrimmar
-	886,	--Terrace of Endless Spring
-	930,	--Throne of Thunder
-
-	--Draenor Dungeons
-	984,	--Auchindoun
-	964,	--Bloodmaul Slag Mines
-	993,	--Grimrail Depot
-	987,	--Iron Docks
-	969,	--Shadowmoon Burial Grounds
-	989,	--Skyreach
-	1008,	--The Everbloom
-	995,	--Upper Blackrock Spire
-
-	--Draenor Raids
-	994,	--Highmaul
-	988,	--Blackrock Foundry
-	1026,	--Hellfire Citadel
-
-	--Legion Dungeons
-	1081,	--Black Rook Hold
-	1146,	--Cathedral of Eternal Night
-	1087,	--Court of Stars
-	1067,	--Darkheart Thicket
-	1046,	--Eye of Azshara
-	1041,	--Halls of Valor
-	1042,	--Maw of Souls
-	1065,	--Neltharion's Lair
-	1115,	--Return to Karazhan
-	1079,	--The Arcway
-	1045,	--Vault of the Wardens
-	1066,	--Violet Hold
-
-	--Legion Raids
-	1094,	--The Emerald Nightmare
-	1114,	--Trial of Valor
-	1088,	--The Nighthold
-	1147,	--Tomb of Sargeras
-
-	--Legion Scenarios
-	1105,	--Scarlet Monastery
-	1144,	--Shado-Pan Showdown
-	1173,	--Arcatraz
+	12,	--Kalimdor
+		1,	--Durotar
+			85,	--Orgrimmar
+				213,	--Ragefire Chasm
+				503,	--Brawl'gar Arena
+				522,	--The Secrets of Ragefire
+			461,	--Valley of Trials
+			463,	--Echo Isles
+		7,	--Mulgore
+			462,	--Camp Narache
+		10,	--Northern Barrens
+			92,	--Warsong Gulch
+			279,	--Wailing Caverns
+		57,	--Teldrassil
+			460,	--Shadowglen
+		62,	--Darkshore
+		63,	--Ashenvale
+			221,	--Blackfathom Deeps
+		64,	--Thousand Needles
+			300,	--Razorfen Downs
+		65,	--Stonetalon Mountains
+		66,	--Desolace
+			280,	--Maraudon
+		69,	--Feralas
+			234,	--Dire Maul
+		70,	--Dustwallow Marsh
+			248,	--Onyxia's Lair
+		71,	--Tanaris
+			130,	--The Culling of Stratholme
+			219,	--Zul'Farrak
+			398,	--Well of Eternity
+			399,	--Hour of Twilight
+			401,	--End Time
+			409,	--Dragon Soul
+		76,	--Azshara
+		77,	--Felwood
+		78,	--Un'Goro Crater
+		80,	--Moonglade
+		81,	--Silithus
+			247,	--Ruins of Ahn'Qiraj
+			319,	--Ahn'Qiraj
+			904,	--Silithus Brawl
+			1021,	--Chamber of Heart
+		83,	--Winterspring
+		88,	--Thunder Bluff
+		89,	--Darnassus
+		97,	--Azuremyst Isle
+			468,	--Ammen Vale
+		103,	--The Exodar
+		106,	--Bloodmyst Isle
+		198,	--Mount Hyjal
+			338,	--Molten Front
+			367,	--Firelands
+			760,	--Malorne's Nightmare
+		199,	--Southern Barrens
+			301,	--Razorfen Kraul
+		249,	--Uldum
+			277,	--Lost City of the Tol'vir
+			297,	--Halls of Origination
+			325,	--The Vortex Pinnacle
+			328,	--Throne of the Four Winds
+			716,	--Skywall
+		327,	--Ahn'Qiraj: The Fallen Kingdom
+		524,	--Battle on the High Seas
+		782,	--The Emerald Nightmare
+		891,	--Azuremyst Isle (3)
+		907,	--Seething Shore
+	13,	--Eastern Kingdoms
+		14,	--Arathi Highlands
+			93,	--Arathi Basin
+		15,	--Badlands
+			230,	--Uldaman
+		17,	--Blasted Lands
+		18,	--Tirisfal Glades
+			302,	--Scarlet Monastery
+			431,	--Scarlet Halls
+			465,	--Deathknell
+		21,	--Silverpine Forest
+			310,	--Shadowfang Keep
+		22,	--Western Plaguelands
+			306,	--ScholomanceOLD
+			476,	--Scholomance
+			827,	--Stratholme
+		23,	--Eastern Plaguelands
+			124,	--Plaguelands: The Scarlet Enclave
+		25,	--Hillsbrad Foothills
+			91,	--Alterac Valley
+			623,	--Hillsbrad Foothills (Southshore vs. Tarren Mill)
+		26,	--The Hinterlands
+		27,	--Dun Morogh
+			226,	--Gnomeregan
+			427,	--Coldridge Valley
+			469,	--New Tinkertown
+		32,	--Searing Gorge
+			242,	--Blackrock Depths
+		36,	--Burning Steppes
+			232,	--Molten Core
+			250,	--Blackrock Spire
+			283,	--Blackrock Caverns
+			285,	--Blackwing Descent
+			287,	--Blackwing Lair
+			616,	--Upper Blackrock Spire
+			838,	--Battle for Blackrock Mountain
+		37,	--Elwynn Forest
+			425,	--Northshire
+		42,	--Deadwind Pass
+			350,	--Karazhan
+		47,	--Duskwood
+		48,	--Loch Modan
+		49,	--Redridge Mountains
+		224,	--Stranglethorn Vale
+			50,	--Northern Stranglethorn
+				233,	--Zul'Gurub
+			210,	--The Cape of Stranglethorn
+			423,	--Silvershard Mines
+		51,	--Swamp of Sorrows
+			220,	--The Temple of Atal'Hakkar
+		52,	--Westfall
+			291,	--The Deadmines
+		56,	--Wetlands
+		84,	--Stormwind City
+			225,	--The Stockade
+			499,	--Deeprun Tram
+		87,	--Ironforge
+		90,	--Undercity
+		94,	--Eversong Woods
+			467,	--Sunstrider Isle
+				335,	--Sunwell Plateau
+					973,	--The Sunwell
+		95,	--Ghostlands
+			333,	--Zul'Aman
+		110,	--Silvermoon City
+		122,	--Isle of Quel'Danas
+			348,	--Magisters' Terrace
+		179,	--Gilneas
+			202,	--Gilneas City
+			275,	--The Battle for Gilneas
+		203,	--Vashj'ir
+			201,	--Kelp'thar Forest
+			204,	--Abyssal Depths
+				322,	--Throne of the Tides
+				742,	--Abyssal Maw
+			205,	--Shimmering Expanse
+		241,	--Twilight Highlands
+			206,	--Twin Peaks
+			293,	--Grim Batol
+			294,	--The Bastion of Twilight
+		217,	--Ruins of Gilneas
+		218,	--Ruins of Gilneas City
+		244,	--Tol Barad
+			282,	--Baradin Hold
+		245,	--Tol Barad Peninsula
+		501,	--Dalaran
+		908,	--Ruins of Lordaeron
+	113,	--Northrend
+		114,	--Borean Tundra
+			129,	--The Nexus
+			141,	--The Eye of Eternity
+			142,	--The Oculus
+			736,	--The Beyond
+		115,	--Dragonblight
+			128,	--Strand of the Ancients
+			132,	--Ahn'kahet: The Old Kingdom
+			155,	--The Obsidian Sanctum
+			157,	--Azjol-Nerub
+			162,	--Naxxramas
+			200,	--The Ruby Sanctum
+		116,	--Grizzly Hills
+			757,	--Ursoc's Lair
+		117,	--Howling Fjord
+			133,	--Utgarde Keep
+			136,	--Utgarde Pinnacle
+		118,	--Icecrown
+			169,	--Isle of Conquest
+			171,	--Trial of the Champion
+			172,	--Trial of the Crusader
+			183,	--The Forge of Souls
+			184,	--Pit of Saron
+			185,	--Halls of Reflection
+			186,	--Icecrown Citadel
+		119,	--Sholazar Basin
+			888,	--Hall of Communion
+		120,	--The Storm Peaks
+			138,	--Halls of Lightning
+			140,	--Halls of Stone
+			147,	--Ulduar
+		121,	--Zul'Drak
+			153,	--Gundrak
+			160,	--Drak'Tharon Keep
+		123,	--Wintergrasp
+			156,	--Vault of Archavon
+		127,	--Crystalsong Forest
+			125,	--Dalaran (3)
+				168,	--The Violet Hold
+		170,	--Hrothgar's Landing
+		871,	--The Lost Glacier
+		897,	--The Deaths of Chromie
+	948,	--The Maelstrom
+		174,	--The Lost Isles
+		194,	--Kezan
+			1010,	--The MOTHERLODE!!
+		207,	--Deepholm
+			324,	--The Stonecore
+	424,	--Pandaria
+		371,	--The Jade Forest
+			429,	--Temple of the Jade Serpent
+			447,	--A Brewing Storm
+		376,	--Valley of the Four Winds
+			439,	--Stormstout Brewery
+			519,	--Deepwind Gorge
+		379,	--Kun-Lai Summit
+			443,	--Shado-Pan Monastery
+			452,	--Brewmoon Festival
+			480,	--Proving Grounds
+			481,	--Crypt of Forgotten Kings
+			489,	--Dagger in the Dark
+			843,	--Shado-Pan Showdown
+		388,	--Townlong Steppes
+			457,	--Siege of Niuzao Temple
+		390,	--Vale of Eternal Blossoms
+			417,	--Temple of Kotmogu
+			437,	--Gate of the Setting Sun
+			453,	--Mogu'shan Palace
+			471,	--Mogu'shan Vaults
+			556,	--Siege of Orgrimmar
+		418,	--Krasarang Wilds
+			450,	--Unga Ingoo
+			487,	--A Little Patience
+		422,	--Dread Wastes
+			451,	--Assault on Zan'vess
+			474,	--Heart of Fear
+		433,	--The Veiled Stair
+			456,	--Terrace of Endless Spring
+		504,	--Isle of Thunder
+			508,	--Throne of Thunder
+			518,	--Thunder King's Citadel
+		507,	--Isle of Giants
+		516,	--Isle of Thunder (2)
+		554,	--Timeless Isle
+			571,	--Celestial Tournament
+	378,	--The Wandering Isle
+	407,	--Darkmoon Island
+	619,	--Broken Isles
+		627,	--Dalaran (7)
+			732,	--Violet Hold
+			734,	--Hall of the Guardian
+		630,	--Azsuna
+			677,	--Vault of the Wardens
+			713,	--Eye of Azshara
+		634,	--Stormheim
+			649,	--Helheim
+			694,	--Helmouth Shallows
+			703,	--Halls of Valor
+			706,	--Helmouth Cliffs
+			806,	--Trial of Valor
+			877,	--Fields of the Eternal Hunt
+		641,	--Val'sharah
+			747,	--The Dreamgrove
+				715,	--Emerald Dreamway
+			733,	--Darkheart Thicket
+			751,	--Black Rook Hold
+			758,	--Gloaming Reef
+		645,	--Twisting Nether
+		646,	--Broken Shore
+			845,	--Cathedral of Eternal Night
+			850,	--Tomb of Sargeras
+		650,	--Highmountain
+			731,	--Neltharion's Lair
+			739,	--Trueshot Lodge
+			750,	--Thunder Totem
+			826,	--Cave of the Bloodtotem
+		671,	--The Cove of Nashal
+		672,	--Mardum, the Shattered Abyss
+		680,	--Suramar
+			749,	--The Arcway
+			761,	--Court of Stars
+			764,	--The Nighthold
+		695,	--Skyhold
+		702,	--Netherlight Temple
+		714,	--Niskara
+		717,	--Dreadscar Rift
+		719,	--Mardum, the Shattered Abyss (5)
+		740,	--Shadowgore Citadel
+		905,	--Argus
+			830,	--Krokuun
+				940,	--The Vindicaar
+			882,	--Mac'Aree
+				903,	--The Seat of the Triumvirate
+			885,	--Antoran Wastes
+				909,	--Antorus, the Burning Throne
+			921,	--Invasion Point: Aurinor
+			922,	--Invasion Point: Bonich
+			923,	--Invasion Point: Cen'gar
+			924,	--Invasion Point: Naigtal
+			925,	--Invasion Point: Sangua
+			926,	--Invasion Point: Val
+			927,	--Greater Invasion Point: Pit Lord Vilemus
+			928,	--Greater Invasion Point: Mistress Alluradel
+			929,	--Greater Invasion Point: Matron Folnuna
+			930,	--Greater Invasion Point: Inquisitor Meto
+			931,	--Greater Invasion Point: Sotanathor
+			932,	--Greater Invasion Point: Occularus
+		858,	--Assault on Broken Shore
+		971,	--Telogrus Rift
+	824,	--Islands
+	875,	--Zandalar
+		862,	--Zuldazar
+			934,	--Atal'Dazar
+			1004,	--Kings' Rest
+			1165,	--Dazar'alor
+				1166,	--Zanchul
+			1177,	--Breath Of Pa'ku
+		863,	--Nazmir
+			1042,	--The Underrot
+			1148,	--Uldir
+		864,	--Vol'dun
+			1038,	--Temple of Sethraliss
+	876,	--Kul Tiras
+		895,	--Tiragarde Sound
+			974,	--Tol Dagor
+			1161,	--Boralus
+			1162,	--Siege of Boralus
+		896,	--Drustvar
+			1015,	--Waycrest Manor
+			1029,	--WaycrestDimension
+			1045,	--Thros, The Blighted Lands
+		936,	--Freehold
+		942,	--Stormsong Valley
+			1039,	--Shrine of the Storm
+			1182,	--SalstoneMine_Stormsong
+			1183,	--Thornheart
+	938,	--Gilneas Island
+	939,	--Tropical Isle 8.0
+	981,	--Un'gol Ruins
+	1156,	--The Great Sea
+	100,	--Hellfire Peninsula
+		246,	--The Shattered Halls
+		261,	--The Blood Furnace
+		331,	--Magtheridon's Lair
+		347,	--Hellfire Ramparts
+	102,	--Zangarmarsh
+		262,	--The Underbog
+		263,	--The Steamvault
+		265,	--The Slave Pens
+		332,	--Serpentshrine Cavern
+	104,	--Shadowmoon Valley
+		339,	--Black Temple
+		490,	--Black Temple (9)
+	105,	--Blade's Edge Mountains
+		330,	--Gruul's Lair
+	107,	--Nagrand
+	108,	--Terokkar Forest
+		256,	--Auchenai Crypts
+		258,	--Sethekk Halls
+		260,	--Shadow Labyrinth
+		272,	--Mana-Tombs
+	109,	--Netherstorm
+		112,	--Eye of the Storm
+		266,	--The Botanica
+		267,	--The Mechanar
+		269,	--The Arcatraz
+		334,	--Tempest Keep
+		889,	--Arcatraz
+	111,	--Shattrath City
+	525,	--Frostfire Ridge
+		573,	--Bloodmaul Slag Mines
+		590,	--Frostwall
+	534,	--Tanaan Jungle
+		661,	--Hellfire Citadel
+	535,	--Talador
+		593,	--Auchindoun
+	539,	--Shadowmoon Valley (2)
+		574,	--Shadowmoon Burial Grounds
+		582,	--Lunarfall
+		592,	--Defense of Karabor
+	542,	--Spires of Arak
+		601,	--Skyreach
+	543,	--Gorgrond
+		595,	--Iron Docks
+		596,	--Blackrock Foundry
+		606,	--Grimrail Depot
+		620,	--The Everbloom
+	550,	--Nagrand (2)
+		610,	--Highmaul
+	577,	--Tanaan Jungle (2)
+	588,	--Ashran
+		622,	--Stormshield
+		624,	--Warspear
+	933,	--Forge of Aeons
 };
 
 QBG_EMISSARY_MAP_IDS = {
-	962,	--Draenor
-	1007,	--Broken Isles
-	1184,	--Argus
-};
-
-QBG_ARGUS_MAP_IDS = {
-	1170,	--Mac'Aree
-	1171,	--Antoran Wastes
-	1135,	--Krokuun
+	572,	--Draenor
+	619,	--Broken Isles
+	905,	--Argus
+	875,	--Zandalar
+	876,	--Kul Tiras
 };

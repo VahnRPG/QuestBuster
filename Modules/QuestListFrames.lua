@@ -1,7 +1,7 @@
 local _, qb = ...;
 
-local MAX_EMISSARY_QUESTS = WorldMapFrame.UIElementsFrame.BountyBoard.minimumTabsToDisplay;
---local MAX_EMISSARY_QUESTS = 3;
+--local MAX_EMISSARY_QUESTS = WorldMapFrame.UIElementsFrame.BountyBoard.minimumTabsToDisplay;
+local MAX_EMISSARY_QUESTS = 6;
 
 local QUEST_TYPE_COLOR = { r=0.25, g=0.36, b=0.69 };
 local QUEST_TYPE_HOVER_COLOR = { r=0.39, g=0.47, b=0.72 };
@@ -16,575 +16,440 @@ local QUEST_HOVER_COLOR = { r=0.50, g=0.72, b=0.39 };
 --local QUEST_EXPANDED_COLOR = { r=0.16, g=0.51, b=0.08 };		--currently unused
 
 qb.modules.quest_lists = {};
-qb.modules.quest_lists.frame = CreateFrame("Frame", "QuestBuster_ModulesQuestListsFrame", UIParent);
+qb.modules.quest_lists.mover_frame = CreateFrame("Frame", "QuestBuster_QuestLists_MoverFrame", UIParent, "QuestBuster_MoverBar_Template");
+qb.modules.quest_lists.mover_frame:SetSize(336, 10);
+qb.modules.quest_lists.mover_frame:RegisterForDrag("LeftButton");
+qb.modules.quest_lists.mover_frame:SetScript("OnDragStart", function(self)
+	if (not qb.settings:get().quest_list_frame.locked) then
+		self.dragging = true;
+		self:StartMoving();
+	end
+end);
+qb.modules.quest_lists.mover_frame:SetScript("OnDragStop", function(self)
+	if (not qb.settings:get().quest_list_frame.locked) then
+		self.dragging = false;
+		self:StopMovingOrSizing();
+	end
+end);
+qb.modules.quest_lists.mover_frame:SetScript("OnUpdate", function(self)
+	if (self.dragging) then
+		qb.modules.quest_lists:dragFrame();
+	end
+end);
+QuestBuster_QuestLists_MoverFrameTexture:SetSize(336, 16);
+QuestBuster_QuestLists_MoverFrameLabel:SetText(QBL["WORLD_QUEST_HEADER"]);
+QuestBuster_QuestLists_MoverFrame_LockFrame:SetScript("OnClick", function(self)
+	qb.modules.quest_lists:lockFrame();
+end);
+QuestBuster_QuestLists_MoverFrame_CollapseFrame:SetScript("OnClick", function(self)
+	qb.modules.quest_lists:collapseFrame();
+end);
+QuestBuster_QuestLists_MoverFrame_CloseFrame:SetScript("OnClick", function(self)
+	qb.modules.quest_lists:closeFrame();
+end);
+
+qb.modules.quest_lists.frame = CreateFrame("Frame", "QuestBuster_QuestLists_Frame", UIParent, "QuestBuster_ContainerFrame_Template");
+qb.modules.quest_lists.frame:SetSize(336, 16);
+--qb.modules.quest_lists.frame:SetStrata("LOW");
+qb.modules.quest_lists.frame:SetPoint("TOPLEFT", qb.modules.quest_lists.mover_frame, "BOTTOMLEFT", 0, 2);
 qb.modules.quest_lists.frame:RegisterEvent("ADDON_LOADED");
-qb.modules.quest_lists.frame:RegisterEvent("PLAYER_LOGIN");
 qb.modules.quest_lists.frame:SetScript("OnEvent", function(self, event, ...)
 	if (qb.settings.init) then
 		return qb.modules.quest_lists[event] and qb.modules.quest_lists[event](qb, ...)
 	end
 end);
-qb.modules.quest_lists.frames = {};
+qb.modules.quest_lists.emissary_frames = {};
+qb.modules.quest_lists.type_frames = {};
 qb.modules.quest_lists.type_expanded = "";
 qb.modules.quest_lists.filter_expanded = "";
 
-local addon_loaded = false;
 function qb.modules.quest_lists:ADDON_LOADED()
-	local frame_backdrop = {
-		bgFile = "Interface\\TutorialFrame\\TutorialFrameBackground",
-		edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-		tile = true,
-		tileSize = 16,
-		edgeSize = 16,
-		insets = { left = 5, right = 5, top = 5, bottom = 5 },
-	};
-	
-	addon_loaded = false;
-	for frame_id, frame_data in pairs(QBG_QUEST_LIST_FRAMES) do
-		--build mover frame
-		local mover_frame = CreateFrame("Frame", "QuestBuster_QuestList" .. frame_data["name"] .. "MoverFrame", frame_data["parent"]);
-		mover_frame:SetFrameStrata(frame_data["strata"]);
-		mover_frame:SetPoint("CENTER", frame_data["parent"]);
-		mover_frame:EnableMouse(true);
-		mover_frame:SetMovable(true);
-		mover_frame:SetSize(336, 10);
-		mover_frame:RegisterForDrag("LeftButton");
-		mover_frame:SetScript("OnDragStart", function(self)
-			if (not qb.settings:get().quest_list_frames[frame_data["name"]].locked) then
-				self.dragging = true;
-				self:StartMoving();
+	--build base frame - emissary buttons
+	local x_pos = 0;
+	local y_pos = 0;
+	for i=1, MAX_EMISSARY_QUESTS do
+		if (i > 1) then
+			if ((i - 1) % 3 == 0) then
+				x_pos = x_pos - 15;
+				y_pos = 0;
+			else
+				y_pos = y_pos - 16;
 			end
-		end);
-		mover_frame:SetScript("OnDragStop", function(self)
-			if (not qb.settings:get().quest_list_frames[frame_data["name"]].locked) then
-				self.dragging = false;
-				self:StopMovingOrSizing();
-			end
-		end);
-		mover_frame:SetScript("OnUpdate", function(self)
-			if (self.dragging) then
-				qb.modules.quest_lists:dragFrame(frame_data["name"]);
-			end
-		end);
-		local mover_frame_name = mover_frame:GetName();
-		
-		mover_frame.texture = mover_frame:CreateTexture("BACKGROUND");
-		mover_frame.texture:SetPoint("TOPLEFT");
-		mover_frame.texture:SetSize(336, 16);
-		mover_frame.texture:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover");
-		
-		mover_frame.label = mover_frame:CreateFontString(nil, "ARTWORK", "GameFontHighlight");
-		mover_frame.label:SetPoint("CENTER");
-		mover_frame.label:SetText(QBL["WORLD_QUEST_HEADER"]);
-		
-		--build mover frame - config button
-		mover_frame.config = CreateFrame("Button", mover_frame_name .. "_ConfigMenu", mover_frame);
-		mover_frame.config:SetPoint("TOPLEFT", mover_frame_name, "TOPLEFT", 8, 0);
-		mover_frame.config:SetSize(16, 16);
-		mover_frame.config:SetScript("OnClick", function(self)
-			if (WorldMapFrame:IsShown()) then
-				ToggleFrame(WorldMapFrame);
-			end
-			securecall("QuestBuster_Config_Show");
-		end);
-		
-		mover_frame.config.icon = mover_frame.config:CreateTexture("ARTWORK");
-		mover_frame.config.icon:SetAllPoints();
-		mover_frame.config.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover_Menu");
-		
-		--build mover frame - lock button
-		mover_frame.lock = CreateFrame("Button", mover_frame_name .. "_LockFrame", mover_frame);
-		mover_frame.lock:SetPoint("TOPRIGHT", mover_frame_name, "TOPRIGHT", -32, 0);
-		mover_frame.lock:SetSize(16, 16);
-		mover_frame.lock:SetScript("OnClick", function(self)
-			qb.modules.quest_lists:lockFrame(frame_data["name"]);
-		end);
-		
-		mover_frame.lock.icon = mover_frame.lock:CreateTexture("ARTWORK");
-		mover_frame.lock.icon:SetAllPoints();
-		mover_frame.lock.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover_Unlocked");
-		
-		--build mover frame - collapse button
-		mover_frame.collapse = CreateFrame("Button", mover_frame_name .. "_CollapseFrame", mover_frame);
-		mover_frame.collapse:SetPoint("TOPLEFT", mover_frame_name .. "_LockFrame", "TOPRIGHT", -2, 0);
-		mover_frame.collapse:SetSize(16, 16);
-		mover_frame.collapse:SetScript("OnClick", function(self)
-			qb.modules.quest_lists:collapseFrame(frame_data["name"]);
-		end);
-		
-		mover_frame.collapse.icon = mover_frame.collapse:CreateTexture("ARTWORK");
-		mover_frame.collapse.icon:SetAllPoints();
-		mover_frame.collapse.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover_Collapse");
-		
-		--build mover frame - close button
-		mover_frame.close = CreateFrame("Button", mover_frame_name .. "_CloseFrame", mover_frame);
-		mover_frame.close:SetPoint("TOPLEFT", mover_frame_name .. "_CollapseFrame", "TOPRIGHT", -2, 0);
-		mover_frame.close:SetSize(16, 16);
-		mover_frame.close:SetScript("OnClick", function(self)
-			qb.modules.quest_lists:closeFrame(frame_data["name"]);
-		end);
-		
-		mover_frame.close.icon = mover_frame.close:CreateTexture("ARTWORK");
-		mover_frame.close.icon:SetAllPoints();
-		mover_frame.close.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover_Close");
-		
-		--build base frame
-		local frame = CreateFrame("Frame", "QuestBuster_QuestList" .. frame_data["name"] .. "Frame", frame_data["parent"]);
-		frame:SetFrameStrata(frame_data["strata"]);
-		frame:SetPoint("TOPLEFT", mover_frame_name, "BOTTOMLEFT", 0, 2);
-		frame:SetSize(336, 10);
-		frame:SetBackdrop(frame_backdrop);
-		frame.emissary_frames = {};
-		frame.type_frames = {};
-		local frame_name = frame:GetName();
-		
-		--build base frame - emissary buttons
-		for i=1, MAX_EMISSARY_QUESTS do
-			local emissary_frame = CreateFrame("Frame", "QuestBuster_QuestList" .. frame_data["name"] .. "Emissary" .. i .. "Frame", frame);
-			emissary_frame:SetFrameStrata(frame_data["strata"]);
-			emissary_frame:SetPoint("TOPRIGHT", frame_name, "TOPLEFT", 0, ((i - 1) * -16) - 5);
-			emissary_frame:SetSize(16, 16);
-			emissary_frame.emissary_data = {};
-			emissary_frame:SetScript("OnEnter", function(self)
-				frame_data["tooltip"]:SetOwner(self, "ANCHOR_CURSOR");
-				qb.modules.quest_lists:setEmissaryTooltip(frame_data["tooltip"], self.emissary_data);
-				frame_data["tooltip"]:Show();
-			end);
-			emissary_frame:SetScript("OnLeave", function(self)
-				frame_data["tooltip"]:Hide();
-			end);
-			
-			emissary_frame.icon = emissary_frame:CreateTexture("ARTWORK");
-			emissary_frame.icon:SetAllPoints();
-
-			emissary_frame.check_icon = CreateFrame("Frame", nil, emissary_frame);
-			emissary_frame.check_icon:SetPoint("TOPLEFT", emissary_frame, "TOPLEFT", -(emissary_frame:GetWidth() * .25), (emissary_frame:GetHeight() * .25));
-			emissary_frame.check_icon:SetSize(emissary_frame:GetWidth() * 1.5, emissary_frame:GetHeight() * 1.5);
-			
-			emissary_frame.check_icon.icon = emissary_frame.check_icon:CreateTexture("ARTWORK");
-			emissary_frame.check_icon.icon:SetAllPoints();
-			emissary_frame.check_icon.icon:SetAtlas("worldquest-tracker-checkmark", true);
-			
-			frame.emissary_frames[i] = emissary_frame;
 		end
+		local emissary_frame = CreateFrame("Frame", "QuestBuster_QuestLists_Emissary" .. i .. "Frame", qb.modules.quest_lists.frame);
+		emissary_frame:SetPoint("TOPRIGHT", qb.modules.quest_lists.frame, "TOPLEFT", x_pos, y_pos - 5);
+		emissary_frame:SetSize(16, 16);
+		emissary_frame.emissary_data = {};
+		emissary_frame:SetScript("OnEnter", function(self)
+			GameTooltip:SetOwner(self, "ANCHOR_CURSOR");
+			qb.modules.quest_lists:setEmissaryTooltip(self.emissary_data);
+			GameTooltip:Show();
+		end);
+		emissary_frame:SetScript("OnLeave", function(self)
+			GameTooltip:Hide();
+		end);
 		
-		--save frame
-		qb.modules.quest_lists.frames[frame_id] = {
-			["name"] = frame_data["name"],
-			["frame"] = frame,
-			["mover_frame"] = mover_frame,
-			["tooltip"] = frame_data["tooltip"],
-		};
+		emissary_frame.icon = emissary_frame:CreateTexture("ARTWORK");
+		emissary_frame.icon:SetAllPoints();
+
+		emissary_frame.check_icon = CreateFrame("Frame", nil, emissary_frame);
+		emissary_frame.check_icon:SetPoint("TOPLEFT", emissary_frame, "TOPLEFT", -(emissary_frame:GetWidth() * .25), (emissary_frame:GetHeight() * .25));
+		emissary_frame.check_icon:SetSize(emissary_frame:GetWidth() * 1.5, emissary_frame:GetHeight() * 1.5);
 		
-		--qb.modules.quest_lists:updatePosition(frame_data["name"]);
+		emissary_frame.check_icon.icon = emissary_frame.check_icon:CreateTexture("ARTWORK");
+		emissary_frame.check_icon.icon:SetAllPoints();
+		emissary_frame.check_icon.icon:SetAtlas("worldquest-tracker-checkmark", true);
+		
+		qb.modules.quest_lists.emissary_frames[i] = emissary_frame;
 	end
-	addon_loaded = true;
+	qb.modules.quest_lists:updatePosition();
 	
 	qb.modules.quest_lists.frame:UnregisterEvent("ADDON_LOADED");
 end
 
-function qb.modules.quest_lists:PLAYER_LOGIN()
-	if (addon_loaded) then
-		for frame_id, frame_data in pairs(QBG_QUEST_LIST_FRAMES) do
-			qb.modules.quest_lists:updatePosition(frame_data["name"]);
+function qb.modules.quest_lists:update()
+	local config = qb.settings:get().quest_list_frame;
+	if (config.show and qb.modules.world_quests.quests.count > 0) then
+		if (config.state == "expanded") then
+			_G[qb.modules.quest_lists.mover_frame:GetName() .. "_CollapseFrame"]:SetNormalTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover_Collapse");
+
+			for i=1, MAX_EMISSARY_QUESTS do
+				local emissary_frame = qb.modules.quest_lists.emissary_frames[i];
+				if (qb.modules.world_quests.emissary.quests[i]) then
+					local quest_data = qb.modules.world_quests.emissary.quests[i];
+					emissary_frame.emissary_data = quest_data;
+					emissary_frame.icon:SetTexture(quest_data["icon"]);
+					emissary_frame.check_icon.icon:SetAlpha(quest_data["completed"] / quest_data["total"]);
+					emissary_frame:Show();
+				else
+					emissary_frame:Hide();
+				end
+			end
+			
+			local type_count, type_bars = qb.modules.quest_lists:processQuestTypes();
+			if (type_count > 0) then
+				qb.modules.quest_lists.mover_frame:Show();
+				qb.modules.quest_lists.frame:SetHeight(12 + (type_bars * 16));
+				qb.modules.quest_lists.frame:Show();
+			else
+				qb.modules.quest_lists.mover_frame:Hide();
+				qb.modules.quest_lists.frame:Hide();
+			end
+		else
+			qb.modules.quest_lists.mover_frame:Show();
+			_G[qb.modules.quest_lists.mover_frame:GetName() .. "_CollapseFrame"]:SetNormalTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover_Expand");
+			qb.modules.quest_lists.frame:Hide();
 		end
 		
-		qb.modules.quest_lists.frame:UnregisterEvent("PLAYER_LOGIN");
+		if (not config.locked) then
+			_G[qb.modules.quest_lists.mover_frame:GetName() .. "_LockFrame"]:SetNormalTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover_Unlocked");
+		else
+			_G[qb.modules.quest_lists.mover_frame:GetName() .. "_LockFrame"]:SetNormalTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover_Locked");
+		end
 	else
-		qb.omg:create_timer(1, qb.modules.quest_lists:PLAYER_LOGIN());
+		qb.modules.quest_lists.mover_frame:Hide();
+		qb.modules.quest_lists.frame:Hide();
 	end
 end
 
-function qb.modules.quest_lists:update()
-	for frame_id, frame_data in pairs(qb.modules.quest_lists.frames) do
-		local config = qb.settings:get().quest_list_frames[frame_data["name"]];
-		local frame = frame_data["frame"];
-		local mover_frame = frame_data["mover_frame"];
-		
-		if (config.show and qb.modules.world_quests.quests.count > 0) then
-			mover_frame:SetParent(QBG_QUEST_LIST_FRAMES[frame_id]["parent"]);
-			mover_frame:SetFrameStrata(QBG_QUEST_LIST_FRAMES[frame_id]["strata"]);
-			
-			frame:SetParent(QBG_QUEST_LIST_FRAMES[frame_id]["parent"]);
-			frame:SetFrameStrata(QBG_QUEST_LIST_FRAMES[frame_id]["strata"]);
-			
-			if (config.state == "expanded") then
-				local type_count = 0;
-				local type_filter_count = 0;
-				local type_filter_quest_count = 0;
-				for quest_type, quest_data in qb.omg:sortedpairs(qb.modules.world_quests.quests.quests) do
-					if (not frame.type_frames[quest_type]) then
-						local type_frame = CreateFrame("Frame", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "Frame", frame);
-						type_frame:SetSize(324, 16);
-						type_frame.frame_name = type_count;
-						
-						type_frame.expand = CreateFrame("Button", type_frame:GetName() .. "_ExpandFrame", type_frame);
-						type_frame.expand:SetPoint("TOPLEFT", type_frame, "TOPLEFT", 0, 0);
-						type_frame.expand:SetSize(324, 16);
-						type_frame.expand:SetScript("OnEnter", function(self)
-							type_frame.expand.icon:SetVertexColor(QUEST_TYPE_HOVER_COLOR.r, QUEST_TYPE_HOVER_COLOR.g, QUEST_TYPE_HOVER_COLOR.b);
-						end);
-						type_frame.expand:SetScript("OnLeave", function(self)
-							if (qb.modules.quest_lists.type_expanded == quest_type) then
-								type_frame.expand.icon:SetVertexColor(QUEST_TYPE_EXPANDED_COLOR.r, QUEST_TYPE_EXPANDED_COLOR.g, QUEST_TYPE_EXPANDED_COLOR.b);
-							else
-								type_frame.expand.icon:SetVertexColor(QUEST_TYPE_COLOR.r, QUEST_TYPE_COLOR.g, QUEST_TYPE_COLOR.b);
-							end
-						end);
-						type_frame.expand:SetScript("OnClick", function(self)
-							if (qb.modules.quest_lists.type_expanded == quest_type) then
-								qb.modules.quest_lists.type_expanded = "";
-							else
-								qb.modules.quest_lists.type_expanded = quest_type;
-							end
-							qb.modules.quest_lists.filter_expanded = "";
-							qb.modules.quest_lists:update();
-						end);
-						
-						type_frame.expand.icon = type_frame.expand:CreateTexture("ARTWORK");
-						type_frame.expand.icon:SetPoint("TOPLEFT", type_frame.expand, "TOPLEFT", -2, 0);
-						type_frame.expand.icon:SetSize(324, 16);
-						type_frame.expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Bar");
-						type_frame.expand.icon:SetVertexColor(QUEST_TYPE_COLOR.r, QUEST_TYPE_COLOR.g, QUEST_TYPE_COLOR.b);
-						
-						type_frame.expand.label = type_frame.expand:CreateFontString(nil, "ARTWORK", "GameFontNormal");
-						type_frame.expand.label:SetPoint("CENTER");
-						type_frame.expand.label:SetText(QBL["WORLD_QUEST_" .. string.upper(quest_type)]);
-						
-						frame.type_frames[quest_type] = {
-							["name"] = quest_type,
-							["frame"] = type_frame,
-							["filters"] = {},
-						};
-					end
-					
-					local type_frame = frame.type_frames[quest_type]["frame"];
-					if (type_count == 0) then
-						type_frame:SetPoint("TOPLEFT", frame, "TOPLEFT", 8, -6);
-					else
-						type_frame:SetPoint("TOPLEFT", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. (type_count - 1) .."Frame", "BOTTOMLEFT", 0, 4);
-					end
-					
-					for _, child_frame in pairs(frame.type_frames[quest_type]["filters"]) do
-						child_frame["frame"]:Hide();
-					end
-					
-					local total_quests = 0;
-					local filter_count = 0;
-					local filters_displayed = 0;
-					local height_padding = 0;
-					for filter_name, quest_ids in qb.omg:sortedpairs(quest_data) do
-						if (not frame.type_frames[quest_type]["filters"][filter_name]) then
-							local filter_frame = CreateFrame("Frame", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "_" .. filter_count .."Frame", frame);
-							filter_frame:SetPoint("TOPLEFT", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "Frame", "TOPLEFT", 20, 0);
-							filter_frame:SetSize(304, 16);
-							filter_frame.frame_name = type_count .. "_" .. filter_count;
-							
-							filter_frame.expand = CreateFrame("Button", filter_frame:GetName() .. "_ExpandFrame", type_frame);
-							filter_frame.expand:SetPoint("TOPLEFT", filter_frame, "TOPLEFT", -2, 0);
-							filter_frame.expand:SetSize(304, 16);
-							filter_frame.expand:SetScript("OnEnter", function(self)
-								filter_frame.expand.icon:SetVertexColor(FILTER_HOVER_COLOR.r, FILTER_HOVER_COLOR.g, FILTER_HOVER_COLOR.b);
-							end);
-							filter_frame.expand:SetScript("OnLeave", function(self)
-								if (qb.modules.quest_lists.filter_expanded == filter_name) then
-									filter_frame.expand.icon:SetVertexColor(FILTER_EXPANDED_COLOR.r, FILTER_EXPANDED_COLOR.g, FILTER_EXPANDED_COLOR.b);
-								else
-									filter_frame.expand.icon:SetVertexColor(FILTER_COLOR.r, FILTER_COLOR.g, FILTER_COLOR.b);
-								end
-							end);
-							filter_frame.expand:SetScript("OnClick", function(self)
-								if (qb.modules.quest_lists.filter_expanded == filter_name) then
-									qb.modules.quest_lists.filter_expanded = "";
-								else
-									qb.modules.quest_lists.filter_expanded = filter_name;
-								end
-								qb.modules.quest_lists:update();
-							end);
-							
-							filter_frame.expand.icon = filter_frame.expand:CreateTexture("ARTWORK");
-							filter_frame.expand.icon:SetAllPoints();
-							filter_frame.expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Bar");
-							filter_frame.expand.icon:SetVertexColor(FILTER_COLOR.r, FILTER_COLOR.g, FILTER_COLOR.b);
-							
-							filter_frame.expand.label = filter_frame.expand:CreateFontString(nil, "ARTWORK", "GameFontNormal");
-							filter_frame.expand.label:SetPoint("CENTER");
-							filter_frame.expand.label:SetText(qb.omg:trim(qb.omg:ucwords(filter_name)));
-							
-							frame.type_frames[quest_type]["filters"][filter_name] = {
-								["name"] = filter_name,
-								["frame"] = filter_frame,
-								["quests"] = {},
-							};
-						end
-						
-						local filter_frame = frame.type_frames[quest_type]["filters"][filter_name]["frame"];
-						filter_frame:SetPoint("TOPLEFT", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "Frame", "TOPLEFT", 20, (filters_displayed * -15) - height_padding - 15);
-						
-						if (frame.type_frames[quest_type]["filters"][filter_name]["quests"] and next(frame.type_frames[quest_type]["filters"][filter_name]["quests"])) then
-							for quest_id, quest_data in pairs(frame.type_frames[quest_type]["filters"][filter_name]["quests"]) do
-								if (IsQuestFlaggedCompleted(quest_id)) then
-									quest_data["frame"]:Hide();
-									quest_data["frame"].expand:Hide();
-									quest_data["frame"].quest_type:Hide();
-									frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id] = nil;
-								end
-							end
-						end
+function qb.modules.quest_lists:processQuestTypes()
+	local total_bars = 0;
 
-						local total_filter_quests = 0;
-						local quest_count = 0;
-						local quests_displayed = 0;
-						if (quest_ids and next(quest_ids)) then
-							for _, quest_id in qb.omg:sortedpairs(quest_ids) do
-								if (not frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]) then
-									local _, _, _, rarity, elite, tradeskill_line = GetQuestTagInfo(quest_id);
-									local color = WORLD_QUEST_QUALITY_COLORS[rarity];
-									local tradeskill_line_id = tradeskill_line and select(7, GetProfessionInfo(tradeskill_line));
-									local title, faction_id, capped = C_TaskQuest.GetQuestInfoByQuestID(quest_id);
-									
-									local tooltip = frame_data["tooltip"];
-									local quest_frame = CreateFrame("Frame", "QuestBuster_QuestList_" .. frame_data["name"] .. "Type" .. type_count .. "_" .. filter_count .. "_" .. quest_count .."Frame", frame);
-									quest_frame:SetPoint("TOPLEFT", frame.type_frames[quest_type]["filters"][filter_name]["frame"], "TOPLEFT", 20, (quest_count * -15) - 15);
-									quest_frame:SetSize(268, 16);
-									quest_frame.frame_name = type_count .. "_" .. filter_count .. "_" .. quest_count;
-									
-									quest_frame.expand = CreateFrame("Button", quest_frame:GetName() .. "_ExpandFrame", type_frame);
-									quest_frame.expand:SetPoint("TOPLEFT", quest_frame, "TOPLEFT", -2, 0);
-									quest_frame.expand:SetSize(268, 16);
-									quest_frame.expand:SetScript("OnEnter", function(self)
-										quest_frame.expand.icon:SetVertexColor(QUEST_HOVER_COLOR.r, QUEST_HOVER_COLOR.g, QUEST_HOVER_COLOR.b);
-										tooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT");
-										qb.modules.quest_lists:setQuestTooltip(tooltip, quest_id);
-										tooltip:Show();
-									end);
-									quest_frame.expand:SetScript("OnLeave", function(self)
-										quest_frame.expand.icon:SetVertexColor(QUEST_COLOR.r, QUEST_COLOR.g, QUEST_COLOR.b);
-										tooltip:Hide();
-										if (_G["qb.GameTooltip.ItemTooltip"]) then
-											_G["qb.GameTooltip.ItemTooltip"]:Hide();
-										end
-									end);
-									quest_frame.expand:SetScript("OnClick", function(self)
-										PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-										if (IsWorldQuestWatched(quest_id)) then
-											BonusObjectiveTracker_UntrackWorldQuest(quest_id);
-										else
-											BonusObjectiveTracker_TrackWorldQuest(quest_id);
-										end
-									end);
-									
-									quest_frame.expand.icon = quest_frame.expand:CreateTexture("ARTWORK");
-									quest_frame.expand.icon:SetAllPoints();
-									quest_frame.expand.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_Bar");
-									quest_frame.expand.icon:SetVertexColor(QUEST_COLOR.r, QUEST_COLOR.g, QUEST_COLOR.b);
-									
-									quest_frame.expand.label = quest_frame.expand:CreateFontString(nil, "ARTWORK", "GameFontWhiteTiny");
-									quest_frame.expand.label:SetPoint("CENTER");
-									quest_frame.expand.label:SetText(title);
-									--quest_frame.expand.label:SetTextColor(color.r, color.g, color.b);
-									
-									quest_frame.quest_type = CreateFrame("Button", quest_frame:GetName() .. "_QuestType", quest_frame.expand);
-									quest_frame.quest_type:SetPoint("TOPRIGHT", quest_frame.expand.label, "TOPLEFT", -5, 0);
-									quest_frame.quest_type:SetSize(10, 10);
-									
-									quest_frame.quest_type.icon = quest_frame.quest_type:CreateTexture("ARTWORK");
-									quest_frame.quest_type.icon:SetAllPoints();
-									if (qb.modules.world_quests.quest_data[quest_id]["type"] == LE_QUEST_TAG_TYPE_PVP) then
-										quest_frame.quest_type.icon:SetAtlas("worldquest-icon-pvp-ffa", true);
-									elseif (qb.modules.world_quests.quest_data[quest_id]["type"] == LE_QUEST_TAG_TYPE_PET_BATTLE) then
-										quest_frame.quest_type.icon:SetAtlas("worldquest-icon-petbattle", true);
-									elseif (qb.modules.world_quests.quest_data[quest_id]["type"] == LE_QUEST_TAG_TYPE_PROFESSION and WORLD_QUEST_ICONS_BY_PROFESSION[tradeskill_line_id]) then
-										quest_frame.quest_type.icon:SetAtlas(WORLD_QUEST_ICONS_BY_PROFESSION[tradeskill_line_id], true);
-									elseif (qb.modules.world_quests.quest_data[quest_id]["type"] == LE_QUEST_TAG_TYPE_DUNGEON) then
-										quest_frame.quest_type.icon:SetAtlas("worldquest-icon-dungeon", true);
-									else
-										quest_frame.quest_type.icon:SetAtlas("worldquest-questmarker-questbang");
-									end
-									
-									if (TomTom ~= nil and TomTom.AddMFWaypoint ~= nil) then
-										quest_frame.tomtom = CreateFrame("Button", quest_frame:GetName() .. "_TomTom", quest_frame.expand);
-										quest_frame.tomtom:SetPoint("TOPRIGHT", quest_frame.expand, "TOPLEFT", 0, 0);
-										quest_frame.tomtom:SetSize(16, 16);
-										quest_frame.tomtom:SetScript("OnEnter", function(self)
-											tooltip:SetOwner(self, "ANCHOR_CURSOR");
-											tooltip:SetText(QBL["WORLD_QUEST_TOMTOM"] .. title .. "\n" .. qb.modules.world_quests.quest_data[quest_id]["location"]["zone"]);
-											tooltip:Show();
-										end);
-										quest_frame.tomtom:SetScript("OnLeave", function(self)
-											tooltip:Hide();
-										end);
-										quest_frame.tomtom:SetScript("OnClick", function(self)
-											local location_data = qb.modules.world_quests.quest_data[quest_id]["location"];
-											TomTom:AddMFWaypoint(location_data["map_id"], location_data["floor"], location_data["x"], location_data["y"], {
-												title = title,
-												persistent = nil,
-												minimap = true,
-												world = true,
-											});
-											TomTom:SetClosestWaypoint();
-										end);
-										
-										quest_frame.tomtom.icon = quest_frame.tomtom:CreateTexture("ARTWORK");
-										quest_frame.tomtom.icon:SetAllPoints();
-										quest_frame.tomtom.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_TomTom");
-									end
-
-									if (qb.modules.world_quests.quest_data[quest_id]["find_group"]) then
-										quest_frame.find_group = CreateFrame("Button", quest_frame:GetName() .. "_FindGroup", quest_frame.expand);
-										quest_frame.find_group:SetPoint("TOPLEFT", quest_frame.expand, "TOPRIGHT", 0, 0);
-										quest_frame.find_group:SetSize(16, 16);
-										quest_frame.find_group:SetScript("OnEnter", function(self)
-											tooltip:SetOwner(self, "ANCHOR_CURSOR");
-											tooltip:SetText(QBL["WORLD_QUEST_FIND_GROUP"] .. title);
-											tooltip:Show();
-										end);
-										quest_frame.find_group:SetScript("OnLeave", function(self)
-											tooltip:Hide();
-										end);
-										quest_frame.find_group:SetScript("OnClick", function(self)
-											LFGListUtil_FindQuestGroup(quest_id);
-										end);
-									
-										quest_frame.find_group.icon = quest_frame.find_group:CreateTexture("ARTWORK");
-										quest_frame.find_group.icon:SetAllPoints();
-										quest_frame.find_group.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_QuestList_FindGroup");
-									end
-									
-									frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id] = {
-										["quest_id"] = quest_id,
-										["quest_name"] = title,
-										["frame"] = quest_frame,
-									};
-								end
-								
-								local filter_quest_frame = frame.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id]["frame"];
-								filter_quest_frame:SetPoint("TOPLEFT", frame.type_frames[quest_type]["filters"][filter_name]["frame"], "TOPLEFT", 20, (quests_displayed * -15) - height_padding - 15);
-								
-								local minutes_left = C_TaskQuest.GetQuestTimeLeftMinutes(quest_id);
-								if (minutes_left and minutes_left > 0 and minutes_left <= WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
-									color = RED_FONT_COLOR;
-									filter_quest_frame.expand.label:SetTextColor(color.r, color.g, color.b, color.a);
-								end
-								
-								if (qb.modules.quest_lists.filter_expanded == filter_name) then
-									filter_quest_frame:Show();
-									filter_quest_frame.expand:Show();
-									filter_quest_frame.quest_type:Show();
-									if (filter_quest_frame.find_group ~= nil) then
-										if (config.show_find_group) then
-											filter_quest_frame:SetWidth(268);
-											filter_quest_frame.expand:SetWidth(268);
-											filter_quest_frame.find_group:Show();
-										else
-											filter_quest_frame:SetWidth(284);
-											filter_quest_frame.expand:SetWidth(284);
-											filter_quest_frame.find_group:Hide();
-										end
-									else
-										filter_quest_frame:SetWidth(284);
-										filter_quest_frame.expand:SetWidth(284);
-									end
-									quests_displayed = quests_displayed + 1;
-								else
-									filter_quest_frame:Hide();
-									filter_quest_frame.expand:Hide();
-									filter_quest_frame.quest_type:Hide();
-								end
-								
-								total_quests = total_quests + 1;
-								total_filter_quests = total_filter_quests + 1;
-								quest_count = quest_count + 1;
-							end
-						end
-						
-						if (total_filter_quests > 0 and qb.modules.quest_lists.type_expanded == quest_type) then
-							frame.type_frames[quest_type]["filters"][filter_name]["frame"]:SetHeight(10 + (quests_displayed * 15));
-							frame.type_frames[quest_type]["filters"][filter_name]["frame"]:Show();
-							if (qb.modules.quest_lists.filter_expanded == filter_name) then
-								frame.type_frames[quest_type]["filters"][filter_name]["frame"].expand.icon:SetVertexColor(FILTER_EXPANDED_COLOR.r, FILTER_EXPANDED_COLOR.g, FILTER_EXPANDED_COLOR.b);
-							else
-								frame.type_frames[quest_type]["filters"][filter_name]["frame"].expand.icon:SetVertexColor(FILTER_COLOR.r, FILTER_COLOR.g, FILTER_COLOR.b);
-							end
-							frame.type_frames[quest_type]["filters"][filter_name]["frame"].expand:Show();
-							filters_displayed = filters_displayed + 1;
-							height_padding = height_padding + (quests_displayed * 15);
-						else
-							frame.type_frames[quest_type]["filters"][filter_name]["frame"]:Hide();
-							frame.type_frames[quest_type]["filters"][filter_name]["frame"].expand:Hide();
-						end
-						
-						filter_count = filter_count + 1;
-						type_filter_quest_count = type_filter_quest_count + quests_displayed;
-					end
-					
-					type_filter_count = type_filter_count + filters_displayed;
-					
-					if (total_quests > 0) then
-						frame.type_frames[quest_type]["frame"]:SetHeight(20 + (filters_displayed * 15) + height_padding);
-						frame.type_frames[quest_type]["frame"]:Show();
-						if (qb.modules.quest_lists.type_expanded == quest_type) then
-							frame.type_frames[quest_type]["frame"].expand.icon:SetVertexColor(QUEST_TYPE_EXPANDED_COLOR.r, QUEST_TYPE_EXPANDED_COLOR.g, QUEST_TYPE_EXPANDED_COLOR.b);
-						else
-							frame.type_frames[quest_type]["frame"].expand.icon:SetVertexColor(QUEST_TYPE_COLOR.r, QUEST_TYPE_COLOR.g, QUEST_TYPE_COLOR.b);
-						end
-						frame.type_frames[quest_type]["frame"].expand:Show();
-					else
-						frame.type_frames[quest_type]["frame"]:Hide();
-						frame.type_frames[quest_type]["frame"].expand:Hide();
-					end
-					
-					type_count = type_count + 1;
+	local type_count = 0;
+	local previous_frame = nil;
+	for quest_type, quest_data in qb.omg:sortedpairs(qb.modules.world_quests.quests.quests) do
+		if (not qb.modules.quest_lists.type_frames[quest_type]) then
+			local type_frame = CreateFrame("Frame", "QuestBuster_QuestLists_Type" .. type_count .. "Frame", qb.modules.quest_lists.frame, "QuestBuster_QuuestListBar_Template");
+			type_frame:SetSize(324, 16);
+			local expand = _G[type_frame:GetName() .. "_Expand"];
+			_G[expand:GetName() .. "Label"]:SetText(QBL["WORLD_QUEST_" .. string.upper(quest_type)]);
+			expand:SetSize(324, 16);
+			expand:GetNormalTexture():SetVertexColor(QUEST_TYPE_COLOR.r, QUEST_TYPE_COLOR.g, QUEST_TYPE_COLOR.b);
+			expand:SetScript("OnEnter", function(self)
+				expand:GetNormalTexture():SetVertexColor(QUEST_TYPE_HOVER_COLOR.r, QUEST_TYPE_HOVER_COLOR.g, QUEST_TYPE_HOVER_COLOR.b);
+			end);
+			expand:SetScript("OnLeave", function(self)
+				if (qb.modules.quest_lists.type_expanded == quest_type) then
+					expand:GetNormalTexture():SetVertexColor(QUEST_TYPE_EXPANDED_COLOR.r, QUEST_TYPE_EXPANDED_COLOR.g, QUEST_TYPE_EXPANDED_COLOR.b);
+				else
+					expand:GetNormalTexture():SetVertexColor(QUEST_TYPE_COLOR.r, QUEST_TYPE_COLOR.g, QUEST_TYPE_COLOR.b);
 				end
+			end);
+			expand:SetScript("OnClick", function(self)
+				if (qb.modules.quest_lists.type_expanded == quest_type) then
+					qb.modules.quest_lists.type_expanded = "";
+				else
+					qb.modules.quest_lists.type_expanded = quest_type;
+				end
+				qb.modules.quest_lists.filter_expanded = "";
+				qb.modules.quest_lists:update();
+			end);
+			
+			qb.modules.quest_lists.type_frames[quest_type] = {
+				["name"] = quest_type,
+				["frame"] = type_frame,
+				["filters"] = {},
+			};
+		end
+		
+		for filter_name, child_frame in pairs(qb.modules.quest_lists.type_frames[quest_type]["filters"]) do
+			child_frame["frame"]:Hide();
+			child_frame["frame"].hideChildren();
+		end
+		
+		local type_frame = qb.modules.quest_lists.type_frames[quest_type]["frame"];
+		if (not previous_frame) then
+			type_frame:SetPoint("TOPLEFT", qb.modules.quest_lists.frame, "TOPLEFT", 8, -6);
+		else
+			type_frame:SetPoint("TOPLEFT", previous_frame, "BOTTOMLEFT", 0, 0);
+		end
+		
+		local filter_count, filter_bars = qb.modules.quest_lists:processQuestTypeFilters(quest_type, quest_data, type_count);
+		if (filter_count > 0) then
+			local bar_height = 0;
+			total_bars = total_bars + 1;
+			if (qb.modules.quest_lists.type_expanded == quest_type) then
+				total_bars = total_bars + filter_bars;
+				bar_height = filter_bars * 16;
+				_G[type_frame:GetName() .. "_Expand"]:GetNormalTexture():SetVertexColor(QUEST_TYPE_EXPANDED_COLOR.r, QUEST_TYPE_EXPANDED_COLOR.g, QUEST_TYPE_EXPANDED_COLOR.b);
+			else
+				_G[type_frame:GetName() .. "_Expand"]:GetNormalTexture():SetVertexColor(QUEST_TYPE_COLOR.r, QUEST_TYPE_COLOR.g, QUEST_TYPE_COLOR.b);
+			end
+			type_frame:SetHeight(16 + bar_height);
+			type_frame:Show();
+			previous_frame = type_frame;
+		else
+			type_frame:Hide();
+		end
+		
+		type_count = type_count + 1;
+	end
 
-				for i=1, MAX_EMISSARY_QUESTS do
-					local emissary_frame = frame.emissary_frames[i];
-					if (qb.modules.world_quests.emissary.quests[i]) then
-						local quest_data = qb.modules.world_quests.emissary.quests[i];
-						emissary_frame.emissary_data = quest_data;
-						emissary_frame.icon:SetTexture(quest_data["icon"]);
-						emissary_frame.check_icon.icon:SetAlpha(quest_data["completed"] / quest_data["total"]);
-						emissary_frame:Show();
+	return type_count, total_bars;
+end
+
+function qb.modules.quest_lists:processQuestTypeFilters(quest_type, type_data, type_count)
+	local total_bars = 0;
+
+	local filter_count = 0;
+	local previous_frame = nil;
+	if (type_data and next(type_data)) then
+		local quest_data = qb.modules.quest_lists.type_frames[quest_type];
+		for filter_name, quest_ids in qb.omg:sortedpairs(type_data) do
+			if (not qb.modules.quest_lists.type_frames[quest_type]["filters"][filter_name]) then
+				local filter_frame = CreateFrame("Frame", "QuestBuster_QuestLists_Type" .. type_count .. "_" .. filter_name .."Frame", qb.modules.quest_lists.frame, "QuestBuster_QuuestListBar_Template");
+				filter_frame:SetPoint("TOPLEFT", quest_data["frame"], "TOPLEFT", 20, 0);
+				filter_frame:SetSize(304, 16);
+				local expand = _G[filter_frame:GetName() .. "_Expand"];
+				_G[expand:GetName() .. "Label"]:SetText(qb.omg:trim(qb.omg:ucwords(filter_name)));
+				expand:SetSize(304, 16);
+				expand:GetNormalTexture():SetVertexColor(FILTER_COLOR.r, FILTER_COLOR.g, FILTER_COLOR.b);
+				expand:SetScript("OnEnter", function(self)
+					expand:GetNormalTexture():SetVertexColor(FILTER_HOVER_COLOR.r, FILTER_HOVER_COLOR.g, FILTER_HOVER_COLOR.b);
+				end);
+				expand:SetScript("OnLeave", function(self)
+					if (qb.modules.quest_lists.filter_expanded == filter_name) then
+						expand:GetNormalTexture():SetVertexColor(FILTER_EXPANDED_COLOR.r, FILTER_EXPANDED_COLOR.g, FILTER_EXPANDED_COLOR.b);
 					else
-						emissary_frame:Hide();
+						expand:GetNormalTexture():SetVertexColor(FILTER_COLOR.r, FILTER_COLOR.g, FILTER_COLOR.b);
+					end
+				end);
+				expand:SetScript("OnClick", function(self)
+					if (qb.modules.quest_lists.filter_expanded == filter_name) then
+						qb.modules.quest_lists.filter_expanded = "";
+					else
+						qb.modules.quest_lists.filter_expanded = filter_name;
+					end
+					qb.modules.quest_lists:update();
+				end);
+
+				filter_frame.hideChildren = function()
+					for quest_id, quest_data in pairs(qb.modules.quest_lists.type_frames[quest_type]["filters"][filter_name]["quests"]) do
+						quest_data["frame"]:Hide();
 					end
 				end
 				
-				mover_frame:Show();
-				mover_frame.collapse.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover_Collapse");
-				if (type_count > 0 or type_filter_count > 0 or type_filter_quest_count > 0) then
-					frame:SetHeight(16 + (type_count * 15) + (type_filter_count * 15) + (type_filter_quest_count * 15));
-					frame:Show();
-				else
-					frame:SetHeight(28);
-					frame:Show();
-				end
-			else
-				mover_frame:Show();
-				mover_frame.collapse.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover_Expand");
-				frame:Hide();
+				qb.modules.quest_lists.type_frames[quest_type]["filters"][filter_name] = {
+					["name"] = filter_name,
+					["frame"] = filter_frame,
+					["quests"] = {},
+				};
 			end
 			
-			if (not config.locked) then
-				mover_frame.lock.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover_Unlocked");
-			else
-				mover_frame.lock.icon:SetTexture("Interface\\AddOns\\QuestBuster\\Images\\QuestBuster_Mover_Locked");
+			for quest_id, quest_data in pairs(qb.modules.quest_lists.type_frames[quest_type]["filters"][filter_name]["quests"]) do
+				if (IsQuestFlaggedCompleted(quest_id)) then
+					quest_data["frame"]:Hide();
+					qb.modules.quest_lists.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id] = nil;
+				end
 			end
-		else
-			mover_frame:Hide();
-			frame:Hide();
+			
+			local filter_frame = qb.modules.quest_lists.type_frames[quest_type]["filters"][filter_name]["frame"];
+			if (not previous_frame) then
+				filter_frame:SetPoint("TOPLEFT", quest_data["frame"], "TOPLEFT", 20, -16);
+			else
+				filter_frame:SetPoint("TOPLEFT", previous_frame, "BOTTOMLEFT", 0, 0);
+			end
+
+			local quest_count, quest_bars = qb.modules.quest_lists:processQuestTypeFilterQuests(quest_type, filter_name, quest_ids, type_count, filter_count);
+			if (quest_count > 0 and qb.modules.quest_lists.type_expanded == quest_type) then
+				local bar_height = 0;
+				total_bars = total_bars + 1;
+				if (qb.modules.quest_lists.filter_expanded == filter_name) then
+					total_bars = total_bars + quest_bars;
+					bar_height = quest_bars * 16;
+					_G[filter_frame:GetName() .. "_Expand"]:GetNormalTexture():SetVertexColor(FILTER_EXPANDED_COLOR.r, FILTER_EXPANDED_COLOR.g, FILTER_EXPANDED_COLOR.b);
+				else
+					_G[filter_frame:GetName() .. "_Expand"]:GetNormalTexture():SetVertexColor(FILTER_COLOR.r, FILTER_COLOR.g, FILTER_COLOR.b);
+				end
+				filter_frame:SetHeight(16 + bar_height);
+				filter_frame:Show();
+				previous_frame = filter_frame;
+			else
+				filter_frame:Hide();
+			end
+			
+			filter_count = filter_count + 1;
 		end
 	end
+
+	return filter_count, total_bars;
 end
 
-function qb.modules.quest_lists:setEmissaryTooltip(tooltip, emissary_data)
+function qb.modules.quest_lists:processQuestTypeFilterQuests(quest_type, filter_name, quest_ids, type_count, filter_count)
+	local total_bars = 0;
+
+	local quest_count = 0;
+	local previous_frame = nil;
+	if (quest_ids and next(quest_ids)) then
+		local filter_data = qb.modules.quest_lists.type_frames[quest_type]["filters"][filter_name];
+		for _, quest_id in qb.omg:sortedpairs(quest_ids) do
+			local filter_quest_data = qb.modules.world_quests.quest_data[quest_id];
+			if (not filter_quest_data["completed"]) then
+				if (not filter_data["quests"][quest_id]) then
+					local quest_frame = CreateFrame("Frame", "QuestBuster_QuestLists_Type" .. type_count .. "_" .. filter_count .. "_" .. quest_id .."Frame", qb.modules.quest_lists.frame, "QuestBuster_QuuestListQuestBar_Template");
+					quest_frame:SetPoint("TOPLEFT", filter_data["frame"], "TOPLEFT", 20, 0);
+					quest_frame:SetSize(284, 16);
+
+					local _, _, _, rarity, elite, tradeskill_line = GetQuestTagInfo(quest_id);
+					local color = WORLD_QUEST_QUALITY_COLORS[rarity];
+					local tradeskill_line_id = tradeskill_line and select(7, GetProfessionInfo(tradeskill_line));
+					local title, faction_id, capped = C_TaskQuest.GetQuestInfoByQuestID(quest_id);
+					local expand = _G[quest_frame:GetName() .. "_Expand"];
+					expand:SetSize(268, 16);
+					expand:GetNormalTexture():SetVertexColor(FILTER_COLOR.r, FILTER_COLOR.g, FILTER_COLOR.b);
+					_G[expand:GetName() .. "Label"]:SetText(title);
+					--_G[expand:GetName() .. "Label"]:SetTextColor(color.r, color.g, color.b);
+					expand:GetNormalTexture():SetVertexColor(QUEST_COLOR.r, QUEST_COLOR.g, QUEST_COLOR.b);
+					expand:SetScript("OnEnter", function(self)
+						expand:GetNormalTexture():SetVertexColor(QUEST_HOVER_COLOR.r, QUEST_HOVER_COLOR.g, QUEST_HOVER_COLOR.b);
+						QuestBuster_QuestList_RewardTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT");
+						qb.modules.quest_lists:setQuestTooltip(QuestBuster_QuestList_RewardTooltip, quest_id);
+						QuestBuster_QuestList_RewardTooltip:Show();
+					end);
+					expand:SetScript("OnLeave", function(self)
+						expand:GetNormalTexture():SetVertexColor(QUEST_COLOR.r, QUEST_COLOR.g, QUEST_COLOR.b);
+						QuestBuster_QuestList_RewardTooltip:Hide();
+					end);
+					expand:SetScript("OnClick", function(self)
+						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
+						if (IsWorldQuestWatched(quest_id)) then
+							BonusObjectiveTracker_UntrackWorldQuest(quest_id);
+						else
+							BonusObjectiveTracker_TrackWorldQuest(quest_id);
+						end
+					end);
+					
+					local width = 10;
+					if (qb.modules.world_quests.quest_data[quest_id]["type"] == LE_QUEST_TAG_TYPE_PVP) then
+						_G[expand:GetName() .. "QuestIcon"]:SetAtlas("worldquest-icon-pvp-ffa", true);
+					elseif (qb.modules.world_quests.quest_data[quest_id]["type"] == LE_QUEST_TAG_TYPE_PET_BATTLE) then
+						_G[expand:GetName() .. "QuestIcon"]:SetAtlas("worldquest-icon-petbattle", true);
+					elseif (qb.modules.world_quests.quest_data[quest_id]["type"] == LE_QUEST_TAG_TYPE_PROFESSION and WORLD_QUEST_ICONS_BY_PROFESSION[tradeskill_line_id]) then
+						_G[expand:GetName() .. "QuestIcon"]:SetAtlas(WORLD_QUEST_ICONS_BY_PROFESSION[tradeskill_line_id], true);
+					elseif (qb.modules.world_quests.quest_data[quest_id]["type"] == LE_QUEST_TAG_TYPE_DUNGEON) then
+						_G[expand:GetName() .. "QuestIcon"]:SetAtlas("worldquest-icon-dungeon", true);
+					elseif (qb.modules.world_quests.quest_data[quest_id]["type"] == LE_QUEST_TAG_TYPE_RAID) then
+						_G[expand:GetName() .. "QuestIcon"]:SetAtlas("worldquest-icon-raid", true);
+					elseif (qb.modules.world_quests.quest_data[quest_id]["type"] == LE_QUEST_TAG_TYPE_INVASION) then
+						_G[expand:GetName() .. "QuestIcon"]:SetAtlas("worldquest-icon-burninglegion", true);
+					else
+						_G[expand:GetName() .. "QuestIcon"]:SetAtlas("worldquest-questmarker-questbang", true);
+						width = 6;
+					end
+					_G[expand:GetName() .. "QuestIcon"]:SetSize(width, 10);
+					
+					if (TomTom ~= nil) then
+						local tomtom = _G[quest_frame:GetName() .. "_TomTom"];
+						tomtom:SetScript("OnEnter", function(self)
+							GameTooltip:SetOwner(self, "ANCHOR_CURSOR");
+							GameTooltip:SetText(QBL["WORLD_QUEST_TOMTOM"] .. title .. "\n" .. qb.modules.world_quests.quest_data[quest_id]["location"]["zone"]);
+							GameTooltip:Show();
+						end);
+						tomtom:SetScript("OnLeave", function(self)
+							GameTooltip:Hide();
+						end);
+						tomtom:SetScript("OnClick", function(self)
+							local location_data = qb.modules.world_quests.quest_data[quest_id]["location"];
+							TomTom:AddWaypoint(location_data["map_id"], location_data["x"], location_data["y"], {
+								title = title,
+								persistent = nil,
+								minimap = true,
+								world = true,
+							});
+							TomTom:SetClosestWaypoint();
+						end);
+						quest_frame:SetSize(284, 16);
+						expand:SetSize(268, 16);
+						tomtom:Show();
+					else
+						quest_frame:SetSize(284, 16);
+						expand:SetSize(284, 16);
+						_G[quest_frame:GetName() .. "_TomTom"]:Hide();
+					end
+					
+					qb.modules.quest_lists.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id] = {
+						["quest_id"] = quest_id,
+						["quest_name"] = title,
+						["frame"] = quest_frame,
+					};
+				end
+				
+				local quest_frame = filter_data["quests"][quest_id]["frame"];
+				if (not previous_frame) then
+					quest_frame:SetPoint("TOPLEFT", filter_data["frame"], "TOPLEFT", 20, -16);
+				else
+					quest_frame:SetPoint("TOPLEFT", previous_frame, "BOTTOMLEFT", 0, 0);
+				end
+				
+				local minutes_left = C_TaskQuest.GetQuestTimeLeftMinutes(quest_id);
+				if (minutes_left and minutes_left > 0 and minutes_left <= WORLD_QUESTS_TIME_CRITICAL_MINUTES) then
+					_G[quest_frame:GetName() .. "_ExpandLabel"]:SetTextColor(RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b, RED_FONT_COLOR.a);
+				end
+				
+				if (qb.modules.quest_lists.type_expanded == quest_type and qb.modules.quest_lists.filter_expanded == filter_name) then
+					total_bars = total_bars + 1;
+					quest_frame:Show();
+					previous_frame = quest_frame;
+				else
+					quest_frame:Hide();
+				end
+				
+				quest_count = quest_count + 1;
+			end
+		end
+	end
+
+	return quest_count, total_bars;
+end
+
+function qb.modules.quest_lists:setEmissaryTooltip(emissary_data)
 	local faction_name, _, faction_standing = GetFactionInfoByID(emissary_data["faction_id"]);
 	if (emissary_data["pending"] ~= nil) then
-		tooltip:SetText(faction_name .. " - " .. QBL["EMISSARY_PENDING"]);
-		tooltip:AddLine(emissary_data["pending"]);
+		GameTooltip:SetText(faction_name .. " - " .. QBL["EMISSARY_PENDING"]);
+		GameTooltip:AddLine(emissary_data["pending"]);
 	else
-		tooltip:SetText(faction_name .. " - " .. getglobal("FACTION_STANDING_LABEL" .. faction_standing));
-		tooltip:AddLine("Completed: " .. emissary_data["completed"] .. "/" .. emissary_data["total"]);
+		GameTooltip:SetText(faction_name .. " - " .. getglobal("FACTION_STANDING_LABEL" .. faction_standing));
+		GameTooltip:AddLine("Completed: " .. emissary_data["completed"] .. "/" .. emissary_data["total"]);
 	end
 		
 	local minutes_left = C_TaskQuest.GetQuestTimeLeftMinutes(emissary_data["quest_id"]);
@@ -601,7 +466,7 @@ function qb.modules.quest_lists:setEmissaryTooltip(tooltip, emissary_data)
 		else
 			time_str = D_DAYS:format(math.floor(minutes_left - WORLD_QUESTS_TIME_CRITICAL_MINUTES) / 1440);
 		end
-		tooltip:AddLine(BONUS_OBJECTIVE_TIME_LEFT:format(time_str), color:GetRGB());
+		GameTooltip:AddLine(BONUS_OBJECTIVE_TIME_LEFT:format(time_str), color:GetRGB());
 	end
 end
 
@@ -653,145 +518,64 @@ function qb.modules.quest_lists:setQuestTooltip(tooltip, quest_id)
 		end
 	end
 	
-	if (GetQuestLogRewardXP(quest_id) > 0 or GetNumQuestLogRewardCurrencies(quest_id) > 0 or GetNumQuestLogRewards(quest_id) > 0 or GetQuestLogRewardMoney(quest_id) > 0 or GetQuestLogRewardArtifactXP(quest_id) > 0) then
-		tooltip:AddLine(" ");
-		tooltip:AddLine(QUEST_REWARDS, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, true);
-		local found = false;
-
-		-- experience
-		local experience = GetQuestLogRewardXP(quest_id);
-		if (experience > 0) then
-			tooltip:AddLine(BONUS_OBJECTIVE_EXPERIENCE_FORMAT:format(experience), HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
-			found = true;
-		end
-
-		-- money
-		local money = GetQuestLogRewardMoney(quest_id);
-		if (money > 0) then
-			SetTooltipMoney(tooltip, money, nil);
-			found = true;
-		end	
-		local artifact_experience = GetQuestLogRewardArtifactXP(quest_id);
-		if (artifact_experience > 0) then
-			tooltip:AddLine(BONUS_OBJECTIVE_ARTIFACT_XP_FORMAT:format(artifact_experience), HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
-			found = true;
-		end
-
-		-- currency		
-		local currencies = GetNumQuestLogRewardCurrencies(quest_id);
-		for i=1, currencies do
-			local name, texture, num_items = GetQuestLogRewardCurrencyInfo(i, quest_id);
-			local text = BONUS_OBJECTIVE_REWARD_WITH_COUNT_FORMAT:format(texture, num_items, name);
-			tooltip:AddLine(text, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
-			found = true;
-		end
-		
-		-- items
-		local rewards = GetNumQuestLogRewards(quest_id);
-		if (rewards > 0) then
-			if (found) then
-				tooltip:AddLine(" ");
-			end
-			
-			local item_frame = {};
-			if (tooltip == WorldMapTooltip) then
-				item_frame = WorldMapTooltip.ItemTooltip;
-			elseif (tooltip == GameTooltip) then
-				if (not _G["qb.GameTooltip.ItemTooltip"]) then
-					local frame = CreateFrame("Frame", "qb.GameTooltip.ItemTooltip", GameTooltip, "EmbeddedItemTooltip");
-					frame:SetPoint("TOPLEFT", nil, "BOTTOMLEFT", 10, 8);
-					frame:SetSize(100, 100);
-					frame:SetAttribute("yspacing", 13);
-					frame:Hide();
-					frame.Tooltip.shoppingTooltips = { };
-				end
-				item_frame = _G["qb.GameTooltip.ItemTooltip"];
-			end
-			if (not EmbeddedItemTooltip_SetItemByQuestReward(item_frame, 1, quest_id)) then
-				tooltip:AddLine(RETRIEVING_DATA, RED_FONT_COLOR:GetRGB());
-			end
-			if (_G["qb.GameTooltip.ItemTooltip"]) then
-				GameTooltip_InsertFrame(GameTooltip, _G["qb.GameTooltip.ItemTooltip"]);
-			end
-		end
-	end
-	
-	tooltip:AddLine(" ");
 	tooltip:AddLine(QBL["WORLD_QUEST_TRACKING_TOOLTIP"]);
+	
+	GameTooltip_AddQuestRewardsToTooltip(tooltip, quest_id);
 end
 
-function qb.modules.quest_lists:lockFrame(frame_name)
-	if (not qb.settings:get().quest_list_frames[frame_name].locked) then
-		qb.settings:get().quest_list_frames[frame_name].locked = true;
+function qb.modules.quest_lists:lockFrame()
+	if (not qb.settings:get().quest_list_frame.locked) then
+		qb.settings:get().quest_list_frame.locked = true;
 	else
-		qb.settings:get().quest_list_frames[frame_name].locked = false;
+		qb.settings:get().quest_list_frame.locked = false;
 	end
 	qb.modules.quest_lists:update();
 end
 
-function qb.modules.quest_lists:collapseFrame(frame_name)
-	if (_G["QuestBuster_QuestList" .. frame_name .. "Frame"]:IsShown()) then
-		_G["QuestBuster_QuestList" .. frame_name .. "Frame"]:Hide();
-		qb.settings:get().quest_list_frames[frame_name].state = "collapsed";
+function qb.modules.quest_lists:collapseFrame()
+	if (_G["QuestBuster_QuestLists_Frame"]:IsShown()) then
+		_G["QuestBuster_QuestLists_Frame"]:Hide();
+		qb.settings:get().quest_list_frame.state = "collapsed";
 	else
-		_G["QuestBuster_QuestList" .. frame_name .. "Frame"]:Show();
-		qb.settings:get().quest_list_frames[frame_name].state = "expanded";
+		_G["QuestBuster_QuestLists_Frame"]:Show();
+		qb.settings:get().quest_list_frame.state = "expanded";
 	end
 	qb.modules.quest_lists:update();
 end
 
-function qb.modules.quest_lists:closeFrame(frame_name)
-	_G["QuestBuster_QuestList" .. frame_name .. "MoverFrame"]:Hide();
-	_G["QuestBuster_QuestList" .. frame_name .. "Frame"]:Hide();
-	if (not _G["QuestBuster_QuestList" .. frame_name .. "MoverFrame"]:IsShown()) then
-		qb.settings:get().quest_list_frames[frame_name].show = false;
+function qb.modules.quest_lists:closeFrame()
+	_G["QuestBuster_QuestLists_MoverFrame"]:Hide();
+	_G["QuestBuster_QuestLists_Frame"]:Hide();
+	if (not _G["QuestBuster_QuestLists_MoverFrame"]:IsShown()) then
+		qb.settings:get().quest_list_frame.show = false;
 	end
 end
 
-function qb.modules.quest_lists:dragFrame(frame_name)
-	local point, _, relative_point, x, y = _G["QuestBuster_QuestList" .. frame_name .. "MoverFrame"]:GetPoint();
-	qb.settings:get().quest_list_frames[frame_name].position.point = point;
-	qb.settings:get().quest_list_frames[frame_name].position.relative_point = relative_point;
-	qb.settings:get().quest_list_frames[frame_name].position.x = x;
-	qb.settings:get().quest_list_frames[frame_name].position.y = y;
-	qb.modules.quest_lists:updatePosition(frame_name);
+function qb.modules.quest_lists:dragFrame()
+	local point, _, relative_point, x, y = _G["QuestBuster_QuestLists_MoverFrame"]:GetPoint();
+	qb.settings:get().quest_list_frame.position.point = point;
+	qb.settings:get().quest_list_frame.position.relative_point = relative_point;
+	qb.settings:get().quest_list_frame.position.x = x;
+	qb.settings:get().quest_list_frame.position.y = y;
+	qb.modules.quest_lists:updatePosition();
 end
 
-function qb.modules.quest_lists:updatePosition(frame_name)
-	local position = qb.settings:get().quest_list_frames[frame_name].position;
-	_G["QuestBuster_QuestList" .. frame_name .. "MoverFrame"]:ClearAllPoints();
-	_G["QuestBuster_QuestList" .. frame_name .. "MoverFrame"]:SetPoint(position.point, nil, position.relative_point, position.x, position.y);
+function qb.modules.quest_lists:updatePosition()
+	local position = qb.settings:get().quest_list_frame.position;
+	_G["QuestBuster_QuestLists_MoverFrame"]:ClearAllPoints();
+	_G["QuestBuster_QuestLists_MoverFrame"]:SetPoint(position.point, nil, position.relative_point, position.x, position.y);
 end
 
-function qb.modules.quest_lists:resetPosition(frame_name)
-	qb.settings:get().quest_list_frames[frame_name].position = {
+function qb.modules.quest_lists:resetPosition()
+	qb.settings:get().quest_list_frame.position = {
 		point = "TOPLEFT",
 		relative_point = "TOPLEFT",
 		x = 490,
 		y = -330,
 	};
-	qb.modules.quest_lists:updatePosition(frame_name);
+	qb.modules.quest_lists:updatePosition();
 end
 
 function QuestBuster_QuestListFrames_Toggle()
-	qb.modules.quest_lists:collapseFrame("Default");
+	qb.modules.quest_lists:collapseFrame();
 end
-
-function QuestBuster_QuestListFrames_ToggleSize()
-	for frame_id, frame_data in pairs(qb.modules.quest_lists.frames) do
-		local config = qb.settings:get().quest_list_frames[frame_data["name"]];
-		local frame = frame_data["frame"];
-		local mover_frame = frame_data["mover_frame"];
-		
-		if (config.show and qb.modules.world_quests.quests.count > 0) then
-			mover_frame:SetParent(QBG_QUEST_LIST_FRAMES[frame_id]["parent"]);
-			mover_frame:SetFrameStrata(QBG_QUEST_LIST_FRAMES[frame_id]["strata"]);
-
-			frame:SetParent(QBG_QUEST_LIST_FRAMES[frame_id]["parent"]);
-			frame:SetFrameStrata(QBG_QUEST_LIST_FRAMES[frame_id]["strata"]);
-		end
-	end
-end
-
-hooksecurefunc("WorldMap_ToggleSizeUp", QuestBuster_QuestListFrames_ToggleSize);
-hooksecurefunc("WorldMap_ToggleSizeDown", QuestBuster_QuestListFrames_ToggleSize);

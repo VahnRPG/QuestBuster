@@ -20,8 +20,6 @@
 		</Frames>
 		<Scripts>
 			<OnLoad>
-				self:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b);
-				self:SetBackdropColor(TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, TOOLTIP_DEFAULT_BACKGROUND_COLOR.b);
 				self.shoppingTooltips = { QuestBuster_QuestList_RewardCompareTooltip1, QuestBuster_QuestList_RewardCompareTooltip2 };
 			</OnLoad>
 			<OnUpdate>

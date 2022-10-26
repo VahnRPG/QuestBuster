@@ -1,7 +1,7 @@
 local _, qb = ...;
 
 --local MAX_EMISSARY_QUESTS = WorldMapFrame.UIElementsFrame.BountyBoard.minimumTabsToDisplay;
-local MAX_EMISSARY_QUESTS = 6;
+local MAX_EMISSARY_QUESTS = 9;
 
 local QUEST_TYPE_COLOR = { r=0.25, g=0.36, b=0.69 };
 local QUEST_TYPE_HOVER_COLOR = { r=0.39, g=0.47, b=0.72 };
@@ -277,7 +277,7 @@ function qb.modules.quest_lists:processQuestTypeFilters(quest_type, type_data, t
 			end
 			
 			for quest_id, quest_data in pairs(qb.modules.quest_lists.type_frames[quest_type]["filters"][filter_name]["quests"]) do
-				if (IsQuestFlaggedCompleted(quest_id)) then
+				if (C_QuestLog.IsQuestFlaggedCompleted(quest_id)) then
 					quest_data["frame"]:Hide();
 					qb.modules.quest_lists.type_frames[quest_type]["filters"][filter_name]["quests"][quest_id] = nil;
 				end
@@ -330,10 +330,12 @@ function qb.modules.quest_lists:processQuestTypeFilterQuests(quest_type, filter_
 					quest_frame:SetPoint("TOPLEFT", filter_data["frame"], "TOPLEFT", 20, 0);
 					quest_frame:SetSize(284, 16);
 
-					local _, _, _, rarity, elite, tradeskill_line = GetQuestTagInfo(quest_id);
-					local color = WORLD_QUEST_QUALITY_COLORS[rarity];
-					local tradeskill_line_id = tradeskill_line and select(7, GetProfessionInfo(tradeskill_line));
+					local _, _, _, rarity, elite, tradeskill_line = C_QuestLog.GetQuestTagInfo(quest_id);
+					local info = C_QuestLog.GetQuestTagInfo(quest_id);
+					local rarity = info and info.quality or Enum.WorldQuestQuality.Common;
+					local tradeskill_line = info.tradeskillLineID;
 					local title, faction_id, capped = C_TaskQuest.GetQuestInfoByQuestID(quest_id);
+
 					local expand = _G[quest_frame:GetName() .. "_Expand"];
 					expand:SetSize(268, 16);
 					expand:GetNormalTexture():SetVertexColor(FILTER_COLOR.r, FILTER_COLOR.g, FILTER_COLOR.b);
@@ -352,30 +354,18 @@ function qb.modules.quest_lists:processQuestTypeFilterQuests(quest_type, filter_
 					end);
 					expand:SetScript("OnClick", function(self)
 						PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON);
-						if (IsWorldQuestWatched(quest_id)) then
+
+						local watch_type = C_QuestLog.GetQuestWatchType(quest_id);
+						if (watch_type == Enum.QuestWatchType.Manual or (watch_type == Enum.QuestWatchType.Automatic and C_SuperTrack.GetSuperTrackedQuestID() == quest_id)) then
+						--if (IsWorldQuestWatched(quest_id)) then
 							BonusObjectiveTracker_UntrackWorldQuest(quest_id);
 						else
-							BonusObjectiveTracker_TrackWorldQuest(quest_id);
+							BonusObjectiveTracker_TrackWorldQuest(quest_id, Enum.QuestWatchType.Manual);
 						end
 					end);
 					
-					local width = 10;
-					if (qb.modules.world_quests.quest_data[quest_id]["type"] == LE_QUEST_TAG_TYPE_PVP) then
-						_G[expand:GetName() .. "QuestIcon"]:SetAtlas("worldquest-icon-pvp-ffa", true);
-					elseif (qb.modules.world_quests.quest_data[quest_id]["type"] == LE_QUEST_TAG_TYPE_PET_BATTLE) then
-						_G[expand:GetName() .. "QuestIcon"]:SetAtlas("worldquest-icon-petbattle", true);
-					elseif (qb.modules.world_quests.quest_data[quest_id]["type"] == LE_QUEST_TAG_TYPE_PROFESSION and WORLD_QUEST_ICONS_BY_PROFESSION[tradeskill_line_id]) then
-						_G[expand:GetName() .. "QuestIcon"]:SetAtlas(WORLD_QUEST_ICONS_BY_PROFESSION[tradeskill_line_id], true);
-					elseif (qb.modules.world_quests.quest_data[quest_id]["type"] == LE_QUEST_TAG_TYPE_DUNGEON) then
-						_G[expand:GetName() .. "QuestIcon"]:SetAtlas("worldquest-icon-dungeon", true);
-					elseif (qb.modules.world_quests.quest_data[quest_id]["type"] == LE_QUEST_TAG_TYPE_RAID) then
-						_G[expand:GetName() .. "QuestIcon"]:SetAtlas("worldquest-icon-raid", true);
-					elseif (qb.modules.world_quests.quest_data[quest_id]["type"] == LE_QUEST_TAG_TYPE_INVASION) then
-						_G[expand:GetName() .. "QuestIcon"]:SetAtlas("worldquest-icon-burninglegion", true);
-					else
-						_G[expand:GetName() .. "QuestIcon"]:SetAtlas("worldquest-questmarker-questbang", true);
-						width = 6;
-					end
+					local atlas, width, height = QuestUtil.GetWorldQuestAtlasInfo(qb.modules.world_quests.quest_data[quest_id]["type"], false, info.tradeskillLineID);
+					_G[expand:GetName() .. "QuestIcon"]:SetAtlas(atlas, true);
 					_G[expand:GetName() .. "QuestIcon"]:SetSize(width, 10);
 					
 					if (TomTom ~= nil) then
@@ -472,7 +462,8 @@ end
 
 function qb.modules.quest_lists:setQuestTooltip(tooltip, quest_id)
 	local title, faction_id, capped = C_TaskQuest.GetQuestInfoByQuestID(quest_id);
-	local _, _, _, rarity = GetQuestTagInfo(quest_id);
+	local info = C_QuestLog.GetQuestTagInfo(quest_id);
+	local rarity = info and info.quality or Enum.WorldQuestQuality.Common;
 	local color = WORLD_QUEST_QUALITY_COLORS[rarity];
 	tooltip:SetText(title, color.r, color.g, color.b);
 	

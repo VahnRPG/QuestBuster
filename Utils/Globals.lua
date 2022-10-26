@@ -24,12 +24,29 @@ QBG_QUEST_TYPES = {
 };
 
 QBG_WORLD_QUEST_TYPES = {
+	--[[
 	[LE_QUEST_TAG_TYPE_DUNGEON]		= "Dungeon",
 	[LE_QUEST_TAG_TYPE_INVASION]	= "Invasion",
 	[LE_QUEST_TAG_TYPE_PVP]			= "PVP",
 	[LE_QUEST_TAG_TYPE_PET_BATTLE]	= "Pet Battle",
 	[LE_QUEST_TAG_TYPE_PROFESSION]	= "Profession",
 	[LE_QUEST_TAG_TYPE_RAID]		= "Raid",
+	]]--
+	[Enum.QuestTagType.Profession]	= "Profession",
+	[Enum.QuestTagType.Normal]	= "Normal",
+	[Enum.QuestTagType.PvP]	= "PVP",
+	[Enum.QuestTagType.PetBattle]	= "Pet Battle",
+	[Enum.QuestTagType.Bounty]	= "Bounty",
+	[Enum.QuestTagType.Dungeon]	= "Dungeon",
+	[Enum.QuestTagType.Invasion]	= "Invasion",
+	[Enum.QuestTagType.Raid]	= "Raid",
+	[Enum.QuestTagType.Contribution]	= "Contribution",
+	[Enum.QuestTagType.RatedReward]	= "Rated Reward",
+	[Enum.QuestTagType.InvasionWrapper]	= "Invasion",
+	[Enum.QuestTagType.FactionAssault]	= "Faction Assault",
+	[Enum.QuestTagType.Islands]	= "Island",
+	[Enum.QuestTagType.Threat]	= "Threat",
+	[Enum.QuestTagType.CovenantCalling]	= "Covenant",
 };
 
 -------------------------------------------------------------------------------
@@ -51,15 +68,11 @@ QBG_MOD_COLOR = QBG_CLR_MAX_ALPHA .. "ee2299";
 
 -------------------------------------------------------------------------------
 -- uiMapIDs
---   Normally generated from: https://wow.gamepedia.com/MapID
+--   Normally generated from: https://wow.gamepedia.com/UiMapID
 -------------------------------------------------------------------------------
 QBG_MAP_IDS = {
 	12,	--Kalimdor
 		1,	--Durotar
-			85,	--Orgrimmar
-				213,	--Ragefire Chasm
-				503,	--Brawl'gar Arena
-				522,	--The Secrets of Ragefire
 			461,	--Valley of Trials
 			463,	--Echo Isles
 		7,	--Mulgore
@@ -88,6 +101,7 @@ QBG_MAP_IDS = {
 			399,	--Hour of Twilight
 			401,	--End Time
 			409,	--Dragon Soul
+			1552,	--Caverns of Time
 		76,	--Azshara
 		77,	--Felwood
 		78,	--Un'Goro Crater
@@ -98,6 +112,10 @@ QBG_MAP_IDS = {
 			904,	--Silithus Brawl
 			1021,	--Chamber of Heart
 		83,	--Winterspring
+		85,	--Orgrimmar
+			213,	--Ragefire Chasm
+			503,	--Brawl'gar Arena
+			522,	--The Secrets of Ragefire
 		88,	--Thunder Bluff
 		89,	--Darnassus
 		97,	--Azuremyst Isle
@@ -108,6 +126,7 @@ QBG_MAP_IDS = {
 			338,	--Molten Front
 			367,	--Firelands
 			760,	--Malorne's Nightmare
+			1556,	--Hyjal Summit
 		199,	--Southern Barrens
 			301,	--Razorfen Kraul
 		249,	--Uldum
@@ -121,6 +140,7 @@ QBG_MAP_IDS = {
 		782,	--The Emerald Nightmare
 		891,	--Azuremyst Isle (3)
 		907,	--Seething Shore
+		1469,	--Vision of Orgrimmar
 	13,	--Eastern Kingdoms
 		14,	--Arathi Highlands
 			93,	--Arathi Basin
@@ -139,6 +159,7 @@ QBG_MAP_IDS = {
 			827,	--Stratholme
 		23,	--Eastern Plaguelands
 			124,	--Plaguelands: The Scarlet Enclave
+			1557,	--Naxxramas
 		25,	--Hillsbrad Foothills
 			91,	--Alterac Valley
 			623,	--Hillsbrad Foothills (Southshore vs. Tarren Mill)
@@ -147,6 +168,10 @@ QBG_MAP_IDS = {
 			226,	--Gnomeregan
 			427,	--Coldridge Valley
 			469,	--New Tinkertown
+			1371,	--GnomereganA
+			1372,	--GnomereganB
+			1374,	--GnomereganD
+			1380,	--GnomereganC
 		32,	--Searing Gorge
 			242,	--Blackrock Depths
 		36,	--Burning Steppes
@@ -178,15 +203,16 @@ QBG_MAP_IDS = {
 			225,	--The Stockade
 			499,	--Deeprun Tram
 		87,	--Ironforge
+			1361,	--OldIronforge
 		90,	--Undercity
 		94,	--Eversong Woods
 			467,	--Sunstrider Isle
-				335,	--Sunwell Plateau
-					973,	--The Sunwell
 		95,	--Ghostlands
 			333,	--Zul'Aman
 		110,	--Silvermoon City
 		122,	--Isle of Quel'Danas
+			335,	--Sunwell Plateau
+				973,	--The Sunwell
 			348,	--Magisters' Terrace
 		179,	--Gilneas
 			202,	--Gilneas City
@@ -202,12 +228,13 @@ QBG_MAP_IDS = {
 			293,	--Grim Batol
 			294,	--The Bastion of Twilight
 		217,	--Ruins of Gilneas
-		218,	--Ruins of Gilneas City
+			218,	--Ruins of Gilneas City
 		244,	--Tol Barad
 			282,	--Baradin Hold
 		245,	--Tol Barad Peninsula
 		501,	--Dalaran
 		908,	--Ruins of Lordaeron
+		1470,	--Vision of Stormwind
 	113,	--Northrend
 		114,	--Borean Tundra
 			129,	--The Nexus
@@ -219,7 +246,6 @@ QBG_MAP_IDS = {
 			132,	--Ahn'kahet: The Old Kingdom
 			155,	--The Obsidian Sanctum
 			157,	--Azjol-Nerub
-			162,	--Naxxramas
 			200,	--The Ruby Sanctum
 		116,	--Grizzly Hills
 			757,	--Ursoc's Lair
@@ -255,8 +281,10 @@ QBG_MAP_IDS = {
 		174,	--The Lost Isles
 		194,	--Kezan
 			1010,	--The MOTHERLODE!!
+			1531,	--Crapopolis
 		207,	--Deepholm
 			324,	--The Stonecore
+		1474,	--The Maelstrom - Heart of Azeroth
 	424,	--Pandaria
 		371,	--The Jade Forest
 			429,	--Temple of the Jade Serpent
@@ -279,6 +307,7 @@ QBG_MAP_IDS = {
 			453,	--Mogu'shan Palace
 			471,	--Mogu'shan Vaults
 			556,	--Siege of Orgrimmar
+				1479,	--Baine Rescue
 		418,	--Krasarang Wilds
 			450,	--Unga Ingoo
 			487,	--A Little Patience
@@ -294,10 +323,12 @@ QBG_MAP_IDS = {
 		516,	--Isle of Thunder (2)
 		554,	--Timeless Isle
 			571,	--Celestial Tournament
+		1502,	--Snowblossom Village
+		1530,	--Vale of Eternal Blossoms (4)
 	378,	--The Wandering Isle
 	407,	--Darkmoon Island
 	619,	--Broken Isles
-		627,	--Dalaran (7)
+		627,	--Dalaran (6)
 			732,	--Violet Hold
 			734,	--Hall of the Guardian
 		630,	--Azsuna
@@ -305,7 +336,6 @@ QBG_MAP_IDS = {
 			713,	--Eye of Azshara
 		634,	--Stormheim
 			649,	--Helheim
-			694,	--Helmouth Shallows
 			703,	--Halls of Valor
 			706,	--Helmouth Cliffs
 			806,	--Trial of Valor
@@ -313,6 +343,7 @@ QBG_MAP_IDS = {
 		641,	--Val'sharah
 			747,	--The Dreamgrove
 				715,	--Emerald Dreamway
+				1475,	--The Emerald Dream
 			733,	--Darkheart Thicket
 			751,	--Black Rook Hold
 			758,	--Gloaming Reef
@@ -325,12 +356,14 @@ QBG_MAP_IDS = {
 			739,	--Trueshot Lodge
 			750,	--Thunder Totem
 			826,	--Cave of the Bloodtotem
+			1472,	--The Dragon's Spine
 		671,	--The Cove of Nashal
 		672,	--Mardum, the Shattered Abyss
 		680,	--Suramar
 			749,	--The Arcway
 			761,	--Court of Stars
 			764,	--The Nighthold
+		694,	--Helmouth Shallows
 		695,	--Skyhold
 		702,	--Netherlight Temple
 		714,	--Niskara
@@ -356,6 +389,9 @@ QBG_MAP_IDS = {
 			930,	--Greater Invasion Point: Inquisitor Meto
 			931,	--Greater Invasion Point: Sotanathor
 			932,	--Greater Invasion Point: Occularus
+			1691,	--Shattered Grove
+			1715,	--Vestibule Of Eternity
+			1717,	--Chill's Reach
 		858,	--Assault on Broken Shore
 		971,	--Telogrus Rift
 	824,	--Islands
@@ -366,29 +402,39 @@ QBG_MAP_IDS = {
 			1165,	--Dazar'alor
 				1166,	--Zanchul
 			1177,	--Breath Of Pa'ku
+			1348,	--Zandalari Treasury
+			1352,	--Battle of Dazar'alor
 		863,	--Nazmir
-			1042,	--The Underrot
+			1041,	--The Underrot
 			1148,	--Uldir
 		864,	--Vol'dun
 			1038,	--Temple of Sethraliss
 	876,	--Kul Tiras
 		895,	--Tiragarde Sound
+			936,	--Freehold
 			974,	--Tol Dagor
 			1161,	--Boralus
 			1162,	--Siege of Boralus
 		896,	--Drustvar
 			1015,	--Waycrest Manor
-			1029,	--WaycrestDimension
 			1045,	--Thros, The Blighted Lands
-		936,	--Freehold
+			1407,	--Prison of Ink
 		942,	--Stormsong Valley
 			1039,	--Shrine of the Storm
-			1182,	--SalstoneMine_Stormsong
+			1182,	--Saltstone Mine
 			1183,	--Thornheart
+			1345,	--Crucible of Storms
+		1462,	--Mechagon Island
+		1490,	--Mechagon
+		1501,	--Crestfall
+		1573,	--Mechagon City
 	938,	--Gilneas Island
 	939,	--Tropical Isle 8.0
 	981,	--Un'gol Ruins
 	1156,	--The Great Sea
+	1355,	--Nazjatar
+		1512,	--The Eternal Palace
+	1580,	--Ny'alotha
 	100,	--Hellfire Peninsula
 		246,	--The Shattered Halls
 		261,	--The Blood Furnace
@@ -428,7 +474,6 @@ QBG_MAP_IDS = {
 	539,	--Shadowmoon Valley (2)
 		574,	--Shadowmoon Burial Grounds
 		582,	--Lunarfall
-		592,	--Defense of Karabor
 	542,	--Spires of Arak
 		601,	--Skyreach
 	543,	--Gorgrond
@@ -443,6 +488,30 @@ QBG_MAP_IDS = {
 		622,	--Stormshield
 		624,	--Warspear
 	933,	--Forge of Aeons
+	1525,	--Revendreth
+		1644,	--Ember Court
+		1663,	--Halls of Atonement
+		1675,	--Sanguine Depths
+		1699,	--Sinfall
+		1735,	--Castle Nathria
+	1533,	--Bastion
+		1667,	--The Necrotic Wake
+		1692,	--Spires Of Ascension
+		1707,	--Elysian Hold
+		1711,	--Ascension Coliseum
+	1536,	--Maldraxxus
+		1674,	--Plaguefall
+		1683,	--Theater of Pain
+		1698,	--Seat of the Primus
+		1724,	--Vortrexxis
+		1725,	--Necropolis_Zerekriss
+	1543,	--The Maw
+	1565,	--Ardenweald
+		1662,	--Queen's Conservatory
+		1669,	--Mists of Tirna Scithe
+		1677,	--De Other Side
+		1701,	--Heart of the Forest
+	1670,	--Oribos
 };
 
 QBG_EMISSARY_MAP_IDS = {
@@ -451,4 +520,8 @@ QBG_EMISSARY_MAP_IDS = {
 	905,	--Argus
 	875,	--Zandalar
 	876,	--Kul Tiras
+	1699,	--Sinfall
+	1707,	--Elysian Hold
+	1698,	--Seat of the Primus
+	1701,	--Heart of the Forest
 };

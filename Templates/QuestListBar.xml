@@ -58,7 +58,9 @@
 					</Layer>
 					<Layer level="OVERLAY">
 						<Texture name="$parentQuestIcon">
-							<AbsDimension x="10" y="10" />
+							<Size>
+								<AbsDimension x="10" y="10" />
+							</Size>
 							<Anchors>
 								<Anchor point="TOPRIGHT" relativeTo="$parentLabel" relativePoint="TOPLEFT">
 									<Offset>

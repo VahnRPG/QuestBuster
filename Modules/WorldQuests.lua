@@ -42,12 +42,6 @@ qb.modules.world_quests.quest_data = {};
 local ARTIFACT_SPELL_ID = 227907;
 local ARTIFACT_SPELL_NAME = GetSpellInfo(ARTIFACT_SPELL_ID);
 
-local function isWorldQuest(quest_id)
-	local _, _, world_quest_type = GetQuestTagInfo(quest_id);
-	
-	return world_quest_type ~= nil;
-end
-
 local function setQuestData(ui_map_id, zone_name, info)
 	local quest_id = info.questId;
 	if (not qb.modules.world_quests.quest_data[quest_id]) then
@@ -78,8 +72,8 @@ local function setQuestData(ui_map_id, zone_name, info)
 	end
 
 	if (HaveQuestData(quest_id)) then
-		qb.modules.world_quests.quest_data[quest_id]["completed"] = IsQuestFlaggedCompleted(quest_id);
-		if (isWorldQuest(quest_id) and WorldMap_DoesWorldQuestInfoPassFilters(info)) then
+		qb.modules.world_quests.quest_data[quest_id]["completed"] = C_QuestLog.IsQuestFlaggedCompleted(quest_id);
+		if (QuestUtils_IsQuestWorldQuest(quest_id) and WorldMap_DoesWorldQuestInfoPassFilters(info)) then
 			--process zone
 			C_TaskQuest.RequestPreloadRewardData(quest_id);
 			qb.modules.world_quests.quests.count = qb.modules.world_quests.quests.count + 1;
@@ -94,16 +88,16 @@ local function setQuestData(ui_map_id, zone_name, info)
 			qb.modules.world_quests.quest_data[quest_id]["location"]["y"] = info.y;
 			
 			--process quest type
-			local _, _, world_quest_type = GetQuestTagInfo(quest_id);
+			local info = C_QuestLog.GetQuestTagInfo(quest_id);
 			local type_name = "Other";
-			if (QBG_WORLD_QUEST_TYPES[world_quest_type]) then
-				type_name = QBG_WORLD_QUEST_TYPES[world_quest_type];
+			if (QBG_WORLD_QUEST_TYPES[info.worldQuestType]) then
+				type_name = QBG_WORLD_QUEST_TYPES[info.worldQuestType];
 			end
 			if (not qb.modules.world_quests.quests.quests["types"][type_name]) then
 				qb.modules.world_quests.quests.quests["types"][type_name] = {};
 			end
 			qb.modules.world_quests.quests.quests["types"][type_name][quest_id] = quest_id;
-			qb.modules.world_quests.quest_data[quest_id]["type"] = world_quest_type;
+			qb.modules.world_quests.quest_data[quest_id]["type"] = info.worldQuestType;
 			
 			--process faction
 			local _, faction_id = C_TaskQuest.GetQuestInfoByQuestID(quest_id);
@@ -170,13 +164,18 @@ local function setQuestData(ui_map_id, zone_name, info)
 				for i=1, items do
 					local _, _, _, _, _, item_id = GetQuestLogRewardInfo(i, quest_id);
 					if (item_id) then
-						local _, _, _, _, _, item_type, item_subtype = GetItemInfo(item_id);
-						item_type = string.lower(item_type);
-						if (not qb.modules.world_quests.quests.quests["rewards"][item_type]) then
-							qb.modules.world_quests.quests.quests["rewards"][item_type] = {};
+						local item_name, _, _, _, _, item_type, item_subtype = GetItemInfo(item_id);
+						if (item_type ~= nil) then
+							item_type = string.lower(item_type);
+							--qb.omg:echo("Item: " .. item_name .. " (" .. item_id .. ") - " .. item_type .. " -> " .. item_subtype);
+							if (not qb.modules.world_quests.quests.quests["rewards"][item_type]) then
+								qb.modules.world_quests.quests.quests["rewards"][item_type] = {};
+							end
+							qb.modules.world_quests.quests.quests["rewards"][item_type][quest_id] = quest_id;
+							qb.modules.world_quests.quest_data[quest_id]["rewards"]["items"][item_id] = item_id;
+						else
+							--qb.omg:echo("Item Id: " .. item_id);
 						end
-						qb.modules.world_quests.quests.quests["rewards"][item_type][quest_id] = quest_id;
-						qb.modules.world_quests.quest_data[quest_id]["rewards"]["items"][item_id] = item_id;
 					end
 				end
 
@@ -186,6 +185,8 @@ local function setQuestData(ui_map_id, zone_name, info)
 			if (not rewards) then
 				qb.modules.world_quests.quests.quests["rewards"]["other"][quest_id] = quest_id;
 				qb.modules.world_quests.quest_data[quest_id]["rewards"]["other"] = "No / Other Rewards";
+			elseif (qb.modules.world_quests.quests.quests["rewards"]["other"][quest_id] ~= nil) then
+				qb.modules.world_quests.quests.quests["rewards"]["other"][quest_id] = nil;
 			end
 			
 			local minutes_left = C_TaskQuest.GetQuestTimeLeftMinutes(quest_id);
@@ -283,7 +284,7 @@ function qb.modules.world_quests:findEmissary()
 	local count = 1;
 	local bounties = {};
 	for i, ui_map_id in pairs(QBG_EMISSARY_MAP_IDS) do
-		local bounty_data, _, locked_quest_id = GetQuestBountyInfoForMapID(ui_map_id);
+		local bounty_data, _, locked_quest_id = C_QuestLog.GetBountiesForMapID(ui_map_id);
 		if (bounty_data ~= nil and qb.omg:tcount(bounty_data) > 0) then
 			--qb.omg:echo("Bounties: " .. ui_map_id .. " -> " .. qb.omg:tcount(bounty_data));
 			for j, bounty in ipairs(bounty_data) do

@@ -215,7 +215,7 @@ child_auto_quest_frame:SetScript("OnShow", function(child_auto_quest_frame)
 		qb.brokers:update();
 	end);
 	
-	auto_quest_details_frame = CreateFrame("Frame", config_frame_name .. "AutoQuestDetails", child_auto_quest_frame);
+	auto_quest_details_frame = CreateFrame("Frame", config_frame_name .. "AutoQuestDetails", child_auto_quest_frame, BackdropTemplateMixin and "BackdropTemplate");
 	auto_quest_details_frame:SetPoint("TOPLEFT", auto_quest_enabled, "BOTTOMLEFT", 0, 0);
 	auto_quest_details_frame:SetSize(590, 470);
 	auto_quest_details_frame:SetBackdrop(backdrop);
@@ -303,7 +303,7 @@ child_auto_quest_frame:SetScript("OnShow", function(child_auto_quest_frame)
 	daily_quest_rewards_label:SetPoint("TOPLEFT", auto_quest_reward_label, "BOTTOMLEFT", 0, -25);
 	daily_quest_rewards_label:SetText(QBL["CONFIG_TITLE_DAILY_QUEST_REWARD"]);
 
-	daily_quest_rewards_frame = CreateFrame("Frame", config_frame_name .. "DailyQuestRewards", auto_quest_details_frame);
+	daily_quest_rewards_frame = CreateFrame("Frame", config_frame_name .. "DailyQuestRewards", auto_quest_details_frame, BackdropTemplateMixin and "BackdropTemplate");
 	daily_quest_rewards_frame:SetPoint("TOPLEFT", daily_quest_rewards_label, "BOTTOMLEFT", 0, -5);
 	daily_quest_rewards_frame:SetSize(560, 265);
 	daily_quest_rewards_frame:SetBackdrop(backdrop);

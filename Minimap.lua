@@ -3,9 +3,8 @@ local _, qb = ...;
 qb.minimap = {};
 qb.minimap.frame = CreateFrame("Frame", "QuestBuster_MinimapFrame", Minimap);
 qb.minimap.frame:SetFrameStrata("LOW");
-qb.minimap.frame:SetPoint("TOPLEFT", Minimap, "RIGHT");
+qb.minimap.frame:SetPoint("CENTER", Minimap, "CENTER");
 qb.minimap.frame:SetSize(32, 32);
-qb.minimap.frame:EnableMouse(true);
 qb.minimap.frame:RegisterEvent("ADDON_LOADED");
 qb.minimap.frame:SetScript("OnEvent", function(self, event, ...)
 	if (qb.settings.init) then
@@ -24,11 +23,9 @@ qb.minimap.frame.button:RegisterForDrag("LeftButton");
 qb.minimap.frame.button:RegisterForClicks("RightButtonDown");
 qb.minimap.frame.button:SetScript("OnDragStart", function(self)
 	self.dragging = true;
-	self:StartMoving();
 end);
 qb.minimap.frame.button:SetScript("OnDragStop", function(self)
 	self.dragging = false;
-	self:StopMovingOrSizing();
 end);
 qb.minimap.frame.button:SetScript("OnUpdate", function(self)
 	if (self.dragging) then
@@ -67,24 +64,20 @@ function qb.minimap:update()
 end
 
 function qb.minimap:dragFrame()
-	local xpos, ypos = GetCursorPosition();
-	local xmin, ymin = Minimap:GetLeft(), Minimap:GetBottom();
+	local cursor_x, cursor_y = GetCursorPosition();
+	local minimap_x, minimap_y = Minimap:GetCenter();
+	local minimap_scale = Minimap:GetEffectiveScale();
 
-	xpos = (xmin - xpos) / UIParent:GetScale() + 80;
-	ypos = (ypos / UIParent:GetScale()) - ymin - 80;
+	local position_x = (cursor_x / minimap_scale) - minimap_x;
+	local position_y = (cursor_y / minimap_scale) - minimap_y;
 
-	local angle = math.deg(math.atan2(ypos, xpos));
-	if (angle < 0) then
-		angle = angle + 360;
-	end;
-
-	qb.settings:get().minimap.position = angle;
+	qb.settings:get().minimap.position = math.deg(math.atan2(position_y, position_x)) % 360;
 	qb.minimap:updatePosition();
 end
 
 function qb.minimap:updatePosition()
-	local radius = 80;
+	local radius = 105;
 	local angle = qb.settings:get().minimap.position;
 	
-	qb.minimap.frame:SetPoint("TOPLEFT", "Minimap", "TOPLEFT", (52 - (radius * cos(angle))), ((radius * sin(angle)) - 52));
+	qb.minimap.frame:SetPoint("CENTER", Minimap, "CENTER", (radius * cos(angle)), (radius * sin(angle)));
 end
